@@ -126,8 +126,8 @@
 - Modify: `Modules/Core/app/Models/Concerns/HasVersionedRelations.php` (registration check)
 - Test: `Modules/Core/tests/Unit/Versioning/RelationDescriptorTest.php`, `VersionedRelationCaptureTest.php`
 
-- [ ] **Step 1: Write the failing tests:** a descriptor defaults to `partial` and can be declared `complete`; registering a relation whose related model is the root's own class (a symmetric relation like `Content::related()`) is refused.
-- [ ] **Step 2–5:** run and fail, implement, run, commit. The fingerprint (Slice 5) and the revert gate (Slice 6) read `coverage` later.
+- [x] **Step 1: Write the failing tests:** a descriptor defaults to `partial` and can be declared `complete`; registering a relation whose related model is the root's own class (a symmetric relation like `Content::related()`) is refused.
+- [x] **Step 2–5:** run and fail, implement, run, commit. The fingerprint (Slice 5) and the revert gate (Slice 6) read `coverage` later.
 
 ### Task B2: Membership rows from the pivot events (D41, D42)
 
@@ -136,8 +136,10 @@
 - Modify: the test stubs of `Modules/Core/tests/Stubs/Versioning/Relations/` (a custom pivot class with the trait)
 - Test: `VersionedRelationCaptureTest.php`
 
-- [ ] **Step 1: Write the failing tests:** attaching through a custom pivot of a registered relation writes a `created` membership row on the root (`relation_path` = the relation, `subject_key = {id}`, empty contents unless a column is declared authoritative, D41); detaching, also without ids, writes `deleted` rows; a relation not registered writes nothing; versioning off writes nothing; a raw query on the pivot table writes nothing.
-- [ ] **Step 2–5:** run and fail; implement: the pivot finds its root from its keys and the relation whose pivot class it is among the root's descriptors; run; commit.
+- [x] **Step 1: Write the failing tests:** attaching through a custom pivot of a registered relation writes a `created` membership row on the root (`relation_path` = the relation, `subject_key = {id}`, empty contents unless a column is declared authoritative, D41); detaching, also without ids, writes `deleted` rows; a relation not registered writes nothing; versioning off writes nothing; a raw query on the pivot table writes nothing.
+- [x] **Step 2–5:** run and fail; implement: the pivot finds its root from its keys and the relation whose pivot class it is among the root's descriptors; run; commit.
+
+**Found at execution (2026-10-26):** the pivot capture is its own trait, `RecordsMembershipOnRoot`, not `RecordsChangesOnOwner`: a pivot's `delete()` returns an int and the translation trait's wrapper would not fit it. The root is the pivot's parent when the link is made from the root, otherwise its related record, named by the pivot's key without loading it; the relation is the registered one stored in the pivot's table with the root on that pivot column (`versionedRelationThroughPivot()`). The descriptor gained `pivotColumns`, the authoritative pivot columns of D41, which the stubs declare for `position`. The explicit methods of `HasVersionedRelations` no longer write rows themselves, the pivot does; they are removed in B3. PHPStan does not analyse the trait until an application class uses it (the CMS pivots, Slice 10).
 
 ### Task B3: Relation subclasses open the scope on both sides (D42, D52)
 
@@ -147,9 +149,11 @@
 - Modify: `Modules/Core/app/Models/Concerns/HasVersionedRelations.php` (remove `attachVersioned`, `detachVersioned`, `syncVersioned`; the revert's `applyMembershipTarget()` relies on the pivot events instead of writing rows itself)
 - Test: `VersionedRelationSyncTest.php`, `VersionedRelationCaptureTest.php`, `VersionedRelationRestoreTest.php`, `VersionedRelationMembershipReadTest.php` (moved off the removed methods)
 
-- [ ] **Step 1: Write the failing tests:** a `sync()` of three subjects from the root gives one `atomic` set of three rows; a `sync()` from the inverse side over two roots gives two sets, one per root, both `atomic`; `detach()` without ids writes the rows; the relation's mutators on a model that is not a versioned root open nothing.
-- [ ] **Step 2: Move the existing tests** off `attachVersioned`, `detachVersioned` and `syncVersioned` to plain `attach`, `detach` and `sync` (the methods are removed by D42; their tests keep their intent).
-- [ ] **Step 3–5:** implement (the root side runs `run()` for the parent; the inverse side runs `run()` for the parent too, whose own set stays empty and is removed, while each pivot joins its root's set through `setFor()`), run, commit.
+- [x] **Step 1: Write the failing tests:** a `sync()` of three subjects from the root gives one `atomic` set of three rows; a `sync()` from the inverse side over two roots gives two sets, one per root, both `atomic`; `detach()` without ids writes the rows; the relation's mutators on a model that is not a versioned root open nothing.
+- [x] **Step 2: Move the existing tests** off `attachVersioned`, `detachVersioned` and `syncVersioned` to plain `attach`, `detach` and `sync` (the methods are removed by D42; their tests keep their intent).
+- [x] **Step 3–5:** implement (the root side runs `run()` for the parent; the inverse side runs `run()` for the parent too, whose own set stays empty and is removed, while each pivot joins its root's set through `setFor()`), run, commit.
+
+**Found at execution (2026-10-26):** the factories live in a trait, `ReturnsVersionedRelations`, used by `Core\Overrides\Model` and by the test stubs; the wrapping lives in `OpensRevisionOnMutation`, shared by the two subclasses. `syncWithoutDetaching()` is not wrapped on its own: it calls `sync()`, which is. A model outside `Core\Overrides\Model` that takes part in a versioned relation adds the trait (none does today). PHPStan reports on `Modules/Core/app/Overrides` are identical before and after.
 
 ### Task B4: A CRUD update of a record and its relations is one revision (D42)
 
