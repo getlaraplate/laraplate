@@ -161,11 +161,15 @@
 - Modify: `Modules/Core/app/Services/Crud/CrudService.php` (`update()`: per record, `$found_record->update()` and `syncModelRelations()` inside one `run()` for the record)
 - Test: `Modules/Core/tests/Integration/Services/CrudServiceTest.php` or a new versioning test with a stub root
 
-- [ ] **Step 1–5:** a CRUD update with fields and relations gives one set; run and fail; implement; run the CRUD tests; commit. (The compare and set of D40 is Slice 6.)
+- [x] **Step 1–5:** a CRUD update with fields and relations gives one set; run and fail; implement; run the CRUD tests; commit. (The compare and set of D40 is Slice 6.)
+
+**Found at execution (2026-10-28):** implemented in `f5cb08eb` (Core), test `Modules/Core/tests/Integration/Services/Crud/CrudVersionedUpdateTest.php`.
 
 ### Part B closing
 
-- [ ] Regression per suite; `MODULE.md` (membership capture, relation subclasses, coverage); **pause for review** before Part C.
+- [x] Regression per suite; `MODULE.md` (membership capture, relation subclasses, coverage); **pause for review** before Part C.
+
+**Part B regression (2026-10-28):** Core `Unit/Versioning` 5, `Integration/Versioning` 132, `Integration/Helpers` 304, `Integration/Services` 755, `Integration/Models` 117: all passed (one pre-existing warning and one risky test, not in the relation code). `MODULE.md` describes the relation capture; the paragraph on the removed explicit methods is gone. Review before Part C: pending with the user.
 
 ---
 
