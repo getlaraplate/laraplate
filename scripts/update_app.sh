@@ -51,7 +51,12 @@ php artisan migrate
 php artisan db:seed
 
 php artisan optimize:clear
-php artisan optimize
+
+read -p "Do you want to run the optimize command? (y/N): " choice
+
+if [[ ! "$choice" =~ ^[Yy]$ ]]; then
+    php artisan optimize
+fi
 
 if command -v supervisorctl &> /dev/null; then
     supervisorctl reload
