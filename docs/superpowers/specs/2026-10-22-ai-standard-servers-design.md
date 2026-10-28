@@ -1,6 +1,6 @@
 # AI module on standard servers
 
-**Status:** Built 2026-10-23, plan `../plans/2026-10-22-ai-standard-servers.md` (closed). The hands-on verification of section 9 was not run: the owner deferred it, and the guide says so.
+**Status:** Built 2026-10-23, plan `../plans/2026-10-22-ai-standard-servers.md` (closed). The hands-on verification of section 9 is done for Infinity (test A, see Verification); TEI and speaches are not yet run, and the guide says so.
 
 **Date:** 2026-10-22
 
@@ -132,7 +132,16 @@ The research spec was desk research: nothing was run. Before the guides are writ
 
 ## Verification
 
-Not run (2026-10-23). The owner chose to skip tests A, B and C of the research spec for now; nothing was installed. The guide `Modules/AI/docs/STANDARD_SERVERS_INSTALLATION.md` opens by saying it was written from the servers' documentation (TEI v1.9.4, Infinity 0.0.78, speaches v0.9.0-rc.3) and not run on the reference host. The items to settle when it is run are in section 11 and in the plan's delivery status.
+**Test A, Infinity, run on 2026-10-23** at the owner's request (Infinity 0.0.78, CPU, Python 3.12 from `uv` in a throwaway environment, a 14-core workstation, models from Hugging Face; raw results in the shared notes folder, `infinity-verification-2026-10-23.json`). The system Python was 3.14, which Infinity refuses (it needs below 3.14).
+
+- Install: CPU torch first, then `infinity_emb[server,torch]==0.0.78` (1.2 GB in all); `[all]` was not tried. Start: `infinity_emb v2 --model-id intfloat/multilingual-e5-small --model-id cross-encoder/mmarco-mMiniLMv2-L12-H384-v1 --engine torch --device cpu --port 7997 --api-key ... --url-prefix /v1`.
+- Embeddings: both models load; `POST /v1/embeddings` answers `data[].embedding` with `index`, `model` and `usage`; 384 dimensions, norm 1; vectors identical to `sentence-transformers` for the same prefixed text (cosine 0.99999999, largest difference 0.0). The `model` in the answer is the requested name.
+- Rerank: `POST /v1/rerank` `{model, query, documents}` answers `results[{relevance_score, index, document}]` sorted by score; scores are the sigmoid of the `CrossEncoder` logits (difference 0.0, same order), range 0.00003 to 0.99; `raw_scores` gives the logits. 64 pairs took 0.7 s on this machine (the figure of 5 s per search was measured by the owner on the former service and their CPU; not comparable). A request without `model` is a `400`.
+- Routes: with `--url-prefix /v1`, `/v1/embeddings`, `/v1/rerank`, `/v1/models` and `/v1/openapi.json` exist and `/health` stays at the root; the key protects the first three, `/health` and the OpenAPI document answer without it. There is no `/info` and no `X-Request-Id` echo.
+- Errors and limits: an unknown model is a `400` that lists the loaded ones, an embedding model asked to rerank (or the reverse) a `400`, a wrong or missing key a `401`, an empty batch a `422`; empty texts, 12 000-character texts and batches of 200 are accepted; the `dimensions` field truncates the vector for any model (not sent by the module).
+- The module against it: `ai:servers:check` passed for the e5 profile and the reranker (dialect `cohere`, `AI_RERANK_URL` with the `/v1` prefix) and failed, as designed, for the MiniLM profile that the process does not run; `ai:embeddings:probe` passed for the e5 profile; a wrong key made every row fail.
+
+**Tests B (TEI built from source on the reference LXC) and C (speaches) are not run.** The guide marks what is verified and what is written from documentation.
 
 ## 10. Removal and sequence
 
@@ -157,7 +166,7 @@ Stack root (a separate stack-root plan, after the AI release ships):
 - **TEI refuses a batch over its limit** with `413`; `--max-client-batch-size` is documented as at least `batch_size` (32) and 64 for the reranker; the check of section 7 reports a lower value.
 - **`--default-prompt` doubles the prefix** (section 8).
 - **Infinity v1 is in maintenance and V3 has a restricted licence**; it needs its own venv (`numpy<2`, `sentence-transformers<4`, `transformers<=5.0`, Python below 3.14). It is the alternative, not the default.
-- **Infinity publishes `/embeddings` and `/rerank` under its `--url-prefix`**, not under `/v1` (its OpenAPI document, read 2026-10-23). The client sends `{url}/v1/embeddings` and `{rerank url}/rerank`, so the guide starts Infinity with `--url-prefix /v1` and sets `AI_RERANK_URL` to `http://host:port/v1`; the exact flag spelling is to be confirmed in the verification.
+- **Infinity publishes `/embeddings` and `/rerank` under its `--url-prefix`**, not under `/v1` (its OpenAPI document, read 2026-10-23). The client sends `{url}/v1/embeddings` and `{rerank url}/rerank`, so the guide starts Infinity with `--url-prefix /v1` and sets `AI_RERANK_URL` to `http://host:port/v1`; the flag spelling was confirmed by test A.
 - **speaches** has no stable release after 0.8.3 (`v0.9.0-rc.3`) and no limits found; any OpenAI-style server works because the client is generic. Cloud OpenAI transcription is not in scope.
 - **The `/v1/embeddings` normalisation default** of TEI is not stated in the OpenAPI document. Section 7 checks it with the norm and the hands-on test records it.
 - **The dropdown of transcription models** needs a read of `AiModelChoice`, `AiModelFeature::supportedProviders()` and `ModelCatalog` to accept `openai_compatible:<model>`; the plan starts there.
