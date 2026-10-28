@@ -1,4 +1,5 @@
 ---
+status: completed
 created_on: 2026-10-28
 module: core, sao, mes, ai
 ---
@@ -222,20 +223,35 @@ Expected: PASS, Pint clean.
 - Consumes: the module configs after Tasks 1 to 4 (no `env()` for the 16 names).
 - Produces: a green `EnvExampleCoversConfigTest` and a closed plan.
 
-- [ ] **Step 1: Confirm the 16 names are no longer read by any config**
+- [x] **Step 1: Confirm the 16 names are no longer read by any config**
 
 Run: `grep -rnE "SAO_SIGNAL_MAX_OCCURRENCES|SAO_SIGNAL_WINDOW_MINUTES|SAO_SIGNAL_AUTO_OPEN|SAO_RELEASE_HEALTH_|SAO_CLOSURE_AUTO_CLOSE|MES_PRODUCTION_DAILY_MINUTES|MES_PRODUCTION_DEFAULT_LEAD_TIME_DAYS|CORE_VALIDITY_EXPIRING_WITHIN_HOURS|FILAMENT_TABS_COUNTS_TTL_SECONDS|CORE_MEDIA_DRAFT_TTL_HOURS|AI_SEARCH_ORCHESTRATION_ENABLED|AI_SEARCH_LLM_TIMEOUT" Modules/*/config`
 Expected: no match. The guard `EnvExampleCoversConfigTest` only checks that every name a config reads is in the example, not the reverse, so it cannot flag a stale line: this grep is the check.
 
-- [ ] **Step 2: Remove the 16 names from `.env.example`**
+- [x] **Step 2: Remove the 16 names from `.env.example`**
 
-- [ ] **Step 3: Verify**
+- [x] **Step 3: Verify**
 
 Run: the grep of Step 1 over `.env.example` (expected: no match), `php artisan test --compact tests/Unit/EnvExampleCoversConfigTest.php` (expected: PASS), `bash plan-status --open` (expected: this plan listed with Tasks 1 to 4 done).
 
-- [ ] **Step 4: Close the plan**
+- [x] **Step 4: Close the plan**
 
 Front matter `status: completed`, a `## Delivery status (2026-MM-DD): ...` section with a `**Documented in:**` line naming the four module READMEs and RAG pages, every box `- [x]` or `- [-]` with its reason, and a divergences list (`ERP_STOCK_RESERVATION_SOFT_TTL` decision made by the owner). Add the plan's line to `docs/superpowers/plans/INDEX.md` (name and what it covers, no status). Run `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php`.
 Expected: PASS.
 
-- [ ] **Step 5: Commit (`docs: close the settings over env plan, drop the moved names from .env.example`), push, open the PR**
+- [x] **Step 5: Commit (`docs: close the settings over env plan, drop the moved names from .env.example`), push, open the PR**
+
+## Delivery status (2026-10-28): delivered
+
+16 runtime tunables are Settings: nine in SAO, two in MES, three in Core, two in AI. Each module repository merged its own PR (larasao#2, larames#2, laracore#9, laraai#4), followed by two fixes that landed after the first merges (larasao#3, laraai#5). The 16 names and their comment blocks are gone from `.env.example`; `EnvExampleCoversConfigTest` stays green.
+
+**Documented in:** `Modules/SAO/docs/rag/MODULE.md`, `Modules/MES/docs/rag/MODULE.md`, `Modules/Core/docs/rag/MODULE.md`, `Modules/AI/docs/rag/MODULE.md` (each module's `README.md` carries the same Settings table).
+
+Divergences from the plan, all decided during the run and recorded in the spec (Mechanism and Decisions sections):
+
+- `media.draft_ttl_hours`, `signals.max_occurrences_per_window` and `features.search_orchestration.timeout` keep an existing "0 = off" meaning and take no lower bound of 1; the timeout is read as `max(0.0, ...)`. A floor would have turned an off-switch into an active mode.
+- `features.search_orchestration.enabled` moved although the 2026-10-07 decision kept it in env: its boot-time reader no longer exists.
+- `ERP_STOCK_RESERVATION_SOFT_TTL` was dropped from the list: no code reads `erp.stock_reservation.soft_ttl`. It stays in `.env.example`; the owner decides whether to delete the dead key.
+- The Core definitions test lives in `tests/Feature/Settings` (Core's Unit test case has no config).
+- The Filament tab-count TTL is read at four call sites, all now with the same fallback (60); the `FILTER_OPTIONS_TTL_SECONDS` constant of `PermissionsTable` was removed.
+- `.env.example` comment blocks that only described removed variables were deleted with them.
