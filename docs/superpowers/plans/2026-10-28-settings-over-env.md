@@ -21,14 +21,14 @@ module: core, sao, mes, ai
 - Run Pint from the laraplate root on explicit file lists, never inside `Modules/<Name>` (`.ai/rules/modules.md`).
 - Run only the narrow tests (`php artisan test --compact <path or --filter>`); never with a cached config (`bootstrap/cache/config.php` must not exist).
 - Every seeded default equals the literal in the module config and the fallback at the read site. Values (verbatim from the spec): `signals.max_occurrences_per_window` 1000, `signals.window_minutes` 60, `signals.auto_open.enabled` false, `signals.auto_open.min_occurrences` 1, `release_health.window_days` 7, `release_health.regression_rate_factor` 1.5, `release_health.regression_min_occurrences` 3, `release_health.regressed_new_signals` 3, `closure.auto_close.enabled` false, `production.daily_minutes` 480, `production.default_lead_time_days` 5, `validity.expiring_within_hours` 48, `filament.tabs_counts_ttl_seconds` 60, `media.draft_ttl_hours` 24, `features.search_orchestration.enabled` true, `features.search_orchestration.timeout` 10.
-- Lower bounds, applied where the value is read: every integer above that is a window, threshold, TTL or lead time reads as `max(1, ...)`; `regression_rate_factor` as `max(1.0, ...)`; `search_orchestration.timeout` as `max(1.0, ...)`; `daily_minutes` keeps its existing `max(1.0, ...)`. Booleans have none.
+- Lower bounds, applied where the value is read: every integer above that is a window, threshold, TTL or lead time reads as `max(1, ...)`; `regression_rate_factor` as `max(1.0, ...)`; `daily_minutes` keeps its existing `max(1.0, ...)`. Three values keep an existing "0 = off" meaning and get no floor of 1 (spec, Mechanism): `media.draft_ttl_hours` (0 or negative = never prune), `signals.max_occurrences_per_window` (0 or negative = no cap), `features.search_orchestration.timeout` (0 = no limit, read as `max(0.0, ...)`). Booleans have none.
 - Not moved (spec, last sections): `ERP_STOCK_RESERVATION_SOFT_TTL`, every protection and rate limit, chunk sizes, cron expressions, retention days, drivers. Do not touch them.
 - Setting rows are editable: use `internalSettingsDefinition(...)`, never mark them `managed`.
 - Docs: the module README and `docs/rag/` page of each affected module list the new Settings and defaults; no list of removed variables (spec, Documentation).
 
 ## Review Focus
 
-- A stored value of 0 or a negative number reaches a read site (SAO windows, Core TTLs): it reads as the lower bound, never as a disabled window or an instant expiry.
+- A stored value of 0 or a negative number reaches a read site (SAO windows, Core TTLs): it reads as the lower bound, never as a disabled window or an instant expiry; the three values with an "off" meaning (Global Constraints) keep it instead.
 - The seeder runs twice, or after an operator changed a value: the second run leaves the operator's value and realigns only description and type (the reconciler's `initial(['value'])` rule).
 - A console process boots with the Setting set to true: `SAO_SIGNAL_AUTO_OPEN` registers the scheduled command through the `booted` callback (provider order must not matter).
 - The Settings table is missing (fresh install before migrations): the overlay's `try`/`catch` returns and the config literal answers; the code never throws.
@@ -51,51 +51,51 @@ module: core, sao, mes, ai
 - Consumes: `Seeder::internalSettingsDefinition(string $module, array $rows): SeedDefinition`; `SeedReconciler::reconcile(SeedDefinition): SeedOutcome`; the row shape `array{name, value, encrypted, choices, type: SettingTypeEnum, group_name, description}` of `AIDatabaseSeeder::setting()`.
 - Produces: `SAODatabaseSeeder::runtimeSettingDefinitions(): array` (nine rows, `group_name` `sao`, names without module prefix: `signals.max_occurrences_per_window`, `signals.window_minutes`, `signals.auto_open.enabled`, `signals.auto_open.min_occurrences`, `release_health.window_days`, `release_health.regression_rate_factor`, `release_health.regression_min_occurrences`, `release_health.regressed_new_signals`, `closure.auto_close.enabled`). Same shape the AI and MES seeders expose.
 
-- [ ] **Step 1: Write the failing definitions test**
+- [x] **Step 1: Write the failing definitions test**
 
 `SaoRuntimeSettingDefinitionsTest`: a dataset over the nine names asserting, as the AI test does, `value`, `type` (`Integer`, `Float` for the factor, `Boolean` for the two switches), `choices` null, `group_name` `sao`, and `config('sao.' . $name)` equal to the value.
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 Run: `php artisan test --compact Modules/SAO/tests/Unit/Settings/SaoRuntimeSettingDefinitionsTest.php`
 Expected: FAIL, `runtimeSettingDefinitions` is not defined.
 
-- [ ] **Step 3: Implement `SAODatabaseSeeder::runtimeSettingDefinitions(): array` and the `run()` reconcile**
+- [x] **Step 3: Implement `SAODatabaseSeeder::runtimeSettingDefinitions(): array` and the `run()` reconcile**
 
 Follow `MESDatabaseSeeder::run()` (reconcile, then the `created/realigned/unchanged` console line). The class now extends `Modules\Core\Overrides\Seeder`; keep `$this->call(SAOPermissionSeeder::class)`. Descriptions are one short English sentence each.
 
-- [ ] **Step 4: Replace the `env()` calls in `config/config.php` with the literals of Global Constraints**
+- [x] **Step 4: Replace the `env()` calls in `config/config.php` with the literals of Global Constraints**
 
 Remove only the nine names; leave the cron, sync, health and retention entries untouched.
 
-- [ ] **Step 5: Run the definitions test to verify it passes**
+- [x] **Step 5: Run the definitions test to verify it passes**
 
 Run: the Step 2 command. Expected: PASS.
 
-- [ ] **Step 6: Write the failing seeder and read-site tests**
+- [x] **Step 6: Write the failing seeder and read-site tests**
 
 `SAODatabaseSeederTest`: the nine rows are created stamped module `SAO`; a second run keeps an operator-changed value (copy the shape of `AIDatabaseSeederTest`'s idempotence test with `signals.window_minutes`). `SaoSettingsReadSitesTest`, each case sets a `Setting` row, applies `DatabaseConfigOverlay::applyFromDatabase(app(PerModelSettingResolver::class))` and asserts the code follows it:
 - `SignalIngestService` with `signals.window_minutes` 5 and `signals.max_occurrences_per_window` 2 stops accepting occurrences after two in five minutes;
-- stored 0 for `signals.window_minutes`, `signals.max_occurrences_per_window`, `release_health.window_days`, `release_health.regression_min_occurrences`, `release_health.regressed_new_signals` behaves as 1, and `release_health.regression_rate_factor` stored 0.2 behaves as 1.0 (Review Focus 1);
+- stored 0 for `signals.window_minutes`, `release_health.window_days`, `release_health.regression_min_occurrences`, `release_health.regressed_new_signals` behaves as 1, a stored 0 or negative for `signals.max_occurrences_per_window` never limits, and `release_health.regression_rate_factor` stored 0.2 behaves as 1.0 (Review Focus 1);
 - `ClosureCoordinator` applies a `close` policy when `closure.auto_close.enabled` is true and only proposes when false;
 - a console boot with `signals.auto_open.enabled` true: after seeding the row, `app(Schedule::class)->events()` contains `sao:signals:auto-open` (Review Focus 3); with false it does not;
 - a queued job processed after the Setting changed sees the new `signals.window_minutes` (Review Focus 5, dispatch through the `database` queue connection and `JobProcessing`, not `sync`).
 
-- [ ] **Step 7: Run them to verify they fail**
+- [x] **Step 7: Run them to verify they fail**
 
 Run: `php artisan test --compact Modules/SAO/tests/Feature/Seeders/SAODatabaseSeederTest.php Modules/SAO/tests/Feature/Settings/SaoSettingsReadSitesTest.php`
 Expected: FAIL (seeder rows missing; bounds absent).
 
-- [ ] **Step 8: Add the lower bounds at the read sites listed in Files**
+- [x] **Step 8: Add the lower bounds at the read sites listed in Files**
 
 `max(1, (int) config(...))` and `max(1.0, (float) config(...))` per Global Constraints; no other change to those methods.
 
-- [ ] **Step 9: Run the SAO tests, then Pint**
+- [x] **Step 9: Run the SAO tests, then Pint**
 
 Run: `php artisan test --compact Modules/SAO/tests/Unit/Settings Modules/SAO/tests/Feature/Seeders Modules/SAO/tests/Feature/Settings`, then from the laraplate root `vendor/bin/pint --format agent <the files of this task>`.
 Expected: PASS, Pint clean.
 
-- [ ] **Step 10: Document in the SAO README and RAG page, commit, push, open the PR**
+- [x] **Step 10: Document in the SAO README and RAG page, commit, push, open the PR**
 
 Document the nine Settings with defaults and where they are edited. Commit message `feat(sao): runtime tunables are settings`. PR description: what moved, link to the spec.
 
@@ -115,25 +115,25 @@ Document the nine Settings with defaults and where they are edited. Commit messa
 - Consumes: the row shape of `MESDatabaseSeeder::runtimeSettingDefinitions()` (the lot number row is the model).
 - Produces: rows `production.daily_minutes` (`Float`, 480) and `production.default_lead_time_days` (`Integer`, 5), `group_name` `mes`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 The definitions test asserts the two rows with value, type, group and `config('mes.' . $name)` equal to the value. `MesProductionSettingsTest`: with `production.daily_minutes` 960 stored and overlaid, `ProductionLeadTimeEstimator` uses 960; a stored 0 for either value behaves as the existing floors (1.0 and 1).
 
-- [ ] **Step 2: Run to verify they fail**
+- [x] **Step 2: Run to verify they fail**
 
 Run: `php artisan test --compact Modules/MES/tests --filter="runtime setting|MesProductionSettings"`
 Expected: FAIL.
 
-- [ ] **Step 3: Add the two rows, replace the two `env()` calls with literals**
+- [x] **Step 3: Add the two rows, replace the two `env()` calls with literals**
 
 The floors in `ProductionLeadTimeEstimator` already exist: do not change the estimator.
 
-- [ ] **Step 4: Run the tests and Pint**
+- [x] **Step 4: Run the tests and Pint**
 
 Run: the Step 2 command, then Pint on the touched files from the root.
 Expected: PASS, Pint clean.
 
-- [ ] **Step 5: Document, commit (`feat(mes): production defaults are settings`), push, open the PR**
+- [x] **Step 5: Document, commit (`feat(mes): production defaults are settings`), push, open the PR**
 
 ---
 
@@ -145,32 +145,32 @@ Expected: PASS, Pint clean.
 - Modify: `Modules/Core/database/seeders/CoreDatabaseSeeder.php` (three `self::setting(...)` rows next to `media.search_visibility`)
 - Modify: `Modules/Core/config/config.php:129,137,147` (literals 48, 60, 24)
 - Modify: `Modules/Core/app/Models/Concerns/HasValidity.php:210`, `Modules/Core/app/Console/PruneMediaDraftsCommand.php:37`, `Modules/Core/app/Filament/Resources/Settings/Tables/SettingsTable.php:228,247`, `Modules/Core/app/Filament/Resources/Modifications/Pages/ListModifications.php:88`, `Modules/Core/app/Filament/Resources/Permissions/Tables/PermissionsTable.php:78`
-- Test: `Modules/Core/tests/Unit/Settings/CoreRuntimeSettingDefinitionsTest.php`, `Modules/Core/tests/Feature/Settings/CoreTunableReadSitesTest.php`
+- Test: `Modules/Core/tests/Feature/Settings/CoreRuntimeSettingDefinitionsTest.php`, `Modules/Core/tests/Feature/Settings/CoreTunableReadSitesTest.php`
 - Docs: `Modules/Core/README.md`, `Modules/Core/docs/rag/MODULE.md`
 
 **Interfaces:**
 - Consumes: `CoreDatabaseSeeder::setting(string $name, mixed $value, SettingTypeEnum $type, string $group, string $description, ?array $choices = null)`.
 - Produces: rows `validity.expiring_within_hours` (Integer, 48, group `validity`), `filament.tabs_counts_ttl_seconds` (Integer, 60, group `filament`), `media.draft_ttl_hours` (Integer, 24, group `media`). The three Filament read sites all fall back to 60 and read `max(1, (int) config(...))` (the spec's unification).
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
-Definitions test: the three rows (value, type, `config('core.' . $name)` equal to the value). Read-site test: `HasValidity` expiring window follows a stored 72 and reads a stored 0 as 1; `PruneMediaDraftsCommand` with `media.draft_ttl_hours` 1 prunes a draft two hours old and keeps one of thirty minutes, and a stored 0 acts as 1; the three Filament sites read the same TTL: assert through a small cache-key spy that all three call `Cache::remember` with 60 when nothing is stored and with the stored value after overlay.
+Definitions test: the three rows (value, type, `config('core.' . $name)` equal to the value). Read-site test: `HasValidity` expiring window follows a stored 72 and reads a stored 0 as 1; `PruneMediaDraftsCommand` with `media.draft_ttl_hours` 1 prunes a draft two hours old and keeps one of thirty minutes, and a stored 0 or negative prunes nothing (0 = never prune, spec Mechanism); the Filament sites read the same TTL: assert through a small cache-key spy that all three call `Cache::remember` with 60 when nothing is stored and with the stored value after overlay.
 
-- [ ] **Step 2: Run to verify they fail**
+- [x] **Step 2: Run to verify they fail**
 
 Run: `php artisan test --compact Modules/Core/tests --filter="CoreRuntimeSettingDefinitions|CoreTunableReadSites"`
 Expected: FAIL.
 
-- [ ] **Step 3: Add the rows, replace the three `env()` calls with literals, add the bounds and unify the Filament fallbacks to 60**
+- [x] **Step 3: Add the rows, replace the three `env()` calls with literals, add the bounds and unify the Filament fallbacks to 60**
 
 The `PermissionsTable` constant `FILTER_OPTIONS_TTL_SECONDS` is no longer the fallback; remove it if nothing else uses it.
 
-- [ ] **Step 4: Run the tests and the existing Settings and seeder tests that touch the Core seeder, then Pint**
+- [x] **Step 4: Run the tests and the existing Settings and seeder tests that touch the Core seeder, then Pint**
 
 Run: the Step 2 command plus `php artisan test --compact Modules/Core/tests --filter="Seeder|Setting"`.
 Expected: PASS, Pint clean.
 
-- [ ] **Step 5: Document, commit (`feat(core): validity, tab-count and media draft values are settings`), push, open the PR**
+- [x] **Step 5: Document, commit (`feat(core): validity, tab-count and media draft values are settings`), push, open the PR**
 
 ---
 
@@ -181,7 +181,7 @@ Expected: PASS, Pint clean.
 **Files:**
 - Modify: `Modules/AI/database/seeders/AIDatabaseSeeder.php` (two rows in `runtimeSettingDefinitions()`, next to the other `features.*.enabled` rows)
 - Modify: `Modules/AI/config/config.php:219,222` (literals `true` and `10.0`)
-- Modify: `Modules/AI/app/Services/LlmSearchService.php:118` (bound), `Modules/AI/app/Search/AiSearchStrategyResolver.php:47` (unchanged)
+- Modify: `Modules/AI/app/Services/LlmSearchService.php:118` (bound at `max(0.0, ...)`), `Modules/AI/app/Search/AiSearchStrategyResolver.php:47` (unchanged)
 - Test: `Modules/AI/tests/Unit/Settings/AiRuntimeSettingDefinitionsTest.php` (two dataset rows), `Modules/AI/tests/Feature/Settings/SearchOrchestrationSettingsTest.php`
 - Docs: `Modules/AI/README.md`, AI `docs/rag/` configuration page
 
@@ -189,23 +189,23 @@ Expected: PASS, Pint clean.
 - Consumes: `AIDatabaseSeeder::setting(...)` (private static, same class).
 - Produces: rows `features.search_orchestration.enabled` (Boolean, true) and `features.search_orchestration.timeout` (Float, 10.0), `group_name` `ai`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
-Add two rows to the existing dataset of `AiRuntimeSettingDefinitionsTest` (it already asserts `config('ai.' . $name)`). `SearchOrchestrationSettingsTest`: with the switch stored false and overlaid, `AiSearchStrategyResolver` degrades with reason `search_orchestration_disabled`; with `timeout` stored 0, `LlmSearchService` configures the agent with 1.0 seconds, with 25 it configures 25.0.
+Add two rows to the existing dataset of `AiRuntimeSettingDefinitionsTest` (it already asserts `config('ai.' . $name)`). `SearchOrchestrationSettingsTest`: with the switch stored false and overlaid, `AiSearchStrategyResolver` degrades with reason `search_orchestration_disabled`; with `timeout` stored 0, `LlmSearchService` configures the agent with 0.0 (no limit), with a negative value 0.0, with 25 it configures 25.0.
 
-- [ ] **Step 2: Run to verify they fail**
+- [x] **Step 2: Run to verify they fail**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Settings/AiRuntimeSettingDefinitionsTest.php Modules/AI/tests/Feature/Settings/SearchOrchestrationSettingsTest.php`
 Expected: FAIL.
 
-- [ ] **Step 3: Add the rows, replace the two `env()` calls with literals, bound the timeout at `LlmSearchService.php:118`**
+- [x] **Step 3: Add the rows, replace the two `env()` calls with literals, bound the timeout at `LlmSearchService.php:118` as `max(0.0, ...)`**
 
-- [ ] **Step 4: Run the tests and `AIDatabaseSeederTest`, then Pint**
+- [x] **Step 4: Run the tests and `AIDatabaseSeederTest`, then Pint**
 
 Run: the Step 2 command plus `php artisan test --compact Modules/AI/tests/Feature/Seeders/AIDatabaseSeederTest.php`.
 Expected: PASS, Pint clean.
 
-- [ ] **Step 5: Document, commit (`feat(ai): search orchestration switch and timeout are settings`), push, open the PR**
+- [x] **Step 5: Document, commit (`feat(ai): search orchestration switch and timeout are settings`), push, open the PR**
 
 ---
 
