@@ -55,7 +55,7 @@ The AI switch fixes an inconsistency: every other `ai.features.*.enabled` is alr
 
 - **The scheduler read is safe.** `SAO_SIGNAL_AUTO_OPEN` is read in a `booted` callback, which runs after every provider's `boot()`, so the console overlay set by `CoreServiceProvider` is already applied. A test must prove it, because a reordering of providers would break it silently.
 - **Clamp at the read site, not in the form.** The SAO values (windows, thresholds, factor) and the Core TTLs get a lower bound where they are read, so a typo in the form cannot disable a window or produce a zero TTL. `FILAMENT_TABS_COUNTS_TTL_SECONDS` is read with three different fallbacks (300, 60, a constant); once the seeded default is 60 the fallbacks are unified to read the same value.
-- **Existing `.env` values are not carried over.** The convention is that a managed value has no env variable, so an operator who had set one of the 16 loses it silently on update. The module README lists each removed variable with its old default, and the first-run seed creates the default; the operator re-enters the value in Filament. This is the same break `AI_FAQ_VECTOR_STORE` had on 2026-10-07.
+- **Existing `.env` values are not carried over, and nothing documents the removal.** Laraplate is in development with no installation in use (owner, 2026-10-28), so a value set in an `.env` is ignored with no migration note. Revisit this rule before the first stable release.
 - **`.env.example` and `env:fill`.** The 16 names are removed from `.env.example`. `EnvExampleCoversConfigTest` scans module configs, so it stays green because the config lines are removed too.
 
 ## Not moved, with the reason
@@ -81,8 +81,8 @@ Per module, in the module's own `tests/`:
 - The seeder creates each definition with the type and default above (idempotent on a second run).
 - Overlay proof per read site: set the Setting, apply the overlay, assert the code uses it. The scheduler case runs the real `booted` path.
 - Read-site clamps: a zero or negative stored value yields the lower bound.
-- No `env()` or config line left for a moved name, enforced by the existing `EnvExampleCoversConfigTest` plus a README listing of removed variables.
+- No `env()` or config line left for a moved name, enforced by the existing `EnvExampleCoversConfigTest`.
 
 ## Documentation
 
-Each affected module README and `docs/rag/` page: the new Settings, their defaults, and the removed variables with the old default and a one-line migration note.
+Each affected module README and `docs/rag/` page: the new Settings and their defaults. No list of removed variables.
