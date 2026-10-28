@@ -34,7 +34,7 @@ final readonly class ConfigEnvNames
                 continue;
             }
 
-            preg_match_all("/env\\(\\s*'([A-Z][A-Z0-9_]*)'/", self::withoutComments((string) file_get_contents($file)), $matches);
+            preg_match_all('/(?<![A-Za-z0-9_>:])env\\(\\s*[\'"]([A-Z][A-Z0-9_]*)[\'"]/', self::withoutComments((string) file_get_contents($file)), $matches);
 
             foreach ($matches[1] as $name) {
                 $names[$name] = true;
