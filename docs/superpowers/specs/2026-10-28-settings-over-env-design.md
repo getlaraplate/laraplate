@@ -1,7 +1,7 @@
 # Runtime tunables move from `.env` to Settings
 
 **Date:** 2026-10-28
-**Status:** Approved by the owner on 2026-10-28; Tasks 1 to 4 of the plan are built (one PR per module repository), Task 5 waits for their merge.
+**Status:** Built 2026-10-28, plan `../plans/2026-10-28-settings-over-env.md` (closed).
 **Modules:** `Core`, `SAO`, `MES`, `AI`
 **Origin:** the owner asked which of the 139 module variables in `.env.example` are not URLs or credentials and could be Settings instead. The list below is the part they agreed to after a review that cut the first proposal (about 70) down to 16.
 
