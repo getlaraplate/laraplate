@@ -24,7 +24,7 @@ A variable moves only if all five hold:
 The existing one, as `AIDatabaseSeeder` already uses it:
 
 - A module seeder returns definitions (`name`, `value`, `type`, `group_name`, `description`, optional `choices`) and `SeedReconciler` creates them. The name carries no module prefix: the overlay copies the row onto the config key `{module}.{name}`, so `sao.signals.window_minutes` stays the same key the code already reads.
-- A managed value has **no config entry and no env variable**. The `env()` call and the config line are deleted; the read site keeps `config('key', default)` and the default must equal the seeded one.
+- A moved value has **no env variable**. The `env()` call is replaced by the literal default in the module config file, as the AI settings migrated on 2026-10-07 did (`'max_output_chars' => 500`); the literal must equal the seeded default, and a test asserts it. The read site keeps `config('key', default)` with the same default.
 - Where the overlay applies, verified in code: HTTP requests (`ApplyDatabaseSettingsOverlay` in the `web` and `api` groups and in the Filament panel stack), console commands (boot of `CoreServiceProvider`), queued jobs (`ApplySettingsOverlayBeforeJob` before each job). A long-lived worker therefore sees a change on the next job.
 - `Setting` has no min/max. Bounds are enforced where the value is read (`max(1, ...)`), as the code already does.
 
@@ -81,7 +81,7 @@ Per module, in the module's own `tests/`:
 - The seeder creates each definition with the type and default above (idempotent on a second run).
 - Overlay proof per read site: set the Setting, apply the overlay, assert the code uses it. The scheduler case runs the real `booted` path.
 - Read-site clamps: a zero or negative stored value yields the lower bound.
-- No `env()` or config line left for a moved name, enforced by the existing `EnvExampleCoversConfigTest`.
+- No `env()` left for a moved name, enforced by the existing `EnvExampleCoversConfigTest`: it reads the names the module configs pass to `env()`, so removing the call and the `.env.example` line together keeps it green.
 
 ## Documentation
 
