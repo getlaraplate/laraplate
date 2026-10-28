@@ -60,7 +60,7 @@ The AI switch fixes an inconsistency: every other `ai.features.*.enabled` is alr
 
 ## Not moved, with the reason
 
-- **`ERP_STOCK_RESERVATION_SOFT_TTL`**: no code reads `erp.stock_reservation.soft_ttl` (searched `Modules/*/app` and `Modules/*/src`). Moving a dead key would add a Setting that does nothing. Proposed instead: delete the config line and the variable, or leave it until stock reservation expiry is built. The owner decides.
+- **`ERP_STOCK_RESERVATION_SOFT_TTL`**: no code reads `erp.stock_reservation.soft_ttl` (searched `Modules/*/app` and `Modules/*/src`). Moving a dead key would add a Setting that does nothing. The owner decided on 2026-10-28 to leave the key as it is: the expiry sweep exists (`erp:stock-reservations:expire`), and the key is read by whoever creates a `soft` hold, which today is nobody; the intended creator is the Shop checkout (`2026-09-17-shop-module-design.md`, E29: `soft` at Draft, `hard` at capture).
 - **Ingestion limits, rate limits, `CORE_AGGREGATE_MAX_*`**: protections against abuse and expensive queries; the rate limiters are registered at boot, so the overlay could also arrive late.
 - **Embedding chunk size, search analyzers**: changing them leaves vectors and indexes inconsistent until a reindex.
 - **`CACHE_DURATION_*`, `LOCKING_LEASE_TTL`**: cache and concurrency semantics, read very early.

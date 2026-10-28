@@ -251,7 +251,7 @@ Divergences from the plan, all decided during the run and recorded in the spec (
 
 - `media.draft_ttl_hours`, `signals.max_occurrences_per_window` and `features.search_orchestration.timeout` keep an existing "0 = off" meaning and take no lower bound of 1; the timeout is read as `max(0.0, ...)`. A floor would have turned an off-switch into an active mode.
 - `features.search_orchestration.enabled` moved although the 2026-10-07 decision kept it in env: its boot-time reader no longer exists.
-- `ERP_STOCK_RESERVATION_SOFT_TTL` was dropped from the list: no code reads `erp.stock_reservation.soft_ttl`. It stays in `.env.example`; the owner decides whether to delete the dead key.
+- `ERP_STOCK_RESERVATION_SOFT_TTL` was dropped from the list: no code reads `erp.stock_reservation.soft_ttl` today. The owner decided to leave the key in `.env.example` and the ERP config as it is: it is read by whoever creates a `soft` hold, and the intended creator is the Shop checkout (not yet planned; Shop spec E29).
 - The Core definitions test lives in `tests/Feature/Settings` (Core's Unit test case has no config).
 - The Filament tab-count TTL is read at four call sites, all now with the same fallback (60); the `FILTER_OPTIONS_TTL_SECONDS` constant of `PermissionsTable` was removed.
 - `.env.example` comment blocks that only described removed variables were deleted with them.
