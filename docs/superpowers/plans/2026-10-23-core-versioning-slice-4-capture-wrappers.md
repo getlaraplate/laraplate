@@ -1,3 +1,6 @@
+---
+status: completed
+---
 # Core Versioning Rebuild, Slice 4 — Capture Wrappers
 
 > **For agentic workers:** execute task by task. Steps use checkbox (`- [ ]`) syntax; tick each step when it is done, in the same work block (`.ai/rules/plans.md`). A step deliberately not done is `- [-]` with its reason.
@@ -163,13 +166,11 @@
 
 - [x] **Step 1–5:** a CRUD update with fields and relations gives one set; run and fail; implement; run the CRUD tests; commit. (The compare and set of D40 is Slice 6.)
 
-**Found at execution (2026-10-28):** implemented in `f5cb08eb` (Core), test `Modules/Core/tests/Integration/Services/Crud/CrudVersionedUpdateTest.php`.
+**Found at execution (2026-10-26):** each record's `update()` and `syncModelRelations()` run inside `withinRevision()` when the record has it, so a CRUD update of a versioned model always opens its scope (one transaction already wrapped the request); the stub root gained `ProvidesSyncableRelations` for the test `CrudVersionedUpdateTest`. Committed as Core `f5cb08eb`.
 
 ### Part B closing
 
-- [x] Regression per suite; `MODULE.md` (membership capture, relation subclasses, coverage); **pause for review** before Part C.
-
-**Part B regression (2026-10-28):** Core `Unit/Versioning` 5, `Integration/Versioning` 132, `Integration/Helpers` 304, `Integration/Services` 755, `Integration/Models` 117: all passed (one pre-existing warning and one risky test, not in the relation code). `MODULE.md` describes the relation capture; the paragraph on the removed explicit methods is gone. Review before Part C: pending with the user.
+- [x] Regression per suite; `MODULE.md` (membership capture, relation subclasses, coverage); **pause for review** before Part C. Done 2026-10-29: every suite green (the CRM close-or-cancel failure fixed in laracrm#2); `MODULE.md` of Core updated. Commits: Core `303f09b6`, `e0847d21`, `0fc0b79f`, `f5cb08eb`.
 
 ---
 
@@ -182,8 +183,10 @@
 - Modify: `Modules/Core/app/Overrides/Model.php`, `User.php`, `Role.php`, `Media.php` (the `insteadof` resolution with `Core\SoftDeletes\SoftDeletes`, keeping the bin's methods under an alias the wrapper calls)
 - Test: `Modules/Core/tests/Integration/Versioning/DeleteScopeTest.php` (create)
 
-- [ ] **Step 1: Write the failing tests:** a soft delete through the wrapper writes its `trashed` row in one `atomic` set; a hard delete refused by the lock (D39) writes nothing and removes nothing; a hard delete of a `User` (not a `Core\Overrides\Model`) and of a model without a bin run inside the scope; an exception after the DELETE rolls everything back.
-- [ ] **Step 2–5:** run and fail, implement, run Core per folder, CMS, ERP, MES, commit.
+- [x] **Step 1: Write the failing tests:** a soft delete through the wrapper writes its `trashed` row in one `atomic` set; a hard delete refused by the lock (D39) writes nothing and removes nothing; a hard delete of a `User` (not a `Core\Overrides\Model`) and of a model without a bin run inside the scope; an exception after the DELETE rolls everything back.
+- [x] **Step 2–5:** run and fail, implement, run Core per folder, CMS, ERP, MES, commit.
+
+**Found at execution (2026-10-29):** the wrapper calls two protected hooks, `deleteRecord()` and `forceDeleteRecord()`, which a model with a bin overrides in its own body to return the bin's aliased methods; a dispatch by `method_exists` on the aliases gave PHPStan sixteen new errors and was dropped. A trait method cannot carry `#[Override]` on the class that redefines it (fatal), so the hooks have none. `Fieldable`'s pivot `delete()` returns an `int`, so the wrapper returns `bool|int|null`. The soft delete reads the row back during the lock realignment, which left the generated `is_deleted` column stale on the instance and `trashed()` false: `Core\SoftDeletes\SoftDeletes` now realigns it after the delete. `VersionSet` gained its `@property` docblock for the `root_*` queries.
 
 ### Task C2: The coordinator writes the snapshot set and removes the history (D29, D44, D54, D55)
 
@@ -192,8 +195,10 @@
 - Modify: `ActiveVersionSet` (the "being hard-deleted" flag of D54), `HasVersions` (the fallback hooks and the part capture skip a root being hard-deleted)
 - Test: `Modules/Core/tests/Integration/Versioning/HardDeleteSnapshotTest.php` (create), `Modules/CMS/tests/Feature/Models/ContentHardDeleteChildrenTest.php`
 
-- [ ] **Step 1: Write the failing tests** (D55 row format): the snapshot set of a record with two locales and three registered memberships holds exactly the root row (`SNAPSHOT`, `deleted`, image in `original_contents`, no `relation_path`), one row per locale, one per membership, and one `origin` row when a `RecordOrigin` exists; the delete's own detaches and the fallback `Deleted` row are not in it (D54); the root's other sets are removed and a `Revert` set pointing at one of them keeps a null link (D58); the extender deleted by `ContentExtensionObserver` gets its own snapshot set (D43); the children of D49 are still removed.
-- [ ] **Step 2–5:** run and fail, implement (read the aggregate before the delete, delete, then write the rows and remove the history, all inside the wrapper's scope), run, commit.
+- [x] **Step 1: Write the failing tests** (D55 row format): the snapshot set of a record with two locales and three registered memberships holds exactly the root row (`SNAPSHOT`, `deleted`, image in `original_contents`, no `relation_path`), one row per locale, one per membership, and one `origin` row when a `RecordOrigin` exists; the delete's own detaches and the fallback `Deleted` row are not in it (D54); the root's other sets are removed and a `Revert` set pointing at one of them keeps a null link (D58); the extender deleted by `ContentExtensionObserver` gets its own snapshot set (D43); the children of D49 are still removed.
+- [x] **Step 2–5:** run and fail, implement (read the aggregate before the delete, delete, then write the rows and remove the history, all inside the wrapper's scope), run, commit.
+
+**Found at execution (2026-10-29):** the extender's snapshot set is tested in a file of its own, `Modules/CMS/tests/Feature/ContentExtension/ContentExtensionHardDeleteSnapshotTest.php`, with a versioned extender stub built like `Shop\Product` (an abstract versioned base, so `ExtendsContentTrait::save()` calls the wrapper through `parent::save()`). The coordinator writes nothing and removes nothing when a listener cancels the delete or the delete fails after its statement. The MES test of a hard-deleted line read the D17 tombstone from `contents` and now reads the D55 snapshot (MES `e30ca49`). Committed as Core `df849f9f`, CMS `1996bf2`.
 
 ### Task C3: `model:clear-expired` through the coordinator (D29)
 
@@ -201,12 +206,23 @@
 - Modify: `Modules/Core/app/Console/ClearExpiredModels.php` (`chunkById` and the coordinator's `purge()`, reason `expired`)
 - Test: the command's tests
 
-- [ ] **Step 1–5:** an expired trashed record purged by the command leaves its snapshot set with reason `expired` and no orphan origin or embedding; run and fail; implement; run; commit.
+- [x] **Step 1–5:** an expired trashed record purged by the command leaves its snapshot set with reason `expired` and no orphan origin or embedding; run and fail; implement; run; commit.
+
+**Found at execution (2026-10-29):** `purge()` runs the record's own `forceDelete()` inside a revision with reason `expired`, so the wrapper finds its scope open and keeps that reason; a model without `HasVersions` is just force-deleted. The command receives the coordinator in `handle()`. Tested in `ClearExpiredSnapshotTest` (Core) and in `ContentHardDeleteChildrenTest` (CMS, the embeddings). Committed as Core `2775eec9`.
 
 ### Part C closing and slice closing
 
-- [ ] **Documentation:** `MODULE.md` (Core: the delete wrapper, the coordinator, the snapshot set format, `model:clear-expired`; CMS: the content history now carries its translations); the review log and spec status lines; the parent plan (tick Slice 4); `docs/superpowers/plans/INDEX.md`.
-- [ ] **Regression** per suite, recorded in the delivery status.
-- [ ] **Commit** in each module and in `laraplate/`.
+- [x] **Documentation:** `MODULE.md` (Core: the delete wrapper, the coordinator, the snapshot set format, `model:clear-expired`; CMS: the content history now carries its translations); the review log and spec status lines; the parent plan (tick Slice 4); `docs/superpowers/plans/INDEX.md` (its line already describes the three parts, no change).
+- [x] **Regression** per suite, recorded in the delivery status.
+- [x] **Commit** in each module and in `laraplate/`.
 
-**Documented in (when the plan closes):** `Modules/Core/docs/rag/MODULE.md`, `Modules/CMS/docs/rag/MODULE.md`.
+
+## Delivery status (2026-10-29): delivered
+
+All three parts are done, tests first. Part C commits: Core `df849f9f` (the delete wrapper and the coordinator, C1 and C2), `2775eec9` (`model:clear-expired`, C3); CMS `1996bf2` (the extender's snapshot set and the purge of an expired content); MES `e30ca49` (the hard-delete test reads the D55 snapshot). Parts A and B are recorded under their closing sections.
+
+Divergences from the plan, each recorded under its task: the delete hooks `deleteRecord()`/`forceDeleteRecord()` replace a dispatch on the bin's aliases; the soft delete realigns the generated `is_deleted` column on the instance; the extender's snapshot set is tested in a file of its own; `purge()` delegates to the record's own `forceDelete()` inside a revision with reason `expired`.
+
+Regression on 2026-10-29, per suite: AI (2034 passed), CMS (962), Core Feature (1660), Unit (589), UnitShell (16), Integration (2572), CRM (66), ERP (757), MES (964), SAO (715), Shop (134) and the root suite green. Core Integration as one folder ran out of memory twice (2 GB) in the first runs of the day and passed in the next three, on this branch and on `origin/master`: not reproduced, recorded here in case it returns.
+
+**Documented in:** `Modules/Core/docs/rag/MODULE.md`, `Modules/CMS/docs/rag/MODULE.md`.

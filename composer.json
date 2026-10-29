@@ -150,32 +150,7 @@
     ],
     "plan-status": "@php scripts/plan-status.php",
     "plan-status:test": "bash scripts/tests/plan-status-test.sh",
-    "version": "./scripts/version.sh --nointeractive",
-    "version:module": [
-      "Composer\\Config::disableProcessTimeout",
-      "./scripts/version.sh"
-    ],
-    "version:major": [
-      "Composer\\Config::disableProcessTimeout",
-      "./scripts/version.sh major"
-    ],
-    "version:minor": [
-      "Composer\\Config::disableProcessTimeout",
-      "./scripts/version.sh minor"
-    ],
-    "version:patch": [
-      "Composer\\Config::disableProcessTimeout",
-      "./scripts/version.sh patch"
-    ],
-    "update-all": "./scripts/update-composer.sh",
-    "version:all": [
-      "Composer\\Config::disableProcessTimeout",
-      "./scripts/version.sh --all"
-    ],
-    "version:dry": "./scripts/version.sh --dry-run",
-    "version:test": "bash scripts/tests/version-test.sh",
-    "changelog": "./scripts/version.sh --changelog",
-    "changelog:check": "./scripts/version.sh --changelog-check"
+    "update-all": "./scripts/update-composer.sh"
   },
   "extra": {
     "laravel": {
