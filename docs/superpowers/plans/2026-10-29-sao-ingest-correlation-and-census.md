@@ -51,37 +51,37 @@ module: sao
 - Produces: `final readonly class CorrelationScope { __construct(public ?int $connectionId, public ?int $sourceProfileId, public bool $logsBindingRequired); static forProfile(?Connection $connection, SourceProfile $profile): self; static forLogs(Connection $connection): self }`.
 - Produces: `CorrelationRuleset::correlate(array $canonical, CorrelationScope $scope): array{project: ?Project, rule: ?string, environment: ?string}`. `CorrelationRule` scope `active()` ordered by `priority`, `id`; casts `target`, `match` to the enums.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `CorrelationMatchTest`: `MatchType::Exact->matches('Api.Example.com', 'api.example.com')` true; wildcard `*.example.com` matches `a.b.example.com`, not `example.com`, not `xexample.com` (Review Focus 1: the dot is literal); `api-*` matches `api-eu1`; `*prod*` matches `my-prod-host`; `?` in a pattern matches only a literal `?`. `CorrelationTarget::RequestHost->valueFrom(['request_url' => 'https://Shop.Example.com:8443/a?b=1'])` is `shop.example.com`; `'not a url'` gives null; missing field gives null.
 
 `CorrelationRulesetTest` (feature, factories): priority then id breaks ties; inactive skipped; rule scoped to connection A ignored on B; rule scoped to profile P ignored for profile Q; a rule beats the built-in `project_key` rule; the built-in rule still works with no rules; `forLogs` scope, two logs bindings and no rule gives project null; one binding gives that project with rule `binding`; a rule targeting a project without a logs binding on the connection is skipped and the next rule wins; environment is the rule's, else `canonical['environment']`, else `canonical['server_host']`, else null.
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `php artisan test --compact Modules/SAO/tests/Unit/Ingest/CorrelationMatchTest.php Modules/SAO/tests/Feature/Ingest/CorrelationRulesetTest.php`
 Expected: FAIL, classes missing.
 
-- [ ] **Step 3: Migration, model, factory, enums**
+- [x] **Step 3: Migration, model, factory, enums**
 
 Columns as spec §3.1; FKs to connections, source profiles, projects named like siblings (`{$table_name}_project_FK`); index `(is_active, priority)`. Factory default: active, priority 100, `ServerHost`, `Exact`.
 
 `MatchType::Wildcard->matches()`: lowercase both, `preg_quote` the pattern, replace the quoted `\*` with `.*`, anchor `^...$`, flag `u`. This is the spec's `Str::is` semantics written out, so Review Focus 1 does not depend on the framework's escaping. `Exact`: lowercase equality.
 
-- [ ] **Step 4: `CorrelationScope` and the ruleset**
+- [x] **Step 4: `CorrelationScope` and the ruleset**
 
 Order of spec §3.4. With `logsBindingRequired`, a rule whose `project_id` has no `ProjectBinding` with `Capability::Logs` on `connectionId` is skipped; the single-binding step applies only then. Load the rules once per call with one query (`active()` plus scope filters `whereNull or =`), and the logs-bound project ids once.
 
-- [ ] **Step 5: Callers**
+- [x] **Step 5: Callers**
 
 `WebhookIngestService::handle()` passes `CorrelationScope::forProfile($connection, $profile)` and, before `SignalIngestService::ingest()`, sets `$canonical['environment'] = $correlation['environment']`. `IngestReplayService::dryRun()` passes `forProfile($event->connection, $profile)` and returns `environment` too.
 
-- [ ] **Step 6: Run the new tests and the existing ingest and replay tests**
+- [x] **Step 6: Run the new tests and the existing ingest and replay tests**
 
 Run: `php artisan test --compact Modules/SAO/tests/Unit/Ingest Modules/SAO/tests/Feature/Ingest Modules/SAO/tests/Feature/Console/ReplayIngestEventCommandTest.php`
 Expected: PASS.
 
-- [ ] **Step 7: Pint, commit**
+- [x] **Step 7: Pint, commit**
 
 `feat(sao): operator correlation rules`.
 
