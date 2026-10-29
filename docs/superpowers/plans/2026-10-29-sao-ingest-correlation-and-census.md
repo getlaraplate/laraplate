@@ -431,9 +431,9 @@ Commit `feat(sao): vcs drivers tell whether a ref contains a commit`.
 - Modify: `Modules/SAO/app/Data/FixStatus.php` (`contained_environments`, `not_contained_environments`, lists of environment names, appended last with default `[]`), `Modules/SAO/app/Services/FixStatusResolver.php`, the ticket infolist under `Modules/SAO/app/Filament/Resources/Tickets/Schemas/`, `Modules/SAO/docs/rag/MODULE.md`
 - Test: `Modules/SAO/tests/Feature/Services/FixStatusResolverTest.php`, `Modules/SAO/tests/Feature/Services/ClosureEvaluationTest.php` (unchanged outcomes), `Modules/SAO/tests/Feature/Filament/TicketResourceTest.php`
 
-- [ ] **Step 1: Failing tests**: an environment whose latest presence row for its current commit is true is listed contained, false not contained, null in neither; an environment with a stale row (older commit) is in neither; existing `deployed_environments`, `missing_environments`, `deployed_there` and every closure outcome unchanged; the infolist shows both lists.
-- [ ] **Step 2: Run them to verify they fail**: `php artisan test --compact Modules/SAO/tests/Feature/Services/FixStatusResolverTest.php Modules/SAO/tests/Feature/Filament/TicketResourceTest.php`, expected FAIL.
-- [ ] **Step 3: Implement, run the two files plus `ClosureEvaluationTest.php` and `ClosureContextResolverTest.php`, Pint, docs, commit, push, PR** `feat(sao): fix status shows containment per environment`; PR "SAO fix containment" linking spec §7 and stating that closure is unchanged (open product decision).
+- [x] **Step 1: Failing tests**: an environment whose latest presence row for its current commit is true is listed contained, false not contained, null in neither; an environment with a stale row (older commit) is in neither; existing `deployed_environments`, `missing_environments`, `deployed_there` and every closure outcome unchanged; the infolist shows both lists.
+- [x] **Step 2: Run them to verify they fail**: `php artisan test --compact Modules/SAO/tests/Feature/Services/FixStatusResolverTest.php Modules/SAO/tests/Feature/Filament/TicketResourceTest.php`, expected FAIL.
+- [x] **Step 3: Implement, run the two files plus `ClosureEvaluationTest.php` and `ClosureContextResolverTest.php`, Pint, docs, commit, push, PR** `feat(sao): fix status shows containment per environment`; PR "SAO fix containment" linking spec §7 and stating that closure is unchanged (open product decision).
 
 ---
 
