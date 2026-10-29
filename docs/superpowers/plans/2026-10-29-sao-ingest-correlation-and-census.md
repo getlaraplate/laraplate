@@ -349,16 +349,16 @@ Commit `feat(sao): http-version probe driver`.
 - Consumes: `VersionProbeCapability` (Task 10), `DeployCensusService::recordProbe()` (Task 9).
 - Produces: `sao:census:probe {project?}`: for each project (or the given key prefix) with a `probe` binding, each environment with a `base_url`; one output line per environment, exit code non-zero if any failed.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Two environments, one probe fails: the other is recorded, the failing one unchanged and reported, exit code 1; environment without `base_url` skipped; schedule contains the command only with `sao.probe.enabled` true and uses `sao.probe.cron`.
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 Run: `php artisan test --compact Modules/SAO/tests/Feature/Console/ProbeCensusCommandTest.php`
 Expected: FAIL.
 
-- [ ] **Step 3: Implement, run, Pint, docs, commit, push, PR**
+- [x] **Step 3: Implement, run, Pint, docs, commit, push, PR**
 
 The `.env.example` lines go in a laraplate branch and PR of their own (`chore(env): SAO probe schedule names`); run `php artisan test --compact tests/Unit/EnvExampleCoversConfigTest.php` there. Commit `feat(sao): scheduled census probe`. PR "SAO environment deploy data and probe" linking spec §6.
 
