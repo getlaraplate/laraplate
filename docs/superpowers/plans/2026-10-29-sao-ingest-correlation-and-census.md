@@ -186,20 +186,20 @@ Expected: PASS. Commit `feat(sao): ingest events record their pipeline`.
 - Produces: `IngestReprocessService::reprocess(IngestEvent $event, bool $dryRun = false): ReprocessOutcome` and `reprocessMany(Builder $query, bool $dryRun = false): Collection<int, ReprocessOutcome>`; `final readonly class ReprocessOutcome { __construct(public int $eventId, public IngestStatus $before, public IngestStatus $after, public ?string $winningRule, public bool $applied) }`.
 - Produces: command `sao:ingest:reprocess {event?} {--status=} {--connection=} {--since=} {--dry-run}`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Service: `Uncorrelated` profile event fixed by a new rule becomes `Ingested` on the same id with `reprocessed_at` set and the occurrence at the event's `created_at`; `Discarded` `no-logs-binding` logs event becomes `Ingested` after a binding is added; `Failed` is eligible; `Ingested` and `deploy`/`code` pipelines return `applied` false and change nothing; dry-run reports the would-be status and writes nothing (no signal, no occurrence, row unchanged); two `reprocess()` calls on the same row ingest once (call it twice; the second sees `Ingested` after the lock and the status re-check). Command: filters by status, connection, `--since` (date), single id; prints one line per event and a total.
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `php artisan test --compact Modules/SAO/tests/Feature/Ingest/IngestReprocessServiceTest.php Modules/SAO/tests/Feature/Console/ReprocessIngestEventsCommandTest.php`
 Expected: FAIL.
 
-- [ ] **Step 3: Extract `process()` in both ingest services; implement the service**
+- [x] **Step 3: Extract `process()` in both ingest services; implement the service**
 
 Per event: `$event->getConnection()->transaction(...)`, re-read with `lockForUpdate()`, check `pipeline->isReprocessable()` and status in {Discarded, Uncorrelated, Failed}, call the pipeline's `process()` with `$event->created_at`, set `reprocessed_at`. Wrap the whole call in `PipelineContext::run()`. Dry-run: run the same code inside the transaction, capture the outcome, then throw a private `DryRunRollback` exception caught outside the transaction, so nothing is written and the decision logic is not duplicated. An exception inside `process()` marks the row `Failed` with the exception class as outcome.
 
-- [ ] **Step 4: Run tests, Pint, commit**
+- [x] **Step 4: Run tests, Pint, commit**
 
 Expected: PASS. Commit `feat(sao): reprocess unmatched ingest events`.
 
