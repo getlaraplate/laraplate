@@ -421,9 +421,9 @@ Commit `feat(sao): vcs drivers tell whether a ref contains a commit`.
 - Produces: `FixPresenceService::checkEnvironment(Environment $environment): int` and `checkChangeRef(ChangeRef $changeRef): int` (rows written); `CheckFixPresenceJob` with `forEnvironment(int $id)` / `forChangeRef(int $id)`; command `sao:fix:check {project?}`.
 - Pairs: `Fixes` change refs with `commit_sha` of tickets of the environment's project × environments of that project with `current_commit`. VCS binding: the project's `vcs` binding (first by id). A pair whose row exists for `(change_ref, environment, deployed_commit)` with `contained` not null is skipped; a null row is retried and overwritten.
 
-- [ ] **Step 1: Failing tests**: one row per pair with true/false; a null answer stored as null and retried on the next call, never false; a new `current_commit` adds a row and leaves the old one; an unchanged commit makes no VCS call (assert with `StubVcsDriver` call count); saving an environment with a changed `current_commit` dispatches the job (`Queue::fake()`), saving other fields does not; saving a `Fixes` ref with `commit_sha` dispatches, a `Mentions` ref does not; no `vcs` binding writes nothing; the command backfills one project.
-- [ ] **Step 2: Run them to verify they fail**: `php artisan test --compact Modules/SAO/tests/Feature/Services/FixPresenceServiceTest.php Modules/SAO/tests/Feature/Console/CheckFixPresenceCommandTest.php`, expected FAIL.
-- [ ] **Step 3: Implement, run tests, Pint, commit** `feat(sao): record whether each environment contains each fix`.
+- [x] **Step 1: Failing tests**: one row per pair with true/false; a null answer stored as null and retried on the next call, never false; a new `current_commit` adds a row and leaves the old one; an unchanged commit makes no VCS call (assert with `StubVcsDriver` call count); saving an environment with a changed `current_commit` dispatches the job (`Queue::fake()`), saving other fields does not; saving a `Fixes` ref with `commit_sha` dispatches, a `Mentions` ref does not; no `vcs` binding writes nothing; the command backfills one project.
+- [x] **Step 2: Run them to verify they fail**: `php artisan test --compact Modules/SAO/tests/Feature/Services/FixPresenceServiceTest.php Modules/SAO/tests/Feature/Console/CheckFixPresenceCommandTest.php`, expected FAIL.
+- [x] **Step 3: Implement, run tests, Pint, commit** `feat(sao): record whether each environment contains each fix`.
 
 ### Task 15: `FixStatus` read side, docs, open the slice PR
 
