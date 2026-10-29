@@ -292,20 +292,20 @@ Rows `signals.recurrence_comment.enabled` (Boolean, true) and `signals.recurrenc
 - Produces: `DeployCensusService::observe(Environment $environment, string $version, ?string $commit = null, ?string $branch = null): Environment` and `recordProbe(...)` with the same signature; null keeps the stored value.
 - Produces: `Environment.base_url`, `current_commit`, `current_branch`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Census: commit and branch stored when given, kept when null. Deployment: GitHub deployment meta `sha`/`ref` reach the environment. Signal: payload `version` `1.4.0`, `commit` `abc1234`, environment `customer-a` existing on the project → environment updated; environment `web-01` unknown → no `Environment` row created and nothing stamped.
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `php artisan test --compact Modules/SAO/tests/Feature/Services/DeployCensusServiceTest.php Modules/SAO/tests/Feature/Ingest/DeploymentIngestServiceTest.php Modules/SAO/tests/Feature/Ingest/SignalIngestVersionTest.php`
 Expected: FAIL.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `DeploymentIngestService` reads `$event->meta['sha']` and `['ref']` when strings. `SignalIngestService` looks up `Environment` by `(project_id, name)` with `first()`, never creates.
 
-- [ ] **Step 4: Run tests, Pint, commit**
+- [x] **Step 4: Run tests, Pint, commit**
 
 Commit `feat(sao): environments record commit and branch`.
 
