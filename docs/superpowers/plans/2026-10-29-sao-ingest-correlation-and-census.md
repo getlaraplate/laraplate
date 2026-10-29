@@ -261,20 +261,20 @@ Expected: PASS. Commit `fix(sao): lock the signal row while recording an occurre
 - Consumes: `TicketComment::postFor(Ticket, string, ChangeContext)`, `ChangeContext::forAutomation(string $sourceKey)`, `StatusCategory::isTerminal()`.
 - Produces: `SignalRecurrenceCommenter::afterOccurrence(Signal $signal, SignalOccurrence $occurrence): ?TicketComment`; `public static function sourceKey(Signal $signal): string` returning `signal-recurrence:{id}`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Comment posted on an open and on an in-progress ticket; none on a terminal one, none without `ticket_id`, none when disabled, none for an occurrence dropped by the rate limit (the commenter is never reached); second occurrence inside 60 minutes posts nothing, after 61 minutes one comment whose body states the count since the previous comment, first and last time, environments and versions of that span; cooldown setting 0 behaves as 1; the comment has `System` origin and the source key; reprocessing 300 old events of one signal (Task 5 service) posts exactly one comment (Review Focus 3).
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `php artisan test --compact Modules/SAO/tests/Feature/Services/SignalRecurrenceCommenterTest.php`
 Expected: FAIL.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Last comment: `TicketComment` where `ticket_id`, `source_key`, latest `created_at`. Span start: that comment's `created_at`, else the linked ticket's `created_at`; the span counts the signal's occurrences recorded (`created_at`, not `occurred_at`, so replayed ones count) after it. Body: plain English lines, no markup beyond what siblings use in system comments. Cooldown against `now()`.
 
-- [ ] **Step 4: Settings and docs, run tests, Pint, commit, push, PR**
+- [x] **Step 4: Settings and docs, run tests, Pint, commit, push, PR**
 
 Rows `signals.recurrence_comment.enabled` (Boolean, true) and `signals.recurrence_comment.cooldown_minutes` (Integer, 60). Commit `feat(sao): recurrence comment on the open ticket`. PR "SAO recurrence comment" linking spec §5.
 
