@@ -125,20 +125,20 @@ Run: the Step 2 command plus `Modules/SAO/tests/Feature/Drivers/LogsDriversTest.
 - Modify: `Modules/SAO/lang/*/sao.php` labels as siblings do, `Modules/SAO/docs/rag/MODULE.md` (correlation rules, canonical `server_host`/`request_url`), `Modules/SAO/docs/rag/DRIVERS_USER.md` (Graylog `application_url`)
 - Test: `Modules/SAO/tests/Feature/Filament/CorrelationRuleResourceTest.php`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Copy the shape of `SourceProfileResourceTest`: list renders, create stores target/match/pattern/project/environment/scope, table sorted by priority, an unauthorized user is refused.
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 Run: `php artisan test --compact Modules/SAO/tests/Feature/Filament/CorrelationRuleResourceTest.php`
 Expected: FAIL.
 
-- [ ] **Step 3: Build the resource**
+- [x] **Step 3: Build the resource**
 
 Form: `target` and `match` selects from the enums, `pattern` required, `project_id` required select, `environment` text, optional `connection_id` and `source_profile_id` selects, `priority` numeric, `is_active` toggle.
 
-- [ ] **Step 4: Run the test, Pint, docs, commit, push, PR**
+- [x] **Step 4: Run the test, Pint, docs, commit, push, PR**
 
 Expected: PASS. Commit `feat(sao): correlation rules resource`. PR "SAO correlation rules" linking the spec §3.
 
