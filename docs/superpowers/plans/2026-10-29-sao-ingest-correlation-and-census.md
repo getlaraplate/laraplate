@@ -321,20 +321,20 @@ Commit `feat(sao): environments record commit and branch`.
 - Produces: driver key `http-version`, capabilities `[Capability::Probe]`, configuration fields `path` (default `/version`), `version_path` (default `version`), `commit_path`, `branch_path`, `timeout` (seconds, default 5), and secret `auth_header` (`Name: value`). `$context->config['path']` overrides `path`.
 - Produces: `ProbeException` (or the driver's existing exception style) with a short reason, thrown on refusal or bad response, so the command can report it.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Over `Http::fake()`: JSON `{"app":{"version":"1.4.0","git":{"sha":"abc"}}}` with `version_path` `app.version`, `commit_path` `app.git.sha` gives the probed version; binding path override is requested; auth header sent; redirect response (302) is not followed and fails; `ftp://` or empty `base_url` refused without a request; 200 with HTML, a JSON scalar, or a JSON object missing the version path fails (Review Focus 4); timeout passed to the client. `ProbeConformance` asserts the contract on a faked happy path.
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 Run: `php artisan test --compact Modules/SAO/tests/Feature/Drivers/HttpVersionDriverTest.php`
 Expected: FAIL.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Read schema fields the way `GraylogDriver` reads `secret`. URL is `rtrim(base_url, '/') . '/' . ltrim(path, '/')`; scheme from `parse_url` must be `http` or `https`. `Http::timeout()->withoutRedirecting()`; dot-paths through `data_get`. Health check: base URL and path valid.
 
-- [ ] **Step 4: Run tests, Pint, commit**
+- [x] **Step 4: Run tests, Pint, commit**
 
 Commit `feat(sao): http-version probe driver`.
 
