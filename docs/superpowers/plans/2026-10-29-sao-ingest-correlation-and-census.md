@@ -237,16 +237,16 @@ Commit `feat(sao): reprocess actions on ingest events`. PR "SAO ingest reprocess
 **Interfaces:**
 - Produces: `ingest()` body runs in `Signal`'s connection transaction; an existing signal is read with `lockForUpdate()` (serializes the recurrence check of Task 8 on MySQL); a new one is created inside the transaction, and on a unique violation of `(project_id, group_key)` re-read with the lock. `occurrence_count` is written as an atomic `increment()` (`occurrence_count = occurrence_count + 1`), which closes the lost update on every driver, SQLite included.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 SQLite cannot race two processes, so the proof is the SQL: with a query listener on the `Signal` connection, a second `ingest()` of the same group issues an `update` whose SQL contains `occurrence_count` = `occurrence_count` + 1 (grammar-quoted), and `occurrence_count` is 2. A resolved signal still reopens; a rate-limited occurrence still leaves the count unchanged.
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 Run: `php artisan test --compact Modules/SAO/tests/Feature/Ingest/SignalIngestServiceTest.php`
 Expected: FAIL (the update writes a literal count).
 
-- [ ] **Step 3: Implement, run all `tests/Feature/Ingest`, Pint, commit**
+- [x] **Step 3: Implement, run all `tests/Feature/Ingest`, Pint, commit**
 
 Expected: PASS. Commit `fix(sao): lock the signal row while recording an occurrence`.
 
