@@ -1,37 +1,11 @@
 ---
-description: Semantic module versioning workflow for commit and push tasks
+description: Releases are cut by the maintainers, not from this checkout
 alwaysApply: true
 ---
 
-# Semantic Versioning (caveman)
+# Versioning (caveman)
 
-- On commit/push requests, evaluate whether changed modules deserve a semantic version bump.
-- Bumps are not mandatory. Small, docs-only, formatting-only, or exploratory changes usually do not need tags.
-- Each module may define Composer version scripts in its own `composer.json`.
-- Run version commands from the affected module subdirectory, never from project root.
-- If multiple modules are affected, evaluate each module separately.
-
-- Command format:
-  - `composer version`
-  - `composer version:patch`
-  - `composer version:minor`
-  - `composer version:major`
-
-- Bump guide:
-  - `patch`: bug fixes, tests, refactors, compatible internal changes.
-  - `minor`: new backward-compatible features or public behavior additions.
-  - `major`: breaking changes, removed APIs, incompatible migrations, or incompatible behavior changes.
-
-- Workflow before commit/push:
-  - Inspect changed files and identify affected modules.
-  - Decide whether the changes are meaningful enough to tag.
-  - Check the affected module `composer.json` for available version scripts.
-  - Propose `patch`, `minor`, `major`, or skip with a brief reason.
-  - Always ask the user for confirmation before running a version command.
-  - If the user chooses a different type, use that type.
-  - If the user declines, skip the version command.
-  - Run the selected command inside that module directory, for example:
-    - `cd Modules/ERP && composer version:patch`
-  - Include generated version/tag changes in the commit when they are part of the requested release bump.
-
-- If the bump type is ambiguous, explain the ambiguity and ask the user before running the version command.
+- Releases are cut by the maintainers with private tooling. Never run or invent a release command here.
+- Do not bump `version` in any `composer.json`, create tags, or edit `CHANGELOG.md` by hand.
+- Use conventional commits (`feat:`, `fix:`, `feat!:`); level and changelog come from them.
+- Do not propose or ask for a version bump on commit/push requests.

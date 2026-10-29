@@ -32,4 +32,4 @@ This avoids accidentally indexing every Markdown file under `docs/` that was nev
 
 ## Operations
 
-- [Releasing the application and its modules](releasing.md)
+- [Releasing (contributor notes; releases are cut by the maintainers)](releasing.md)
