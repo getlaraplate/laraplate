@@ -158,18 +158,18 @@ Expected: PASS. Commit `feat(sao): correlation rules resource`. PR "SAO correlat
 - Produces: `IngestEvent.pipeline` (cast to the enum), `IngestEvent.reprocessed_at` (datetime).
 - Produces: `SignalIngestService::ingest(Project $project, array $payload, ?CarbonInterface $occurredAt = null): Signal`; the occurrence's `occurred_at` and the signal's `last_seen_at` use `$occurredAt ?? now()` (a new signal's `first_seen_at` too). `last_seen_at` never moves backwards: keep the later of the stored value and `$occurredAt`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Each writer's test asserts its pipeline value. `SignalIngestServiceTest`: with `occurredAt` two days ago, the occurrence has that time, `last_seen_at` of an existing signal seen today stays today, and the rate-limit window counts it as old.
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `php artisan test --compact Modules/SAO/tests/Feature/Ingest`
 Expected: FAIL.
 
-- [ ] **Step 3: Column `pipeline` (string, not null, default `profile`) and `reprocessed_at` (nullable) in the create migration; set the pipeline in each writer; the `occurredAt` parameter**
+- [x] **Step 3: Column `pipeline` (string, not null, default `profile`) and `reprocessed_at` (nullable) in the create migration; set the pipeline in each writer; the `occurredAt` parameter**
 
-- [ ] **Step 4: Run tests, Pint, commit**
+- [x] **Step 4: Run tests, Pint, commit**
 
 Expected: PASS. Commit `feat(sao): ingest events record their pipeline`.
 
