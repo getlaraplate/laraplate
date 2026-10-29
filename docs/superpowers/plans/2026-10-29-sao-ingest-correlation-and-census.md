@@ -375,24 +375,24 @@ The `.env.example` lines go in a laraplate branch and PR of their own (`chore(en
 **Interfaces:**
 - Produces: `VcsCapability::containsCommit(BindingContext $context, string $sha, string $ref): ?bool`. `firstTagContaining()` in the three drivers returns the first tag for which it is true.
 
-- [ ] **Step 1: Confirm the provider endpoints**
+- [x] **Step 1: Confirm the provider endpoints**
 
 Read the current API docs and record the URL in the step: GitHub `GET /repos/{owner}/{repo}/compare/{base}...{head}` (`status`); GitLab `GET /projects/:id/repository/merge_base?refs[]=..&refs[]=..`; Bitbucket Cloud merge base (`/repositories/{workspace}/{repo}/merge-base/{revspec}`). If an endpoint differs from this list, use the documented one and note it here.
 
-- [ ] **Step 2: Write the failing tests**
+- [x] **Step 2: Write the failing tests**
 
 Per driver over `Http::fake()`: contained, identical (sha equals ref), diverged, unknown sha (404) gives null, server error gives null; a 7-character sha matches a full merge-base sha (prefix compare, both lowercased; Review Focus 5). `firstTagContaining`: GitHub's existing tests unchanged; GitLab and Bitbucket skip a diverged tag and return an identical one. `VcsConformance` gains a case on the stub.
 
-- [ ] **Step 3: Run them to verify they fail**
+- [x] **Step 3: Run them to verify they fail**
 
 Run: `php artisan test --compact Modules/SAO/tests/Feature/Drivers/GitHubDriverTest.php Modules/SAO/tests/Feature/Drivers/GitLabDriverTest.php Modules/SAO/tests/Feature/Drivers/BitbucketDriverTest.php`
 Expected: FAIL.
 
-- [ ] **Step 4: Implement**
+- [x] **Step 4: Implement**
 
 GitHub: compare `{sha}...{ref}`, `ahead`/`identical` true, `behind`/`diverged` false, other null. GitLab and Bitbucket: merge base of the two equals `$sha` (prefix rule). Update the three `firstTagContaining` PHPDocs.
 
-- [ ] **Step 5: Run tests, Pint, commit**
+- [x] **Step 5: Run tests, Pint, commit**
 
 Commit `feat(sao): vcs drivers tell whether a ref contains a commit`.
 
