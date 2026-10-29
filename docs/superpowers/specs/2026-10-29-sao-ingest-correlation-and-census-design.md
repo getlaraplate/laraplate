@@ -57,7 +57,7 @@ New table, in its own create migration.
 | `connection_id` | FK nullable | Scope: rule applies only to events received on this connection. |
 | `source_profile_id` | FK nullable | Scope: rule applies only to events normalized by this profile. |
 | `project_id` | FK, required | Target project. |
-| `environment` | string nullable | Target environment name; resolved through the existing `firstOrCreate` by `(project_id, name)`. |
+| `environment` | string nullable | Target environment name, written on the occurrence like a payload environment. No `Environment` row is created from it. |
 | timestamps | | |
 
 Index `(is_active, priority)`.
@@ -116,17 +116,17 @@ Environment: the rule's `environment` if set, else the payload's `environment`, 
 
 Folded into the existing create migration (pre-stable, `migrate:fresh` is acceptable):
 
-- `pipeline`: string, enum `IngestPipeline` {`profile`, `driver`}.
+- `pipeline`: string, enum `IngestPipeline` {`profile`, `logs`, `deploy`, `code`}, one per writer of `IngestEvent` (generic webhook, logs driver push, deploy webhook, code webhook). Only `profile` and `logs` are reprocessable.
 - `reprocessed_at`: timestamp nullable.
 
 ### 4.2 Driver path records one event per item
 
-`DriverWebhookIngestService` verifies the signature, unpacks, and records one `IngestEvent` per unpacked item with `delivery_id` `{delivery}#{index}` and the canonical item as `payload` (the `#{binding}` segment disappears with the fan-out). Correlation then runs per event. The signature is checked only at receipt; reprocessing works on the stored canonical payload. A delivery with no item is recorded once as `Discarded`, as today.
+`DriverWebhookIngestService` verifies the signature, unpacks, and records one `IngestEvent` per unpacked item with `delivery_id` `{delivery}#{index}` and the canonical item as `payload` (the `#{binding}` segment disappears with the fan-out). Correlation then runs per event. A connection with no `logs` binding records each item as `Discarded` (`no-logs-binding`), so the items can be reprocessed once a binding exists. A delivery that unpacks to no item records nothing. The signature is checked only at receipt; reprocessing works on the stored canonical payload.
 
 ### 4.3 `IngestReprocessService`
 
-- Eligible statuses: `Discarded`, `Uncorrelated`, `Failed`. An `Ingested` event is never reprocessed.
-- Per event: a transaction, `lockForUpdate` on the row, re-check that the status is still eligible, then replay the event's `pipeline` (profile selection and normalization for `profile`, correlation for `driver`).
+- Eligible: pipeline `profile` or `logs`, status `Discarded`, `Uncorrelated` or `Failed`. An `Ingested` event is never reprocessed.
+- Per event: a transaction, `lockForUpdate` on the row, re-check that the status is still eligible, then replay the event's `pipeline` (profile selection and normalization for `profile`, correlation for `logs`).
 - The same row is updated (status, outcome, project, winning rule, signal) and `reprocessed_at` is set. No new row, so `(connection_id, delivery_id)` stays unique.
 - Runs inside `PipelineContext`, like the live ingest, so loop protection holds.
 - The occurrence keeps the time of the original delivery: `SignalIngestService::ingest()` gains an optional `?CarbonInterface $occurredAt`, passed the event's `created_at`.
@@ -143,7 +143,7 @@ Reprocessing reaches only events still inside retention (`SAO_RETENTION_INGEST_D
 - Each eligible status is reprocessed; `Ingested` is refused.
 - An event fixed by a new rule becomes `Ingested` on the same row with `reprocessed_at` set and the occurrence at the original time.
 - A concurrent reprocess of the same row ingests once (status re-check under lock).
-- `profile` and `driver` pipelines both replay; the driver path does not re-verify signatures.
+- `profile` and `logs` pipelines both replay, `deploy` and `code` are refused; the logs path does not re-verify signatures.
 - `--dry-run` changes nothing; the bulk action requires the permission.
 
 ---
@@ -208,7 +208,7 @@ Folded into its create migration, all nullable: `base_url`, `current_commit`, `c
 ### 6.3 Passive feeds
 
 - Deploy webhook (`DeploymentIngestService`): passes the deployment's sha and ref when the payload carries them.
-- Signal occurrence: when the canonical payload carries `version` (and optionally `commit`, `branch`) and the event correlated to an environment, the census observes it. This is new: today only deployments feed the census.
+- Signal occurrence: when the canonical payload carries `version` (and optionally `commit`, `branch`) and the project already has an `Environment` with the occurrence's environment name, the census observes it. Occurrences never create environments: a host name used as fallback environment must not fill the census. This is new: today only deployments feed the census.
 
 ### 6.4 Active feed: `http-version` driver
 
@@ -225,7 +225,7 @@ Folded into its create migration, all nullable: `base_url`, `current_commit`, `c
 ### 6.6 Tests
 
 - `observe` and `recordProbe` store commit and branch when given and keep them when not.
-- A deployment webhook stores sha and ref; a correlated occurrence with version and commit updates the environment; an uncorrelated one does not.
+- A deployment webhook stores sha and ref; an occurrence with version and commit updates the existing environment of that name; an occurrence naming an unknown environment creates none.
 - Probe over `Http::fake()`: dot-paths, binding path override, auth header sent, non-JSON or missing field yields no update, timeout and redirect refused, non-http scheme refused.
 - The command reports a per-environment failure and leaves other environments probed.
 - The driver passes the conformance suite for the new capability.
@@ -240,7 +240,7 @@ Folded into its create migration, all nullable: `base_url`, `current_commit`, `c
 
 ### 7.2 `VcsCapability::containsCommit`
 
-New normalized method `containsCommit(BindingContext, string $sha, string $ref): ?bool`: true when `$sha` is reachable from `$ref`, false when it is not, null when the provider cannot tell (unknown sha, API error). Each Git driver (GitHub, GitLab, Bitbucket) implements it from the logic its `firstTagContaining()` already uses internally; `firstTagContaining()` then calls it. This is a refactor with no behaviour change, covered by the conformance suite.
+New normalized method `containsCommit(BindingContext, string $sha, string $ref): ?bool`: true when `$sha` is reachable from `$ref`, false when it is not, null when the provider cannot tell (unknown sha, API error). Each Git driver (GitHub, GitLab, Bitbucket) implements it, and `firstTagContaining()` then calls it for each tag. GitHub keeps its current test (compare status `ahead` or `identical`), so its result does not change. GitLab and Bitbucket today test only that the commit and the tag differ, which also counts a diverged tag and misses an identical one; they move to a merge-base test (the merge base of sha and ref is sha), which corrects both cases. The conformance suite pins the semantics for all three.
 
 ### 7.3 Data
 
@@ -261,7 +261,7 @@ Closure is unchanged: the `fix_deployed_there` condition and `deployed_there` st
 
 ### 7.6 Tests
 
-- `containsCommit` per Git driver over `Http::fake()`: contained, not contained, unknown sha gives null; `firstTagContaining()` results unchanged.
+- `containsCommit` per Git driver over `Http::fake()`: contained, identical, diverged, unknown sha gives null; GitHub's `firstTagContaining()` results unchanged; GitLab and Bitbucket skip a diverged tag and accept an identical one.
 - PR change ref stores the merge sha in `commit_sha`.
 - The job writes one presence per `(change ref, environment, commit)`; a new commit adds a row, an unchanged commit does not re-query.
 - Null is retried, never written as false.
