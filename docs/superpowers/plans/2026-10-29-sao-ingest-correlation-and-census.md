@@ -95,26 +95,26 @@ Expected: PASS.
 - Consumes: `CorrelationRuleset::correlate()`, `CorrelationScope::forLogs()` (Task 1).
 - Produces: canonical fields `server_host`, `request_url` on logs events; `IngestEvent.winning_rule` set on the logs path.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `GraylogDriverTest`: a backlog row with `source` `web-01` and `fields.application_url` `https://shop.example.com/cart` unpacks to `server_host` `web-01`, `request_url` the URL, and no `environment` key.
 
 `DriverWebhookIngestTest`, replacing the fan-out cases: two logs bindings, a rule on `request_host` `shop.example.com` → one `IngestEvent` per item, delivery id `d1#0`, project of the rule, `winning_rule` `rule:{id}`, occurrence environment `web-01` (fallback to `server_host`); two bindings and no rule → `Uncorrelated` `no-correlation-rule-matched`, no signal; one binding, no rule → ingested with `binding`; no binding → each item `Discarded` `no-logs-binding` with its canonical payload; a delivery unpacking to no item records nothing; re-sending `d1` after adding a rule that would route elsewhere records and ingests nothing new (Review Focus 2).
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `php artisan test --compact Modules/SAO/tests/Feature/Ingest/DriverWebhookIngestTest.php Modules/SAO/tests/Feature/Drivers/GraylogDriverTest.php`
 Expected: FAIL.
 
-- [ ] **Step 3: Graylog mapping**
+- [x] **Step 3: Graylog mapping**
 
 `server_host` from `$row['source'] ?? $event['source']`; `request_url` from `$row['fields']['application_url']` when a string. Drop the `environment` key.
 
-- [ ] **Step 4: Per-event loop in `DriverWebhookIngestService::handle()`**
+- [x] **Step 4: Per-event loop in `DriverWebhookIngestService::handle()`**
 
 Loop over items, not bindings: dedupe on `{delivery}#{index}`; with no logs binding record `Discarded`; else correlate, record `Uncorrelated` or set `environment` and ingest. `record()` gains `?string $winningRule`. Update the class PHPDoc (fan-out sentence).
 
-- [ ] **Step 5: Run tests, Pint, commit**
+- [x] **Step 5: Run tests, Pint, commit**
 
 Run: the Step 2 command plus `Modules/SAO/tests/Feature/Drivers/LogsDriversTest.php`. Expected: PASS. Commit `feat(sao): logs deliveries correlate per event`.
 
