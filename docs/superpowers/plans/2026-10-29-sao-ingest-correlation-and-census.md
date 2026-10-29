@@ -209,18 +209,18 @@ Expected: PASS. Commit `feat(sao): reprocess unmatched ingest events`.
 - Modify: `Modules/SAO/app/Authorization/SAOPermissions.php` (`IngestEvent::class => ['replay', 'reprocess']`), `Modules/SAO/app/Filament/Resources/IngestEvents/Tables/IngestEventsTable.php`, lang labels, `Modules/SAO/docs/rag/MODULE.md`
 - Test: `Modules/SAO/tests/Feature/Filament/IngestEventResourceTest.php`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Row action "Reprocess" visible on an `Uncorrelated` row, hidden on `Ingested`; bulk action reprocesses the selected rows; both hidden and refused without `PermissionName::forClass(IngestEvent::class, 'reprocess')`.
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 Run: `php artisan test --compact Modules/SAO/tests/Feature/Filament/IngestEventResourceTest.php`
 Expected: FAIL.
 
-- [ ] **Step 3: Add the actions (pattern of `testConnection` in `ConnectionsTable`), notification with the counts of `ReprocessOutcome`**
+- [x] **Step 3: Add the actions (pattern of `testConnection` in `ConnectionsTable`), notification with the counts of `ReprocessOutcome`**
 
-- [ ] **Step 4: Run the test, Pint, docs (reprocessing, retention limit `SAO_RETENTION_INGEST_DAYS`), commit, push, PR**
+- [x] **Step 4: Run the test, Pint, docs (reprocessing, retention limit `SAO_RETENTION_INGEST_DAYS`), commit, push, PR**
 
 Commit `feat(sao): reprocess actions on ingest events`. PR "SAO ingest reprocessing" linking spec §4.
 
