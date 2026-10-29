@@ -405,9 +405,9 @@ Commit `feat(sao): vcs drivers tell whether a ref contains a commit`.
 **Interfaces:**
 - Produces: `ChangeRef.commit_sha` (nullable string, index). For `ChangeRefType::Commit` the writer sets it to `identifier` regardless of the reference; otherwise `$reference->commitSha ?? stored`.
 
-- [ ] **Step 1: Failing tests**: a merged GitHub PR stores its merge sha; a scanned commit stores its own sha; a re-delivery without sha keeps the stored one.
-- [ ] **Step 2: Run them to verify they fail**: `php artisan test --compact Modules/SAO/tests/Feature/Ingest/CodeWebhookIngestTest.php Modules/SAO/tests/Feature/Attribution/VcsScanServiceTest.php`, expected FAIL.
-- [ ] **Step 3: Implement, run tests, Pint, commit** `feat(sao): change refs keep the commit an environment can contain`.
+- [x] **Step 1: Failing tests**: a merged GitHub PR stores its merge sha; a scanned commit stores its own sha; a re-delivery without sha keeps the stored one.
+- [x] **Step 2: Run them to verify they fail**: `php artisan test --compact Modules/SAO/tests/Feature/Ingest/CodeWebhookIngestTest.php Modules/SAO/tests/Feature/Attribution/VcsScanServiceTest.php`, expected FAIL.
+- [x] **Step 3: Implement, run tests, Pint, commit** `feat(sao): change refs keep the commit an environment can contain`.
 
 ### Task 14: fix presences, job and backfill command
 
