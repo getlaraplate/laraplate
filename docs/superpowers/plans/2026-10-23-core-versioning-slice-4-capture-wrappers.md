@@ -161,11 +161,13 @@
 - Modify: `Modules/Core/app/Services/Crud/CrudService.php` (`update()`: per record, `$found_record->update()` and `syncModelRelations()` inside one `run()` for the record)
 - Test: `Modules/Core/tests/Integration/Services/CrudServiceTest.php` or a new versioning test with a stub root
 
-- [ ] **Step 1–5:** a CRUD update with fields and relations gives one set; run and fail; implement; run the CRUD tests; commit. (The compare and set of D40 is Slice 6.)
+- [x] **Step 1–5:** a CRUD update with fields and relations gives one set; run and fail; implement; run the CRUD tests; commit. (The compare and set of D40 is Slice 6.)
+
+**Found at execution (2026-10-26):** each record's `update()` and `syncModelRelations()` run inside `withinRevision()` when the record has it, so a CRUD update of a versioned model always opens its scope (one transaction already wrapped the request); the stub root gained `ProvidesSyncableRelations` for the test `CrudVersionedUpdateTest`. Committed as Core `f5cb08eb`.
 
 ### Part B closing
 
-- [ ] Regression per suite; `MODULE.md` (membership capture, relation subclasses, coverage); **pause for review** before Part C.
+- [x] Regression per suite; `MODULE.md` (membership capture, relation subclasses, coverage); **pause for review** before Part C. Done 2026-10-29: every suite green (the CRM close-or-cancel failure fixed in laracrm#2); `MODULE.md` of Core updated. Commits: Core `303f09b6`, `e0847d21`, `0fc0b79f`, `f5cb08eb`.
 
 ---
 
