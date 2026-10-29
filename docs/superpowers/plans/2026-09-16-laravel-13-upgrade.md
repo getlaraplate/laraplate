@@ -7,7 +7,7 @@ module: platform
 
 **Goal:** Move the application and all eight native modules from Laravel 12 to Laravel 13 in place, keeping git history, submodules, tooling and behaviour unchanged.
 
-**Architecture:** In-place upgrade. `../laraplate13` is a throwaway scaffold the user built to **census** which library majors exist for Laravel 13; it is not a target to match package by package, and it is already stale in places (see Global Constraints). `wikimedia/composer-merge-plugin` ANDs every `Modules/*/composer.json` into the root solve, so all nine manifests are edited before a single resolve. Framework upgrade and test-runner upgrade (Pest 5 / PHPUnit 13) are separate tasks so a red suite has one cause.
+**Architecture:** In-place upgrade. `../laraplate13` is a throwaway scaffold the user built to **census** which library majors exist for Laravel 13; it is not a target to match package by package, and it is already stale in places (see Global Constraints). `wikimedia/composer-merge-plugin` ANDs every `Modules/*/composer.json` into the root solve, so all nine manifests are edited before a single resolve. The test toolchain stays on Pest 4 throughout: Pest 5, PHPUnit 13 and `pest-plugin-phpstan` were split into `2026-10-29-test-toolchain-pest-5.md` on 2026-10-29, so an open-ended analysis task cannot hold the framework upgrade hostage. `pestphp/pest-plugin-laravel v4.1.0` supports Laravel 13 (`^11.45.2|^12.52.0|^13.0`), so nothing here forces that move.
 
 **Tech Stack:** PHP 8.5, Laravel 13, Filament 5, Livewire 4, Pest, nwidart/laravel-modules 13, Composer merge-plugin.
 
@@ -19,7 +19,7 @@ module: platform
 - **The census is evidence, not a lock to reproduce.** It answers one question per package: which major works under Laravel 13. Every version in this plan's tables was read from it on 2026-10-29. Do not diff the real lock against it expecting equality; the gaps below are known and deliberate.
 - The census is silent on six packages Laraplate requires, all verified framework-agnostic on Packagist on 2026-10-29 (no `laravel/framework` or `illuminate/*` requirement, so Laravel 13 cannot constrain them): `php-mqtt/client v2.3.2` (root + MES), `aws/aws-sdk-php 3.402.4` and `google/auth v1.55.3` (AI), `james-heinrich/getid3 v1.9.27` and `smalot/pdfparser v2.13.1` (Core), plus `symfony/http-client` (removed, below). No constraint change needed for any of them.
 - The census is **stale on `neuron-core/neuron-ai`**: it holds `3.17.2`, while `Modules/AI` already requires `^4.1` after the Neuron 4 upgrade (`2026-10-12-neuron-ai-4-upgrade.md`). Neuron 4 is framework-agnostic (`php: ^8.1`, latest `4.1.16`). Leave the AI constraint alone; ignore the census row.
-- Never import the census scaffold's own starter-kit packages: `livewire/flux`, `livewire/blaze`, `laravel/chisel`, `laravel/pao` (`livewire/flux` is commercial, this repo is AGPL). The census also still lists `overtrue/laravel-versionable ^6.0` and `stephenlake/laravel-approval ^1.1`, which Laraplate **no longer requires**: versioning was detached (see `Modules/Core/tests/Unit/Versioning/VersioningLibraryDetachedTest.php`). Do not reintroduce them. No new dependency without user approval. Exception approved by the user on 2026-09-16: `pestphp/pest-plugin-phpstan` (Task 7).
+- Never import the census scaffold's own starter-kit packages: `livewire/flux`, `livewire/blaze`, `laravel/chisel`, `laravel/pao` (`livewire/flux` is commercial, this repo is AGPL). The census also still lists `overtrue/laravel-versionable ^6.0` and `stephenlake/laravel-approval ^1.1`, which Laraplate **no longer requires**: versioning was detached (see `Modules/Core/tests/Unit/Versioning/VersioningLibraryDetachedTest.php`). Do not reintroduce them. No new dependency without user approval: this plan adds none.
 - `symfony/http-client` is removed from the root manifest. No PHP file in `app/`, `config/`, `routes/` or any module references `Symfony\Component\HttpClient` or `Symfony\Contracts\HttpClient`; it was added with the initial scaffold (`f5b44bf`) and `composer why` lists only the root requirement plus two `conflict` entries (`league/flysystem`, `symfony/http-kernel`), which are not requirements. PSR-18 discovery used by `elastic/transport` resolves to Guzzle, which Laravel already ships.
 - `laravel/socialite` (Core: `Actions/Users/HandleSocialLoginAction.php`, `Auth/Providers/SocialiteProvider.php`) resolves on Laravel 13 **only with `-W`**: `league/oauth1-client` requires `guzzlehttp/guzzle ^6|^7`, so Composer must move Guzzle off 8. Verified on 2026-09-16 against a copy of the census lock: Guzzle 8.2.0 to 7.15.5, `guzzlehttp/promises` 3 to 2.5.3, `guzzlehttp/psr7` 3 to 2.13.1. Laravel 13 accepts `^7.8.2 || ^8.0`, so this is supported. Every solve in this plan uses `-W`, and Guzzle 7 is the expected result.
 - `mtrajano/laravel-swagger` sits at `v0.4.0` in the census, a downgrade from the `^0.6.4` Core requires. It is runtime code in Core (`SwaggerGenerateCommand`, `Overrides/ModuleDocGenerator.php`, `Overrides/ModuleDocRoute.php`, `Providers/RouteServiceProvider.php`). Task 4 has a decision gate; never accept the downgrade silently.
@@ -78,7 +78,7 @@ grep -E '^\s+(FAIL|⨯)' "storage/logs/upgrade-l13/baseline-l12.txt" > "storage/
 ```bash
 composer test:types 2>&1 | tail -5
 ```
-Expected: green, or the same failures you will accept for the rest of the plan. `phpstan.neon` includes `phpstan-baseline.neon` (18.937 lines, the debt frozen on 2026-09-17), so new errors fail the run. Task 7 regenerates it.
+Expected: green, or the same failures you will accept for the rest of the plan. `phpstan.neon` includes `phpstan-baseline.neon` (18.937 lines, the debt frozen on 2026-09-17), so a finding Laravel 13 introduces in analysed code will fail the run and is a regression to fix, not to freeze. Note that `Modules/*/tests/**` is excluded from analysis until `2026-10-29-test-toolchain-pest-5.md` runs: test-only findings stay invisible here.
 
 ---
 
@@ -413,104 +413,7 @@ Repeat Step 1. Expected: `diff` prints nothing.
 
 ---
 
-### Task 7: Pest 5 / PHPUnit 13 and toolchain
-
-**Files:**
-- Modify: `composer.json` (`require-dev`), `composer.lock`, `phpunit.xml` (only if Pest asks to migrate it), `phpstan.neon`, `phpstan-baseline.neon`
-
-**Interfaces:**
-- Consumes: green Laravel 13 suite (Task 6).
-- Produces: dev toolchain at the census versions (`pestphp/pest v5.3.x`, `phpunit/phpunit 13.x`, `peckphp/peck v0.3.x`, `pestphp/pest-plugin-phpstan v5.2.x`) with the Pest PHPStan extension active and the module test suites back under analysis.
-
-- [ ] **Step 1: Bump the dev constraints**
-
-In `composer.json` `require-dev`:
-
-| package | from | to |
-|---|---|---|
-| `pestphp/pest` | `^4.7` | `^5.3` |
-| `pestphp/pest-plugin-laravel` | `^4.1` | `^5.0` |
-| `pestphp/pest-plugin-stressless` | `^4.0` | `^5.0` |
-| `pestphp/pest-plugin-type-coverage` | `^4.0` | `^5.0` |
-| `peckphp/peck` | `^0.1.3` | `^0.3.0` |
-| `pestphp/pest-plugin-phpstan` | (new) | `^5.2` |
-
-`pestphp/pest-plugin-phpstan` requires `pestphp/pest ^5.0.0` and `phpstan/phpstan ^2.2.5`, so it cannot land before this task. Leave `nunomaduro/collision ^8.9.4` as is: Pest 5 requires `^8.9.5`, which that constraint already admits.
-
-- [ ] **Step 2: Resolve**
-
-```bash
-composer update -W --ignore-platform-req=ext-oci8 --ignore-platform-req=ext-imagick \
-  'pestphp/*' peckphp/peck 'phpunit/*' 'sebastian/*' 'phpstan/*'
-```
-Expected: pest `v5.x`, phpunit `13.x`, `pestphp/pest-plugin-phpstan v5.x`. If the solve fails on a package the census does not have, STOP and report it: do not remove packages without approval.
-
-- [ ] **Step 3: Migrate the PHPUnit configuration if asked**
-
-```bash
-php artisan optimize:clear
-vendor/bin/pest --compact tests/Unit/ClosedPlansPointToDocumentationTest.php
-```
-If the output warns that the XML configuration validates against a deprecated schema, run `vendor/bin/pest --migrate-configuration` and review the `phpunit.xml` diff: only schema and attribute changes are allowed, and the `Unit`, `Integration` and `Feature` suites must stay.
-
-- [ ] **Step 4: Enable the Pest PHPStan extension and put the module tests back under analysis**
-
-The repo has no `phpstan/extension-installer`, so the plugin's `extra.phpstan.includes` is not picked up. In `phpstan.neon` line 10, replace:
-```neon
-    # - vendor/pestphp/pest-plugin-phpstan/extension.neon
-```
-with:
-```neon
-    - vendor/pestphp/pest-plugin-phpstan/extension.neon
-```
-Then delete these `excludePaths` entries and the comment above them that says to delete them when the plugin is installed:
-```neon
-        - Modules/*/tests/*
-        - Modules/*/tests/**
-```
-Keep the `Modules/*/stubs/*` entries: their reason (a deliberate `final` extension under BypassFinals) is unrelated.
-
-```bash
-composer test:types 2>&1 | tail -20
-```
-Expected: errors, and many of them. The comment in `phpstan.neon` records that the module suites produced 23.067 of 33.282 errors without the plugin, 11.793 of them `method.internalClass` from ordinary `expect(...)->toBe(...)` calls. Those must be gone now. What remains are real findings in test code that was never analysed.
-
-- [ ] **Step 5: Regenerate the PHPStan baseline**
-
-The baseline (`phpstan-baseline.neon`, 18.937 lines) was frozen on 2026-09-17 against a different analysis surface: Laravel 13 stubs changed, the Pest extension changed how test files read, and Step 4 added the module suites. Regenerate it:
-```bash
-vendor/bin/phpstan analyse --memory-limit=4G --generate-baseline=phpstan-baseline.neon
-composer test:types 2>&1 | tail -5
-```
-Expected: `test:types` green against the new baseline. Then check the debt did not quietly grow:
-```bash
-composer check:debt
-git diff --stat phpstan-baseline.neon
-```
-Report the before and after counts to the user. A baseline that grew by the module suites is expected; one that grew in `app/` or `Modules/*/app/` means Laravel 13 introduced findings worth fixing rather than freezing, and those belong in Step 6 or in their own commit.
-
-- [ ] **Step 6: Full suite and quality gates**
-
-```bash
-php artisan optimize:clear
-php artisan test --compact 2>&1 | tail -5
-composer test:lint
-composer test:types
-composer test:typos
-composer test:licenses
-```
-Expected: the suite matches Task 6 (compare as in Task 6 Step 1). Fix PHPUnit 13 deprecations and removals the way Task 6 Step 2 fixes regressions. Rector or PHPStan findings introduced by the new package stubs are fixed in the owning repo, one commit per concern.
-
-- [ ] **Step 7: Commit (root)**
-
-```bash
-git add composer.json composer.lock phpunit.xml phpstan.neon phpstan-baseline.neon
-git commit -m "chore(deps): upgrade test toolchain to Pest 5 and PHPUnit 13, analyse the module test suites"
-```
-
----
-
-### Task 8: Guidelines and documentation
+### Task 7: Guidelines and documentation
 
 **Files:**
 - Modify: `CLAUDE.md` and `AGENTS.md` (regenerated Boost blocks), `AGENTS.md:67`
@@ -543,7 +446,7 @@ Set `status: completed` in this file's front matter, next to the existing `modul
 
 **Documented in:** `AGENTS.md` (stack line), `README.md`, `Modules/AI/README.md`, `Modules/Core/README.md`, `Modules/ERP/README.md` (requirements).
 ```
-Record every divergence from Tasks 4 to 7 there: the swagger decision, the PHPStan baseline before and after counts, any constraint that had to differ from the tables. Resolve every checkbox first, `- [x]` or `- [-]` with its reason on the same line (`.ai/rules/plans.md`). The `INDEX.md` entry carries no status.
+State there that the test toolchain stayed on Pest 4 by design and name `2026-10-29-test-toolchain-pest-5.md` as the plan that carries it, so the file does not read as if the toolchain was forgotten. Record every divergence from Tasks 4 to 6 there: the swagger decision, any constraint that had to differ from the tables, any PHPStan finding fixed along the way. Resolve every checkbox first, `- [x]` or `- [-]` with its reason on the same line (`.ai/rules/plans.md`). The `INDEX.md` entry carries no status.
 
 ```bash
 php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php
@@ -561,7 +464,7 @@ git commit -m "docs: record the Laravel 13 upgrade"
 
 ---
 
-### Task 9: Bump submodule pointers
+### Task 8: Bump submodule pointers
 
 **Files:**
 - Modify: root gitlinks `Modules/AI`, `Modules/CMS`, `Modules/CRM`, `Modules/Core`, `Modules/ERP`, `Modules/MES`, `Modules/SAO`, `Modules/Shop`
@@ -577,7 +480,7 @@ Expected: eight lines `... upgrade/laravel-13 0`.
 php artisan optimize:clear
 php artisan test --compact 2>&1 | tail -5
 ```
-Expected: the same result as Task 7 Step 6.
+Expected: the same result as Task 6 Step 1.
 
 - [ ] **Step 3: Commit the pointers**
 
@@ -588,4 +491,4 @@ git commit -m "chore(modules): bump all modules to their Laravel 13 upgrade"
 
 - [ ] **Step 4: Hand over**
 
-Report to the user: the branches to merge (root plus eight submodules, submodules first), the swagger decision, the PHPStan baseline change, and that pushing and merging are theirs to do. Do not push or merge.
+Report to the user: the branches to merge (root plus eight submodules, submodules first), the swagger decision, that `2026-10-29-test-toolchain-pest-5.md` is now unblocked, and that pushing and merging are theirs to do. Do not push or merge.
