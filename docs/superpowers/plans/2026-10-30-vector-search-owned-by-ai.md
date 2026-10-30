@@ -84,16 +84,18 @@ module: core, ai, cms, sao
 - Consumes: `IVectorProfileProvider`, `VectorProfile` (Task 1).
 - Produces: `ActiveEmbeddingProfileProvider::current(): ?VectorProfile`; the managed setting `features.embeddings.serving_model` (config `ai.features.embeddings.serving_model`) read by `EmbeddingModelRegistry::activeKey()`, which still falls back to the first configured profile.
 
-- [ ] **Step 1: Failing tests**:
+- [x] **Step 1: Failing tests**:
   - `ActiveEmbeddingProfileProviderTest`: `null when features.embeddings.enabled is off`; `null and one warning logged when the active key is not in config`; `returns VectorProfile(key, dimensions, similarity) of the active profile when on`; `runs no database query` (`DB::listen` records zero).
   - `EmbeddingModelRegistryTest`: `activeKey reads ai.features.embeddings.serving_model`, falls back to the first configured profile when it is empty.
   - `EmbeddingSettingsSeedTest`: `features.embeddings.serving_model` is seeded `managed`, default the stored serving model else the registry's first configured key; a second seed does not overwrite a stored value; `features.embeddings.model` defaults to it. `storedServingModel()` reads `features.embeddings.serving_model`.
   - `HandleModelIndexingListenerTest`: **with only `features.embeddings.enabled` on and a profile configured, an embeddable searchable model dispatches `GenerateEmbeddingsJob`** (the bug that started this).
-- [ ] **Step 2: Run** them; expect failure.
-- [ ] **Step 3: Implement.** The provider returns `null` unless `ai_config_bool('ai.features.embeddings.enabled')`, resolves `registry->get(registry->activeKey())`, catches `InvalidArgumentException` (log warning, `null`). `AIServiceProvider` binds it with `singleton(IVectorProfileProvider::class, ...)`, which overrides Core's `singletonIf`. The seeder adds `features.embeddings.serving_model` next to `features.embeddings.model` with `managed: true`.
-- [ ] **Step 4: Run** the tests; expect pass. Pint. Commit `feat(ai): AI answers the vector profile`.
+- [x] **Step 2: Run** them; expect failure.
+- [x] **Step 3: Implement.** The provider returns `null` unless `ai_config_bool('ai.features.embeddings.enabled')`, resolves `registry->get(registry->activeKey())`, catches `InvalidArgumentException` (log warning, `null`). `AIServiceProvider` binds it with `singleton(IVectorProfileProvider::class, ...)`, which overrides Core's `singletonIf`. The seeder adds `features.embeddings.serving_model` next to `features.embeddings.model` with `managed: true`.
+- [x] **Step 4: Run** the tests; expect pass. Pint. Commit `feat(ai): AI answers the vector profile`.
 
 ### Task 4: The switch and the other AI readers (AI)
+
+**Carry-over from Tasks 1 to 3:** `Searchable::isEmbeddable()` needs a profile, so `EmbeddingsGate::handles()` is false while `features.embeddings.enabled` is off unless a profile is pinned with `VectorProfileContext::using()`: the switch must pin the target profile when it discovers models, and repair does nothing with the feature off (accepted loss, spec 4.4). Tests still setting `core.search.vector.*` move to `ai.features.embeddings.enabled` and `serving_model`: `RepairEmbeddingsTest`, `EmbeddingSwitchStartTest`, `EmbeddingsProviderFactoryTest`, `HandleBulkModelIndexingListenerTest`, `EmbeddingPrefixTest`, `PrefixingEmbeddingsProviderTest`, `QueryEmbeddingCacheTest`; the five `EmbeddingSwitch*` tests and `EmbeddingPgvectorIndexHooksTest` fail on the `VectorModelContext` rename until `EmbeddingSwitchIndexes`, `EmbeddingSwitchVerifier` and `RecordingSwitchSearchEngine` use `VectorProfileContext`.
 
 **Files:**
 - Modify: `Modules/AI/app/Ai/Embeddings/Switching/EmbeddingSwitchActivation.php`, `EmbeddingSwitchStore.php` (remove `suspend()`, `clearSuspension()`, `SUSPENDED_REASON_SETTING`; add `isSwitching(): bool` reading the runtime config copy of `features.embeddings.switch`), `EmbeddingSwitchIndexes.php`, `EmbeddingSwitchVerifier.php`, `Modules/AI/app/Console/EmbeddingsSwitchCommand.php` (calls at lines 241, 268, 373, 385), `Modules/AI/app/Services/EmbeddingVectorSearchAvailability.php`, `Modules/AI/app/Services/SearchOrchestratorAgent.php` (lines 70 and 124)
