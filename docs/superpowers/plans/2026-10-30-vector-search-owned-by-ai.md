@@ -44,10 +44,10 @@ module: core, ai, cms, sao
 **Interfaces:**
 - Produces: `final readonly class VectorProfile { __construct(public string $modelKey, public int $dimensions, public string $similarity) }`; `interface IVectorProfileProvider { public function current(): ?VectorProfile; }`; `VectorProfileContext::get(): ?VectorProfile`, `::modelKey(): ?string`, `::using(VectorProfile $profile, Closure $callback): mixed`; `FakeVectorProfile::use(?VectorProfile $profile = new VectorProfile('a:one', 384, 'cosine')): void` and `::none(): void` (bind a fixed provider instance in the container, and clear the context override).
 
-- [ ] **Step 1: Failing tests** in `VectorProfileContextTest`: `it returns null with the default binding` (container resolves `NullVectorProfileProvider`); `it returns the provider profile outside using`; `using overrides the whole profile (key, dimensions, similarity) and restores the previous one, also when the callback throws`; `modelKey returns the key of the profile or null`.
-- [ ] **Step 2: Run** `php artisan test --compact Modules/Core/tests/Unit/Search/VectorProfileContextTest.php`; expect failure.
-- [ ] **Step 3: Implement** the three classes and the rename (`git mv`); bind `singletonIf(IVectorProfileProvider::class, NullVectorProfileProvider::class)` in `SearchServiceProvider`; `FakeVectorProfile` binds `app()->instance(IVectorProfileProvider::class, ...)` with an anonymous-free fixed provider kept in `tests/Support/FixedVectorProfileProvider.php`.
-- [ ] **Step 4: Run** the test; expect pass. Commit `feat(core): vector profile contract and context`.
+- [x] **Step 1: Failing tests** in `VectorProfileContextTest`: `it returns null with the default binding` (container resolves `NullVectorProfileProvider`); `it returns the provider profile outside using`; `using overrides the whole profile (key, dimensions, similarity) and restores the previous one, also when the callback throws`; `modelKey returns the key of the profile or null`.
+- [x] **Step 2: Run** `php artisan test --compact Modules/Core/tests/Unit/Search/VectorProfileContextTest.php`; expect failure.
+- [x] **Step 3: Implement** the three classes and the rename (`git mv`); bind `singletonIf(IVectorProfileProvider::class, NullVectorProfileProvider::class)` in `SearchServiceProvider`; `FakeVectorProfile` binds `app()->instance(IVectorProfileProvider::class, ...)` with an anonymous-free fixed provider kept in `tests/Support/FixedVectorProfileProvider.php`.
+- [x] **Step 4: Run** the test; expect pass. Commit `feat(core): vector profile contract and context`.
 
 ### Task 2: Core consumers read the profile (Core, CMS, SAO)
 
