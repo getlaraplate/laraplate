@@ -44,10 +44,10 @@ module: core, ai, cms, sao
 **Interfaces:**
 - Produces: `final readonly class VectorProfile { __construct(public string $modelKey, public int $dimensions, public string $similarity) }`; `interface IVectorProfileProvider { public function current(): ?VectorProfile; }`; `VectorProfileContext::get(): ?VectorProfile`, `::modelKey(): ?string`, `::using(VectorProfile $profile, Closure $callback): mixed`; `FakeVectorProfile::use(?VectorProfile $profile = new VectorProfile('a:one', 384, 'cosine')): void` and `::none(): void` (bind a fixed provider instance in the container, and clear the context override).
 
-- [ ] **Step 1: Failing tests** in `VectorProfileContextTest`: `it returns null with the default binding` (container resolves `NullVectorProfileProvider`); `it returns the provider profile outside using`; `using overrides the whole profile (key, dimensions, similarity) and restores the previous one, also when the callback throws`; `modelKey returns the key of the profile or null`.
-- [ ] **Step 2: Run** `php artisan test --compact Modules/Core/tests/Unit/Search/VectorProfileContextTest.php`; expect failure.
-- [ ] **Step 3: Implement** the three classes and the rename (`git mv`); bind `singletonIf(IVectorProfileProvider::class, NullVectorProfileProvider::class)` in `SearchServiceProvider`; `FakeVectorProfile` binds `app()->instance(IVectorProfileProvider::class, ...)` with an anonymous-free fixed provider kept in `tests/Support/FixedVectorProfileProvider.php`.
-- [ ] **Step 4: Run** the test; expect pass. Commit `feat(core): vector profile contract and context`.
+- [x] **Step 1: Failing tests** in `VectorProfileContextTest`: `it returns null with the default binding` (container resolves `NullVectorProfileProvider`); `it returns the provider profile outside using`; `using overrides the whole profile (key, dimensions, similarity) and restores the previous one, also when the callback throws`; `modelKey returns the key of the profile or null`.
+- [x] **Step 2: Run** `php artisan test --compact Modules/Core/tests/Unit/Search/VectorProfileContextTest.php`; expect failure.
+- [x] **Step 3: Implement** the three classes and the rename (`git mv`); bind `singletonIf(IVectorProfileProvider::class, NullVectorProfileProvider::class)` in `SearchServiceProvider`; `FakeVectorProfile` binds `app()->instance(IVectorProfileProvider::class, ...)` with an anonymous-free fixed provider kept in `tests/Support/FixedVectorProfileProvider.php`.
+- [x] **Step 4: Run** the test; expect pass. Commit `feat(core): vector profile contract and context`.
 
 ### Task 2: Core consumers read the profile (Core, CMS, SAO)
 
@@ -60,7 +60,7 @@ module: core, ai, cms, sao
 - Consumes: `VectorProfileContext::get()` from Task 1.
 - Produces: `VectorSearchAvailability::check()` answers `disabled` when the profile is `null`, `dimension_mismatch` when the index holds another length than `get()->dimensions`, `yes` otherwise (`suspended` is no longer Core's).
 
-- [ ] **Step 1: Failing tests**, one assertion set per call site (names are the existing test files' style):
+- [x] **Step 1: Failing tests**, one assertion set per call site (names are the existing test files' style):
   - `VectorSearchConfigTest`: Elasticsearch mapping has `dense_vector` with the profile's `dims` and `similarity`; with `::none()` there is no `embedding` property.
   - Typesense mapping: `embedding` `float[]` field present with a profile, absent without (Typesense needs no dimension; read 2026-10-30).
   - `ElasticsearchTranslator`: a nested `vector` field uses the option when given, else the profile; with neither it emits no `dense_vector`.
@@ -69,9 +69,9 @@ module: core, ai, cms, sao
   - `VectorSearchAvailabilityTest`: `disabled`, `dimension_mismatch`, `yes`; no test sets a suspension any more.
   - `SearchableEmbeddingsArrayTest` / `SearchableEmbeddingsModelKeyTest`: the field dimensions and the stamped key come from the profile.
   - CMS `Content` and SAO `Ticket`: the field carries the profile's dimensions and similarity; with no profile it carries no `vector` option.
-- [ ] **Step 2: Run** the touched Core, CMS and SAO tests; expect failures.
-- [ ] **Step 3: Implement** each call site on `VectorProfileContext::get()`; remove every `384` and `'cosine'` default. `Searchable` keeps the `VectorProfileContext::using()` call it already makes around index documents.
-- [ ] **Step 4: Run** the same tests plus `Modules/Core/tests/Integration/Search`; expect pass. Pint on the changed files from the root. Commit per repo: `refactor(core): read the vector profile instead of core.search.vector`, same for CMS and SAO.
+- [x] **Step 2: Run** the touched Core, CMS and SAO tests; expect failures.
+- [x] **Step 3: Implement** each call site on `VectorProfileContext::get()`; remove every `384` and `'cosine'` default. `Searchable` keeps the `VectorProfileContext::using()` call it already makes around index documents.
+- [x] **Step 4: Run** the same tests plus `Modules/Core/tests/Integration/Search`; expect pass. Pint on the changed files from the root. Commit per repo: `refactor(core): read the vector profile instead of core.search.vector`, same for CMS and SAO.
 
 ### Task 3: The AI provider, the registry and the seeder (AI)
 
@@ -84,16 +84,18 @@ module: core, ai, cms, sao
 - Consumes: `IVectorProfileProvider`, `VectorProfile` (Task 1).
 - Produces: `ActiveEmbeddingProfileProvider::current(): ?VectorProfile`; the managed setting `features.embeddings.serving_model` (config `ai.features.embeddings.serving_model`) read by `EmbeddingModelRegistry::activeKey()`, which still falls back to the first configured profile.
 
-- [ ] **Step 1: Failing tests**:
+- [x] **Step 1: Failing tests**:
   - `ActiveEmbeddingProfileProviderTest`: `null when features.embeddings.enabled is off`; `null and one warning logged when the active key is not in config`; `returns VectorProfile(key, dimensions, similarity) of the active profile when on`; `runs no database query` (`DB::listen` records zero).
   - `EmbeddingModelRegistryTest`: `activeKey reads ai.features.embeddings.serving_model`, falls back to the first configured profile when it is empty.
   - `EmbeddingSettingsSeedTest`: `features.embeddings.serving_model` is seeded `managed`, default the stored serving model else the registry's first configured key; a second seed does not overwrite a stored value; `features.embeddings.model` defaults to it. `storedServingModel()` reads `features.embeddings.serving_model`.
   - `HandleModelIndexingListenerTest`: **with only `features.embeddings.enabled` on and a profile configured, an embeddable searchable model dispatches `GenerateEmbeddingsJob`** (the bug that started this).
-- [ ] **Step 2: Run** them; expect failure.
-- [ ] **Step 3: Implement.** The provider returns `null` unless `ai_config_bool('ai.features.embeddings.enabled')`, resolves `registry->get(registry->activeKey())`, catches `InvalidArgumentException` (log warning, `null`). `AIServiceProvider` binds it with `singleton(IVectorProfileProvider::class, ...)`, which overrides Core's `singletonIf`. The seeder adds `features.embeddings.serving_model` next to `features.embeddings.model` with `managed: true`.
-- [ ] **Step 4: Run** the tests; expect pass. Pint. Commit `feat(ai): AI answers the vector profile`.
+- [x] **Step 2: Run** them; expect failure.
+- [x] **Step 3: Implement.** The provider returns `null` unless `ai_config_bool('ai.features.embeddings.enabled')`, resolves `registry->get(registry->activeKey())`, catches `InvalidArgumentException` (log warning, `null`). `AIServiceProvider` binds it with `singleton(IVectorProfileProvider::class, ...)`, which overrides Core's `singletonIf`. The seeder adds `features.embeddings.serving_model` next to `features.embeddings.model` with `managed: true`.
+- [x] **Step 4: Run** the tests; expect pass. Pint. Commit `feat(ai): AI answers the vector profile`.
 
 ### Task 4: The switch and the other AI readers (AI)
+
+**Carry-over from Tasks 1 to 3:** `Searchable::isEmbeddable()` needs a profile, so `EmbeddingsGate::handles()` is false while `features.embeddings.enabled` is off unless a profile is pinned with `VectorProfileContext::using()`: the switch must pin the target profile when it discovers models, and repair does nothing with the feature off (accepted loss, spec 4.4). Tests still setting `core.search.vector.*` move to `ai.features.embeddings.enabled` and `serving_model`: `RepairEmbeddingsTest`, `EmbeddingSwitchStartTest`, `EmbeddingsProviderFactoryTest`, `HandleBulkModelIndexingListenerTest`, `EmbeddingPrefixTest`, `PrefixingEmbeddingsProviderTest`, `QueryEmbeddingCacheTest`; the five `EmbeddingSwitch*` tests and `EmbeddingPgvectorIndexHooksTest` fail on the `VectorModelContext` rename until `EmbeddingSwitchIndexes`, `EmbeddingSwitchVerifier` and `RecordingSwitchSearchEngine` use `VectorProfileContext`.
 
 **Files:**
 - Modify: `Modules/AI/app/Ai/Embeddings/Switching/EmbeddingSwitchActivation.php`, `EmbeddingSwitchStore.php` (remove `suspend()`, `clearSuspension()`, `SUSPENDED_REASON_SETTING`; add `isSwitching(): bool` reading the runtime config copy of `features.embeddings.switch`), `EmbeddingSwitchIndexes.php`, `EmbeddingSwitchVerifier.php`, `Modules/AI/app/Console/EmbeddingsSwitchCommand.php` (calls at lines 241, 268, 373, 385), `Modules/AI/app/Services/EmbeddingVectorSearchAvailability.php`, `Modules/AI/app/Services/SearchOrchestratorAgent.php` (lines 70 and 124)
@@ -102,25 +104,25 @@ module: core, ai, cms, sao
 **Interfaces:**
 - Consumes: `VectorProfileContext::using()` (Task 1), `features.embeddings.serving_model` (Task 3).
 
-- [ ] **Step 1: Failing tests**:
+- [x] **Step 1: Failing tests**:
   - Activation writes `features.embeddings.serving_model` and `features.embeddings.model` to the target and writes nothing under `search.vector.*`; the previous model's rows are deleted as today.
   - `EmbeddingSwitchStore` has no suspension methods; **the state is `running` before the first re-embed job is dispatched** (order assertion in `EmbeddingSwitchPhasesTest`).
   - `EmbeddingVectorSearchAvailability`: `suspended` while the state is `running` or `failed`; asks the inner guard when `idle`; runs no database query.
   - Indexes are built inside `VectorProfileContext::using(new VectorProfile($target->key, $target->dimensions, $target->similarity), ...)`: the mapping carries the target's dimensions while the serving profile is still the old one; no config key is overridden.
   - Verifier: the smoke vector runs when `EmbeddingsGate::enabled()`; `SearchOrchestratorAgent`: `use_vector` is false when the provider returns `null`.
-- [ ] **Step 2: Run** them; expect failure.
-- [ ] **Step 3: Implement.** Read each caller of `suspend()` / `clearSuspension()` first and keep the order (state before work); `VectorSearchAvailability::forget()` stays in activation.
-- [ ] **Step 4: Run** `php artisan test --compact Modules/AI/tests/Feature Modules/AI/tests/Unit/Embeddings Modules/AI/tests/Unit/Services Modules/AI/tests/Integration`; expect pass. Pint. Commit `refactor(ai): the switch writes AI settings only`.
+- [x] **Step 2: Run** them; expect failure.
+- [x] **Step 3: Implement.** Read each caller of `suspend()` / `clearSuspension()` first and keep the order (state before work); `VectorSearchAvailability::forget()` stays in activation.
+- [x] **Step 4: Run** `php artisan test --compact Modules/AI/tests/Feature Modules/AI/tests/Unit/Embeddings Modules/AI/tests/Unit/Services Modules/AI/tests/Integration`; expect pass. Pint. Commit `refactor(ai): the switch writes AI settings only`.
 
 ### Task 5: Remove the Core settings
 
 **Files:**
 - Modify: `Modules/Core/database/seeders/CoreDatabaseSeeder.php` (the five `search.vector.*` rows), `Modules/Core/tests/Feature/Seeding/VectorSettingsSeedTest.php`, `Modules/Core/tests/Feature/Models/SettingManagedTest.php` (use a managed row the test creates, not a vector key), `Modules/Core/tests/Unit/Settings/ApplicationSettingDefinitionsTest.php`
 
-- [ ] **Step 1: Failing tests**: the Core definitions contain no `search.vector.*` name; `SettingManagedTest` and the seed tests pass without them.
-- [ ] **Step 2: Implement** the removal; then the gate: `grep -rnE "search\.vector\.(enabled|model|dimensions|similarity|suspended_reason)" Modules/*/app Modules/*/database Modules/*/config` prints nothing, and no `config('core.search.vector` remains in `tests/` of any module.
-- [ ] **Step 3: Run** the Core, AI, CMS and SAO suites that touch search (`Modules/*/tests/*/Search`), expect pass. Commit `chore(core): drop the search.vector settings`.
-- [ ] **Step 4 (owner-gated): delete the rows from the development database**, after the PRs are merged and the code is pulled, with the owner's go-ahead: `DELETE FROM core_settings WHERE name IN ('search.vector.enabled','search.vector.model','search.vector.dimensions','search.vector.similarity','search.vector.suspended_reason');`, then `php artisan db:seed` for the AI module (it seeds `features.embeddings.serving_model`) and flush the settings cache.
+- [x] **Step 1: Failing tests**: the Core definitions contain no `search.vector.*` name; `SettingManagedTest` and the seed tests pass without them.
+- [x] **Step 2: Implement** the removal; then the gate: `grep -rnE "search\.vector\.(enabled|model|dimensions|similarity|suspended_reason)" Modules/*/app Modules/*/database Modules/*/config` prints nothing, and no `config('core.search.vector` remains in `tests/` of any module.
+- [x] **Step 3: Run** the Core, AI, CMS and SAO suites that touch search (`Modules/*/tests/*/Search`), expect pass. Commit `chore(core): drop the search.vector settings`.
+- [x] **Step 4 (owner-gated): delete the rows from the development database**, after the PRs are merged and the code is pulled, with the owner's go-ahead: `DELETE FROM core_settings WHERE name IN ('search.vector.enabled','search.vector.model','search.vector.dimensions','search.vector.similarity','search.vector.suspended_reason');`, then `php artisan db:seed` for the AI module (it seeds `features.embeddings.serving_model`) and flush the settings cache. *Covered by the owner's `migrate:fresh` planned for 2026-10-31, which recreates the settings from the seeders, so no manual delete is needed.*
 
 ### Task 6: Documentation, specs, plans and closing
 
