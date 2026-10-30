@@ -33,7 +33,7 @@ Facts read from the code on 2026-10-30.
 
 1. **Search stays in Core, the answer to "vectors, and with what" comes from the AI module.** Core asks a contract; it has no setting about vectors. Without the AI module the default answer is "none" and Core runs keyword search, as today with the flag off.
 2. **One switch: `features.embeddings.enabled`** (AI). It means the feature is active, generation and search together. A state with vectors generated and search off, or the reverse, no longer exists. This supersedes decision 2 of the switch spec, which kept `core.search.vector.*` in Core and had AI write them.
-3. **`features.embeddings.model` stays the operator's choice (the target).** The serving model is a second AI value, `features.embeddings.active`, a command-managed setting written only by the switch at activation. The switch spec removed a setting of that name (ruling R17) because it duplicated Core's `search.vector.model` and could drift; with Core's key gone there is one copy, and the reason for the ruling no longer applies. Decision 4 of the switch spec (the dropdown never changes the serving model) stands.
+3. **`features.embeddings.model` stays the operator's choice (the target).** The serving model is a second AI value, `features.embeddings.serving_model`, a command-managed setting written only by the switch at activation: seeded `managed`, shown read-only in the settings form, never edited by the operator. The name differs from the removed `features.embeddings.active` on purpose, so it does not read as a synonym of `features.embeddings.enabled` and cannot collide with a stale row of the old key. The switch spec removed a setting of that name (ruling R17) because it duplicated Core's `search.vector.model` and could drift; with Core's key gone there is one copy, and the reason for the ruling no longer applies. Decision 4 of the switch spec (the dropdown never changes the serving model) stands.
 4. **Dimensions and similarity are properties of the profile, not settings.** They are a constraint of the model and the service (the metric a model was trained for; the length it produces, verified by the probe), and the engine fixes both in the index mapping. Chosen by picking a profile.
 5. **No hard-coded fallback in Core.** The defaults 384 and `cosine` go away: without a profile Core does not build vector fields.
 6. **The suspension of a switch is derived from its state**, not stored a second time. AI answers `suspended` while `features.embeddings.switch` is not idle. `search.vector.suspended_reason` goes away.
@@ -68,10 +68,10 @@ interface IVectorProfileProvider
 
 ### 4.2 The AI implementation
 
-- `ActiveEmbeddingProfileProvider` (bound over the null one): returns the profile named by `features.embeddings.active` when `features.embeddings.enabled` is on and the profile resolves, otherwise `null`. The profile comes from `EmbeddingModelRegistry`, which already builds it from `ai.features.embeddings.models`.
+- `ActiveEmbeddingProfileProvider` (bound over the null one): returns the profile named by `features.embeddings.serving_model` when `features.embeddings.enabled` is on and the profile resolves, otherwise `null`. The profile comes from `EmbeddingModelRegistry`, which already builds it from `ai.features.embeddings.models`.
 - `EmbeddingVectorSearchAvailability` answers `suspended` first while a switch is not idle, then asks the inner guard, then `no_vectors` as today.
 - `EmbeddingsGate::enabled()` stays on `features.embeddings.enabled`; `isEmbeddable()` is true for a searchable model with a non-empty `$embed` list when the provider has a profile. Turning the switch on is enough to start embedding.
-- Switch procedure (`EmbeddingSwitch*`): activation writes `features.embeddings.active` only; the store no longer writes `suspended_reason`; the verifier and the index builder use `VectorProfileContext::using($targetProfile)`.
+- Switch procedure (`EmbeddingSwitch*`): activation writes `features.embeddings.serving_model` only; the store no longer writes `suspended_reason`; the verifier and the index builder use `VectorProfileContext::using($targetProfile)`.
 - `SearchOrchestratorAgent` asks the provider instead of the flag.
 
 ### 4.3 Core call sites
@@ -96,16 +96,16 @@ DELETE FROM core_settings WHERE name IN (
   'search.vector.similarity', 'search.vector.suspended_reason');
 ```
 
-then flush the settings cache. `features.embeddings.active` is seeded by the AI seeder; an existing database receives it from the next seed or from the first switch (open point 2). `CoreDatabaseSeeder` stops creating the five keys. The `managed` column is untouched (`features.embeddings.switch` and the new `active` use it).
+then flush the settings cache. `features.embeddings.serving_model` is seeded by the AI seeder; an existing database receives it from the next seed or from the first switch (open point 2). `CoreDatabaseSeeder` stops creating the five keys. The `managed` column is untouched (`features.embeddings.switch` and the new `active` use it).
 
 ## 6. Error handling
 
-A profile in `features.embeddings.active` that no longer exists in config resolves to `null` and the log names the key: vector search is off instead of throwing in every engine. `dimension_mismatch` keeps its meaning: the index of an engine holds another length than the profile's.
+A profile in `features.embeddings.serving_model` that no longer exists in config resolves to `null` and the log names the key: vector search is off instead of throwing in every engine. `dimension_mismatch` keeps its meaning: the index of an engine holds another length than the profile's.
 
 ## 7. Testing
 
 - Core: an absent provider means no vector field in mappings and `use_vector` false; a provider with a profile builds the mapping with its dimensions and similarity; `VectorProfileContext::using()` overrides the whole profile and restores it, also on an exception.
-- AI: the provider is `null` with the switch off, with the active key unknown, and returns the profile otherwise; `suspended` while a switch runs; the switch activation writes `features.embeddings.active` and nothing in Core; with the feature on and no other setting, a model is embedded.
+- AI: the provider is `null` with the switch off, with the active key unknown, and returns the profile otherwise; `suspended` while a switch runs; the switch activation writes `features.embeddings.serving_model` and nothing in Core; with the feature on and no other setting, a model is embedded.
 - The roughly forty existing tests that set `core.search.vector.*` (engines, planner, availability, CMS and SAO stubs) move to a Core test stub provider in `tests/Stubs/` registered by a helper on the test case; none is deleted.
 - `EnvExampleCoversConfigTest` and the seed tests (`VectorSettingsSeedTest`, `EmbeddingSettingsSeedTest`, `SettingManagedTest`, `ApplicationSettingDefinitionsTest`) follow the seeders.
 
@@ -130,6 +130,6 @@ Moving engines or query building to the AI module; pausing generation separately
 ## 10. Open points
 
 1. **Shape of the contract.** A separate provider (this spec) against extending `IVectorSearchAvailability::check()` to return the profile. Chosen separate because indexing needs the profile with no model at hand and the guard needs a model; the plan can still merge them if the call sites turn out to be one.
-2. **Seed of `features.embeddings.active` on an existing database**, and how `features.embeddings.model` is seeded today (the plan reads it and mirrors it).
+2. **Seed of `features.embeddings.serving_model` on an existing database**, and how `features.embeddings.model` is seeded today (the plan reads it and mirrors it).
 3. **Typesense.** Whether its `float[]` field needs the dimension; read in the plan.
 4. **The settings page.** Whether the AI group shows the active profile's dimensions and similarity read-only. Nice to have, not required.

@@ -8,7 +8,7 @@ module: core, ai, cms, sao
 
 **Goal:** One switch (`features.embeddings.enabled`) and one source (the AI module) for the model, dimensions and similarity of vector search; Core keeps no `search.vector.*` setting and runs keyword search when AI gives it no profile.
 
-**Architecture:** Core defines `VectorProfile` and `IVectorProfileProvider` (default: `null`); `VectorProfileContext` (renamed from `VectorModelContext`) overrides the whole profile during a switch. AI binds `ActiveEmbeddingProfileProvider`, which reads `features.embeddings.enabled` and the new managed setting `features.embeddings.active`. Core engines and services read the profile instead of `core.search.vector.*`. The five Core settings are deleted last.
+**Architecture:** Core defines `VectorProfile` and `IVectorProfileProvider` (default: `null`); `VectorProfileContext` (renamed from `VectorModelContext`) overrides the whole profile during a switch. AI binds `ActiveEmbeddingProfileProvider`, which reads `features.embeddings.enabled` and the new managed setting `features.embeddings.serving_model`. Core engines and services read the profile instead of `core.search.vector.*`. The five Core settings are deleted last.
 
 **Tech Stack:** PHP 8.5, Laravel 12, Pest. No new dependency.
 
@@ -27,7 +27,7 @@ module: core, ai, cms, sao
 
 1. **A switch must never leave a window where search uses vectors mid-rebuild.** `suspended` is answered from the state while it is `running` or `failed`, and the state is written before the first re-embed (the old code set `suspended_reason` at the same points).
 2. **Feature switched off after being on.** Indexing writes no vector field, search is keyword-only with no exception, an index that still has the mapping is left alone.
-3. **`features.embeddings.active` names a profile no longer in config.** The provider returns `null` and logs a warning; it never throws in every request.
+3. **`features.embeddings.serving_model` names a profile no longer in config.** The provider returns `null` and logs a warning; it never throws in every request.
 4. **Cost.** `IVectorProfileProvider::current()` and the availability guard run per indexed document and per search: no database query in either (settings are read from runtime config).
 5. **PostgreSQL with no profile.** `DatabaseEngine` throws a clear `InvalidArgumentException` naming the missing profile, not a SQL error.
 6. **AI module absent.** An application without it indexes with no vector field and searches by keywords.
@@ -82,15 +82,15 @@ module: core, ai, cms, sao
 
 **Interfaces:**
 - Consumes: `IVectorProfileProvider`, `VectorProfile` (Task 1).
-- Produces: `ActiveEmbeddingProfileProvider::current(): ?VectorProfile`; the managed setting `features.embeddings.active` (config `ai.features.embeddings.active`) read by `EmbeddingModelRegistry::activeKey()`, which still falls back to the first configured profile.
+- Produces: `ActiveEmbeddingProfileProvider::current(): ?VectorProfile`; the managed setting `features.embeddings.serving_model` (config `ai.features.embeddings.serving_model`) read by `EmbeddingModelRegistry::activeKey()`, which still falls back to the first configured profile.
 
 - [ ] **Step 1: Failing tests**:
   - `ActiveEmbeddingProfileProviderTest`: `null when features.embeddings.enabled is off`; `null and one warning logged when the active key is not in config`; `returns VectorProfile(key, dimensions, similarity) of the active profile when on`; `runs no database query` (`DB::listen` records zero).
-  - `EmbeddingModelRegistryTest`: `activeKey reads ai.features.embeddings.active`, falls back to the first configured profile when it is empty.
-  - `EmbeddingSettingsSeedTest`: `features.embeddings.active` is seeded `managed`, default the stored serving model else the registry's first configured key; a second seed does not overwrite a stored value; `features.embeddings.model` defaults to it. `storedServingModel()` reads `features.embeddings.active`.
+  - `EmbeddingModelRegistryTest`: `activeKey reads ai.features.embeddings.serving_model`, falls back to the first configured profile when it is empty.
+  - `EmbeddingSettingsSeedTest`: `features.embeddings.serving_model` is seeded `managed`, default the stored serving model else the registry's first configured key; a second seed does not overwrite a stored value; `features.embeddings.model` defaults to it. `storedServingModel()` reads `features.embeddings.serving_model`.
   - `HandleModelIndexingListenerTest`: **with only `features.embeddings.enabled` on and a profile configured, an embeddable searchable model dispatches `GenerateEmbeddingsJob`** (the bug that started this).
 - [ ] **Step 2: Run** them; expect failure.
-- [ ] **Step 3: Implement.** The provider returns `null` unless `ai_config_bool('ai.features.embeddings.enabled')`, resolves `registry->get(registry->activeKey())`, catches `InvalidArgumentException` (log warning, `null`). `AIServiceProvider` binds it with `singleton(IVectorProfileProvider::class, ...)`, which overrides Core's `singletonIf`. The seeder adds `features.embeddings.active` next to `features.embeddings.model` with `managed: true`.
+- [ ] **Step 3: Implement.** The provider returns `null` unless `ai_config_bool('ai.features.embeddings.enabled')`, resolves `registry->get(registry->activeKey())`, catches `InvalidArgumentException` (log warning, `null`). `AIServiceProvider` binds it with `singleton(IVectorProfileProvider::class, ...)`, which overrides Core's `singletonIf`. The seeder adds `features.embeddings.serving_model` next to `features.embeddings.model` with `managed: true`.
 - [ ] **Step 4: Run** the tests; expect pass. Pint. Commit `feat(ai): AI answers the vector profile`.
 
 ### Task 4: The switch and the other AI readers (AI)
@@ -100,10 +100,10 @@ module: core, ai, cms, sao
 - Test: `EmbeddingSwitchStoreTest`, `EmbeddingSwitchPhasesTest`, `EmbeddingSwitchResumeTest`, `EmbeddingSwitchStartTest`, `EmbeddingSwitchChunkedIndexesTest`, `EmbeddingSwitchVerifierTest`, `EmbeddingVectorSearchAvailabilityTest`, `SearchOrchestratorAgentTest`, `tests/Stubs/EmbeddingSwitchHarness.php` and `RecordingSwitchSearchEngine.php` (all under `Modules/AI/tests`)
 
 **Interfaces:**
-- Consumes: `VectorProfileContext::using()` (Task 1), `features.embeddings.active` (Task 3).
+- Consumes: `VectorProfileContext::using()` (Task 1), `features.embeddings.serving_model` (Task 3).
 
 - [ ] **Step 1: Failing tests**:
-  - Activation writes `features.embeddings.active` and `features.embeddings.model` to the target and writes nothing under `search.vector.*`; the previous model's rows are deleted as today.
+  - Activation writes `features.embeddings.serving_model` and `features.embeddings.model` to the target and writes nothing under `search.vector.*`; the previous model's rows are deleted as today.
   - `EmbeddingSwitchStore` has no suspension methods; **the state is `running` before the first re-embed job is dispatched** (order assertion in `EmbeddingSwitchPhasesTest`).
   - `EmbeddingVectorSearchAvailability`: `suspended` while the state is `running` or `failed`; asks the inner guard when `idle`; runs no database query.
   - Indexes are built inside `VectorProfileContext::using(new VectorProfile($target->key, $target->dimensions, $target->similarity), ...)`: the mapping carries the target's dimensions while the serving profile is still the old one; no config key is overridden.
@@ -120,13 +120,13 @@ module: core, ai, cms, sao
 - [ ] **Step 1: Failing tests**: the Core definitions contain no `search.vector.*` name; `SettingManagedTest` and the seed tests pass without them.
 - [ ] **Step 2: Implement** the removal; then the gate: `grep -rnE "search\.vector\.(enabled|model|dimensions|similarity|suspended_reason)" Modules/*/app Modules/*/database Modules/*/config` prints nothing, and no `config('core.search.vector` remains in `tests/` of any module.
 - [ ] **Step 3: Run** the Core, AI, CMS and SAO suites that touch search (`Modules/*/tests/*/Search`), expect pass. Commit `chore(core): drop the search.vector settings`.
-- [ ] **Step 4 (owner-gated): delete the rows from the development database**, after the PRs are merged and the code is pulled, with the owner's go-ahead: `DELETE FROM core_settings WHERE name IN ('search.vector.enabled','search.vector.model','search.vector.dimensions','search.vector.similarity','search.vector.suspended_reason');`, then `php artisan db:seed` for the AI module (it seeds `features.embeddings.active`) and flush the settings cache.
+- [ ] **Step 4 (owner-gated): delete the rows from the development database**, after the PRs are merged and the code is pulled, with the owner's go-ahead: `DELETE FROM core_settings WHERE name IN ('search.vector.enabled','search.vector.model','search.vector.dimensions','search.vector.similarity','search.vector.suspended_reason');`, then `php artisan db:seed` for the AI module (it seeds `features.embeddings.serving_model`) and flush the settings cache.
 
 ### Task 6: Documentation, specs, plans and closing
 
 **Files:** the lists of section 8 of the spec. Modify only what names the old keys.
 
-- [ ] **Step 1: Module and root documents**, rewritten for the present state: AI `README.md`, `CHANGELOG.md`, `docs/DESIGN_DECISIONS.md`, `docs/SEARCH_AND_TRANSLATION.md`, `docs/rag/MODULE.md`, `docs/rag/MODERATION_AND_SEARCH.md`; Core `README.md`, `CHANGELOG.md`, `docs/EVENT_ORCHESTRATION.md`, `docs/rag/EVENT_ORCHESTRATION.md`, `docs/rag/MODULE.md`, `docs/rag/SEARCH_MATCHING_DEVELOPER.md`, `docs/rag/SEARCH_RETRIEVAL_PIPELINE.md`, `docs/rag/SETTING_ACTIONS_DEVELOPER.md`; root `README.md`, `docs/ricerca-spiegazione-semplice.md`. Say that the AI switch is the single switch, name `features.embeddings.active`, and give the upgrade note with the SQL of Task 5.
+- [ ] **Step 1: Module and root documents**, rewritten for the present state: AI `README.md`, `CHANGELOG.md`, `docs/DESIGN_DECISIONS.md`, `docs/SEARCH_AND_TRANSLATION.md`, `docs/rag/MODULE.md`, `docs/rag/MODERATION_AND_SEARCH.md`; Core `README.md`, `CHANGELOG.md`, `docs/EVENT_ORCHESTRATION.md`, `docs/rag/EVENT_ORCHESTRATION.md`, `docs/rag/MODULE.md`, `docs/rag/SEARCH_MATCHING_DEVELOPER.md`, `docs/rag/SEARCH_RETRIEVAL_PIPELINE.md`, `docs/rag/SETTING_ACTIONS_DEVELOPER.md`; root `README.md`, `docs/ricerca-spiegazione-semplice.md`. Say that the AI switch is the single switch, name `features.embeddings.serving_model`, and give the upgrade note with the SQL of Task 5.
 - [ ] **Step 2: Superseded notes** (one line each, pointing to the spec, no rewrite): specs `2026-10-05-embedding-model-switch-design.md` (decision 2, sections 4.2 and 4.5), `2026-09-12-es-multilingual-index-and-multimodel-embeddings-design.md`, `2026-10-22-ai-standard-servers-design.md`; plans `2026-10-05-embedding-model-switch.md`, `2026-10-06-embedding-switch-chunked-indexes.md`, `2026-09-12-es-multilingual-index-and-multimodel-embeddings.md`, `2026-10-06-ai-module-neuron-review.md`, `2026-10-07-ai-module-review-decisions.md`, `2026-10-21-palette-documentation-search.md`. Set the spec's status to `Implemented` with the divergences found.
 - [ ] **Step 3: Indexes and closing.** Add this plan to `plans/INDEX.md` (name and what it covers, no status); when every box is ticked add `status: completed` to the front matter, a `## Delivery status (date): ...` section and a `**Documented in:**` line naming the module docs, as `ClosedPlansPointToDocumentationTest` requires.
 - [ ] **Step 4: Run** `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php` and `bash plan-status --open` from the stack root. Commit `docs: vector search owned by the AI module`.
