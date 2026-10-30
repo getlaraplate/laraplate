@@ -60,7 +60,7 @@ module: core, ai, cms, sao
 - Consumes: `VectorProfileContext::get()` from Task 1.
 - Produces: `VectorSearchAvailability::check()` answers `disabled` when the profile is `null`, `dimension_mismatch` when the index holds another length than `get()->dimensions`, `yes` otherwise (`suspended` is no longer Core's).
 
-- [ ] **Step 1: Failing tests**, one assertion set per call site (names are the existing test files' style):
+- [x] **Step 1: Failing tests**, one assertion set per call site (names are the existing test files' style):
   - `VectorSearchConfigTest`: Elasticsearch mapping has `dense_vector` with the profile's `dims` and `similarity`; with `::none()` there is no `embedding` property.
   - Typesense mapping: `embedding` `float[]` field present with a profile, absent without (Typesense needs no dimension; read 2026-10-30).
   - `ElasticsearchTranslator`: a nested `vector` field uses the option when given, else the profile; with neither it emits no `dense_vector`.
@@ -69,9 +69,9 @@ module: core, ai, cms, sao
   - `VectorSearchAvailabilityTest`: `disabled`, `dimension_mismatch`, `yes`; no test sets a suspension any more.
   - `SearchableEmbeddingsArrayTest` / `SearchableEmbeddingsModelKeyTest`: the field dimensions and the stamped key come from the profile.
   - CMS `Content` and SAO `Ticket`: the field carries the profile's dimensions and similarity; with no profile it carries no `vector` option.
-- [ ] **Step 2: Run** the touched Core, CMS and SAO tests; expect failures.
-- [ ] **Step 3: Implement** each call site on `VectorProfileContext::get()`; remove every `384` and `'cosine'` default. `Searchable` keeps the `VectorProfileContext::using()` call it already makes around index documents.
-- [ ] **Step 4: Run** the same tests plus `Modules/Core/tests/Integration/Search`; expect pass. Pint on the changed files from the root. Commit per repo: `refactor(core): read the vector profile instead of core.search.vector`, same for CMS and SAO.
+- [x] **Step 2: Run** the touched Core, CMS and SAO tests; expect failures.
+- [x] **Step 3: Implement** each call site on `VectorProfileContext::get()`; remove every `384` and `'cosine'` default. `Searchable` keeps the `VectorProfileContext::using()` call it already makes around index documents.
+- [x] **Step 4: Run** the same tests plus `Modules/Core/tests/Integration/Search`; expect pass. Pint on the changed files from the root. Commit per repo: `refactor(core): read the vector profile instead of core.search.vector`, same for CMS and SAO.
 
 ### Task 3: The AI provider, the registry and the seeder (AI)
 
