@@ -1,6 +1,6 @@
 # Vector search owned by the AI module: design
 
-**Status:** Proposed (2026-10-30), awaiting review.
+**Status:** Proposed (2026-10-30), awaiting review. Plan: `docs/superpowers/plans/2026-10-30-vector-search-owned-by-ai.md`.
 **Related:** `2026-10-05-embedding-model-switch-design.md` (decisions 2 and 4, sections 4.2 and 4.5 are superseded in part by this spec, see section 3), `2026-09-12-es-multilingual-index-and-multimodel-embeddings-design.md` (the profile registry and the `model_key` stamp), `2026-10-22-ai-standard-servers-design.md` (the servers the profiles point at).
 
 ## 1. Purpose
