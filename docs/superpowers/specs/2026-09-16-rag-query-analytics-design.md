@@ -10,7 +10,7 @@
 
 ## Problem
 
-The documentation RAG path answers user questions and keeps no record of them. Nobody can see which questions retrieved nothing (corpus gaps), what languages real usage is in, how often the assistant abstains, or how slow retrieval is in production. Every retrieval-quality decision so far has run against a hand-written fixture (`ai:evaluate-documentation`), never against what users actually ask.
+The documentation RAG path answers user questions and keeps no record of them. Nobody can see which questions retrieved nothing (corpus gaps), what languages real usage is in, how often the assistant abstains, or how slow retrieval is in production. Every retrieval-quality decision so far has run against a hand-written fixture (`test:ai:evaluate-documentation`), never against what users actually ask.
 
 Two existing designs name the hole from opposite sides:
 

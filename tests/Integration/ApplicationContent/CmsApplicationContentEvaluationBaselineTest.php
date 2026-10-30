@@ -87,7 +87,7 @@ it('reproduces the committed record-level baseline from generated CMS records', 
  *
  * The test suite runs Scout on the `collection` driver, so the provider answers through its
  * lexical fallback and a profile change cannot move these numbers here: the gate guards the
- * wiring, and the measurement that justifies a profile is `php artisan ai:tune-retrieval` against
+ * wiring, and the measurement that justifies a profile is `php artisan test:ai:tune-retrieval` against
  * a real engine. When a new profile legitimately changes this fixture's ordering, regenerate the
  * baseline as for the test above (`APP_CONTENT_BASELINE_REGEN=1`), review the diff, and commit it
  * together with the profile.

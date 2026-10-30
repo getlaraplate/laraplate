@@ -33,7 +33,7 @@ Phase 1's command evaluates what the authorized end user sees (projected, post-A
 
 3. **`RetrievalStrategyEvaluationService`** — per dataset case: embed the query (`ITextEmbedder`), then call `EnsembleSearchService::search()` **twice** with an explicit plan forcing keyword+vector+hybrid: once with `ranking.use_reranker=false` (yields `meta.per_strategy` for keyword/vector/hybrid **and** the fused final ordering) and once with `use_reranker=true` (yields the reranked final ordering). Compute `@k` per strategy via the shared helper against `expected_hit_ids`. Aggregate into a strategy×metric report. Injectable `clock` and an injectable retrieval seam (a callable returning the two results) so it is unit-testable without Elasticsearch.
 
-4. **Command** `ai:evaluate-retrieval-strategies --source=<source> --dataset=<file> --output=<file>` — mirrors the Phase 1 command's CLI and report-writing (atomic, `--force`), resolves the model class from the source via the provider's `ProvidesPermissionModel::permissionModel()` (`Content` / `Ticket`), and runs the real engine (Elasticsearch) with no chat model.
+4. **Command** `test:ai:evaluate-retrieval-strategies --source=<source> --dataset=<file> --output=<file>` — mirrors the Phase 1 command's CLI and report-writing (atomic, `--force`), resolves the model class from the source via the provider's `ProvidesPermissionModel::permissionModel()` (`Content` / `Ticket`), and runs the real engine (Elasticsearch) with no chat model.
 
 5. **Dataset** — reuse `ApplicationContentEvaluationDataset` / `ApplicationContentEvaluationCase` as-is (`query`, `expected_hit_ids`, `locale`, `limit`, `slices`). The `authorization` block is **ignored** here (pre-ACL benchmark); `expected_hit_ids` keep the `<source>:` prefix.
 
@@ -66,6 +66,6 @@ Evaluated **pre-authorization**: `EnsembleSearchService`/`AdvancedSearchService`
 
 ## Out of scope here (needs the corpus)
 
-- **Real measurement on Elasticsearch** over the indexed Naxos + The Hacker News corpus via `ai:evaluate-retrieval-strategies` — the actual numbers that show whether vector/hybrid/rerank beat keyword.
+- **Real measurement on Elasticsearch** over the indexed Naxos + The Hacker News corpus via `test:ai:evaluate-retrieval-strategies` — the actual numbers that show whether vector/hybrid/rerank beat keyword.
 - A **gold dataset anchored to that real corpus** (stable ids), and a stored reference report compared with per-metric tolerances (not exact-match; ES ranking is not bit-deterministic).
 These are done once the two-source corpus is indexed and embedded; this design's implementation delivers the plumbing + deterministic tests so that step is a data task, not a code task.

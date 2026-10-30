@@ -1,7 +1,7 @@
 # Measured Retrieval Tuning (L1) — Design
 
 
-**Status:** Implemented 2026-10-01 (mechanism shipped with an L0-equivalent profile; the switch is the `search.adaptive_tuning` setting and the blend the `search.reranker.weight` setting; see the plan's delivery status for divergences). The measured profile is still to be produced manually with `ai:tune-retrieval`.
+**Status:** Implemented 2026-10-01 (mechanism shipped with an L0-equivalent profile; the switch is the `search.adaptive_tuning` setting and the blend the `search.reranker.weight` setting; see the plan's delivery status for divergences). The measured profile is still to be produced manually with `test:ai:tune-retrieval`.
 **Date:** 2026-09-15
 **Author:** swolley + Claude
 **Related:**
@@ -37,7 +37,7 @@ blend:
 | query classification | `mb_strlen($query) < 20` and "contains a digit" | intuition |
 
 The measurement machinery to do better already exists: curated relevance datasets,
-`ai:evaluate-application-content` (end-to-end ordering) and `ai:evaluate-retrieval-strategies`
+`test:ai:evaluate-application-content` (end-to-end ordering) and `test:ai:evaluate-retrieval-strategies`
 (per-strategy ordering, reranker off and on), both emitting precision@k, recall@k, nDCG@k and MRR,
 with committed baselines gated in CI.
 
@@ -87,7 +87,7 @@ wires the second one (it becomes the rerank blend) and deletes the first.
    `RetrievalTuningProfile::apply($plan, $analysis)` right after `safePlan()` and
    `applyEngineCapabilities()`. One insertion point, both planners covered, trivially skippable.
 
-7. **The tuner never writes configuration.** `ai:tune-retrieval` runs a parameter grid through the
+7. **The tuner never writes configuration.** `test:ai:tune-retrieval` runs a parameter grid through the
    existing evaluation services and prints a ranked table plus a ready-to-paste PHP profile block.
    A human reads the numbers and commits the change.
 
@@ -130,7 +130,7 @@ return [
 ```
 
 The values above are **placeholders committed as L0-equivalent-by-default**: the real numbers are
-whatever `ai:tune-retrieval` measures on the curated datasets. The shipped profile must not be a
+whatever `test:ai:tune-retrieval` measures on the curated datasets. The shipped profile must not be a
 guess dressed as a measurement, so the first commit of this file carries the tuner's report path in
 a comment.
 
@@ -156,12 +156,12 @@ AdvancedSearchService::search()
 
 New Core pieces: `Search/Enums/QueryClass.php`, `Search/Services/RetrievalTuningProfile.php`,
 `config/search_tuning.php`, a `search_adaptive_tuning` setting row.
-New AI piece: `Console/TuneRetrievalCommand.php` (`ai:tune-retrieval`).
+New AI piece: `Console/TuneRetrievalCommand.php` (`test:ai:tune-retrieval`).
 
 ## The tuner
 
 ```bash
-php artisan ai:tune-retrieval --source=cms.contents --dataset=<path> \
+php artisan test:ai:tune-retrieval --source=cms.contents --dataset=<path> \
     --grid=default --metric=ndcg_at_5 --output=<report.json>
 ```
 
@@ -200,7 +200,7 @@ covered by the existing ensemble tests.
 - Baseline gates (`CmsApplicationContentEvaluationBaselineTest`,
   `SaoApplicationContentEvaluationBaselineTest`) must stay byte-identical with tuning **off**, and
   a new gate asserts the committed profile does not regress them with tuning **on**.
-- `ai:tune-retrieval`: fake retriever seam, asserts the grid ranks candidates by the chosen metric
+- `test:ai:tune-retrieval`: fake retriever seam, asserts the grid ranks candidates by the chosen metric
   and that no file other than the report is written.
 
 ## Out of scope

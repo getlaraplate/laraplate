@@ -69,7 +69,7 @@ php artisan ai:help --question="How does ACL inheritance work?"
 
 Run a per-module documentation retrieval baseline (retrieval-only, no chat model):
 
-    php artisan ai:evaluate-documentation --module=core --index=user \
+    php artisan test:ai:evaluate-documentation --module=core --index=user \
       --dataset=Modules/Core/docs/rag/evaluations/<file>.json \
       --output=<report>.json
 

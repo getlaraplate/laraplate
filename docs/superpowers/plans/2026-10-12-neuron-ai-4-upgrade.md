@@ -44,7 +44,7 @@ created_on: 2026-10-12
 4. Tables: no `chat_messages` or `workflow_store`; each agent gets a throwaway workflow id (Decision 3).
 5. Container wiring: no `MessageStoreInterface` or `PersistenceInterface` binding; agents are built with `make()` per call, never as singletons, as the skill asks.
 6. `bootstrap/app.php` error mapping: none (Laravel 10 layout); the assistant endpoint turns failures into its own `RunError` codes.
-7. Evaluation: the application has `ai:evaluate-documentation`, not `neuron:evaluate`.
+7. Evaluation: the application has `test:ai:evaluate-documentation`, not `neuron:evaluate`.
 8. Queue: turns do not run as Neuron workflows, so `retry_after` does not depend on them.
 
 Recommendations: when assistant turns move to Neuron workflows (a later spec), adopt `->for($threadId)` with `EloquentMessageStore` and `DatabasePersistence` and the skill's error mapping; declare the filterable metadata fields (`audience`, `module`, `locale`, `tenant_scope`) on the store's `DocumentSchema` so a Neuron retrieval scope becomes possible; make the 60-second request limit a setting if a provider needs longer. The two first-party packages the guides name (`neuron-core/router`, `neuron-core/raptor-retrieval`) are not required. No upgrade guide describes the stricter structured output above: worth telling the Neuron maintainers.

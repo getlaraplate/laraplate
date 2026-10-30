@@ -17,7 +17,7 @@ The evaluation scaffolding is already in place and drives the **real** ranking s
 - `Modules/AI/app/Services/ApplicationContent/Evaluation/ApplicationContentEvaluationService.php` — evaluates a dataset by calling a retrieval closure once per case; emits a payload-free JSON report (schema_version, driver, versions, case_count, metrics, latency_ms, slices).
 - `ApplicationContentEvaluationCase` — carries binary ground truth: `expectedHitIds` (relevant record-id set, e.g. `cms.contents:1`) + `expectedCitationReferences`, plus behavioral `expect*` booleans, `locale`, `limit`, `slices`, `authorization`.
 - `ApplicationContentEvaluationDataset` — strict typed loader; JSON keys exactly: `version`, `provider_version`, `corpus_revision`, `source`, `data_classification` (must be `synthetic`), `cases`.
-- `Console/EvaluateApplicationContentCommand.php` — `ai:evaluate-application-content --dataset= --source= --output= --force`; resolves the registered provider and runs the **real** pipeline `provider->retrieve()` → `AdvancedSearchService` → `EnsembleSearchService` (keyword + vector + hybrid, RRF fusion, `IReranker`) with a DB `LIKE` lexical fallback. No chat model. Deterministic test seam: injectable `clock` closure + injected retrieval callable.
+- `Console/EvaluateApplicationContentCommand.php` — `test:ai:evaluate-application-content --dataset= --source= --output= --force`; resolves the registered provider and runs the **real** pipeline `provider->retrieve()` → `AdvancedSearchService` → `EnsembleSearchService` (keyword + vector + hybrid, RRF fusion, `IReranker`) with a DB `LIKE` lexical fallback. No chat model. Deterministic test seam: injectable `clock` closure + injected retrieval callable.
 
 Registered application-content sources today: `cms.contents` (CMS) and `sao.tickets` (SAO).
 
@@ -35,7 +35,7 @@ Reuse the existing service/case/dataset/command. Phase 1 is additive and touches
 
 ```
 curated dataset JSON (per source, anchored to dev seeders)
-        │  ai:evaluate-application-content --source --dataset --output
+        │  test:ai:evaluate-application-content --source --dataset --output
         ▼
 provider->retrieve()  →  AdvancedSearch → Ensemble(keyword|vector|hybrid, RRF, rerank)  →  ordered hits
         ▼

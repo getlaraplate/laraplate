@@ -275,8 +275,8 @@ Due comandi ci girano sopra:
 
 | Comando | Cosa misura |
 |---------|-------------|
-| `ai:evaluate-application-content` | qualità della lista finale, pipeline vera, senza LLM |
-| `ai:evaluate-retrieval-strategies` | qualità **per strategia**: keyword, vector, hybrid, fused, reranked |
+| `test:ai:evaluate-application-content` | qualità della lista finale, pipeline vera, senza LLM |
+| `test:ai:evaluate-retrieval-strategies` | qualità **per strategia**: keyword, vector, hybrid, fused, reranked |
 
 Il secondo esegue il motore due volte, con reranker spento e acceso, così vedi se il reranker sta
 aiutando davvero o se lo stai pagando per niente.
@@ -323,7 +323,7 @@ il risultato. Riproducibile, revisionabile, protetto dal gate in CI. In pratica:
   RRF, bonus accordo, top-K e miscela del reranker. Mai la scelta delle strategie: se il vettoriale
   gira resta una questione di capacità, non di tuning;
 - ogni risposta dice cosa è successo in `meta.tuning` (versione del profilo e classe della query);
-- i numeri li produce `php artisan ai:tune-retrieval`, che rigioca la fusione su una griglia di
+- i numeri li produce `php artisan test:ai:tune-retrieval`, che rigioca la fusione su una griglia di
   parametri senza rieseguire le query sul motore e stampa il blocco da incollare. Non scrive mai la
   configurazione: la committa un umano;
 - per non scegliere valori che funzionano solo sui casi di prova, il tuner tiene da parte una quota

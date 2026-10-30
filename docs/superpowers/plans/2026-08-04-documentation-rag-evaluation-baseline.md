@@ -2,13 +2,13 @@
 status: completed
 verified_on: 2026-09-15
 verified_by: repo audit
-note: DocumentationEvaluation{Case,Dataset,Service}, ai:evaluate-documentation and DocumentationBaselineGateTest are all present.
+note: DocumentationEvaluation{Case,Dataset,Service}, test:ai:evaluate-documentation and DocumentationBaselineGateTest are all present.
 ---
 # Documentation RAG Evaluation Baseline (R0) Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Give documentation RAG a deterministic, per-module, retrieval-only evaluation baseline (dataset + scoring harness + `ai:evaluate-documentation` command + regression gate), starting with the Core/user index.
+**Goal:** Give documentation RAG a deterministic, per-module, retrieval-only evaluation baseline (dataset + scoring harness + `test:ai:evaluate-documentation` command + regression gate), starting with the Core/user index.
 
 **Architecture:** Mirror the existing, mature application-content evaluation harness (`Modules/AI/app/Services/ApplicationContent/Evaluation/*` + `EvaluateApplicationContentCommand`), adapted to the documentation retrieval contract. Scoring routes through the real `InAppDocumentationRetrieval::retrieve()` using its injectable `$search` closure seam, so audience/permission/tenant/locale filtering and the safe projection run exactly as in production; only the Elasticsearch vector store is replaced by a deterministic in-memory fixture. Level-1 (retrieval) metrics are deterministic and gate CI; Level-2 (live generation) is defined in the spec but not implemented here.
 
@@ -1184,7 +1184,7 @@ git commit -m "feat(ai): documentation evaluation scoring service"
 
 ---
 
-### Task 5: `ai:evaluate-documentation` command
+### Task 5: `test:ai:evaluate-documentation` command
 
 **Files:**
 - Create: `Modules/AI/app/Console/EvaluateDocumentationCommand.php`
@@ -1193,7 +1193,7 @@ git commit -m "feat(ai): documentation evaluation scoring service"
 
 **Interfaces:**
 - Consumes: `DocumentationEvaluationDataset`, `DocumentationEvaluationService` (Tasks 2, 4); `InAppDocumentationRetrieval` (resolved from container); fixtures (Task 3).
-- Produces: artisan command `ai:evaluate-documentation --module= --index=user --dataset= --output= --force`, writing a JSON report atomically. Commands in `app/Console` are auto-registered by the module provider (same as `EvaluateApplicationContentCommand`, which has no explicit registration) — verify with `php artisan list | grep ai:evaluate`.
+- Produces: artisan command `test:ai:evaluate-documentation --module= --index=user --dataset= --output= --force`, writing a JSON report atomically. Commands in `app/Console` are auto-registered by the module provider (same as `EvaluateApplicationContentCommand`, which has no explicit registration) — verify with `php artisan list | grep ai:evaluate`.
 
 - [x] **Step 1: Write the failing test**
 
@@ -1234,7 +1234,7 @@ it('writes a payload-free documentation evaluation report and refuses overwrite'
     ], JSON_THROW_ON_ERROR));
 
     try {
-        $this->artisan('ai:evaluate-documentation', [
+        $this->artisan('test:ai:evaluate-documentation', [
             '--module' => 'core', '--index' => 'user',
             '--dataset' => $dataset_path, '--output' => $output_path,
         ])->assertSuccessful();
@@ -1245,7 +1245,7 @@ it('writes a payload-free documentation evaluation report and refuses overwrite'
             ->and($report['module'])->toBe('core')
             ->and(json_encode($report))->not->toContain('how do I export a grid?');
 
-        $this->artisan('ai:evaluate-documentation', [
+        $this->artisan('test:ai:evaluate-documentation', [
             '--module' => 'core', '--index' => 'user',
             '--dataset' => $dataset_path, '--output' => $output_path,
         ])->assertFailed();
@@ -1258,7 +1258,7 @@ it('writes a payload-free documentation evaluation report and refuses overwrite'
 
 it('fails when the dataset module does not match --module', function (): void {
     app()->instance(InAppDocumentationRetrieval::class, FakeDocumentationSearch::forInAppRetrieval([]));
-    $this->artisan('ai:evaluate-documentation', [
+    $this->artisan('test:ai:evaluate-documentation', [
         '--module' => 'erp', '--index' => 'user',
         '--dataset' => '/missing.json', '--output' => '/tmp/x.json',
     ])->assertFailed();
@@ -1268,7 +1268,7 @@ it('fails when the dataset module does not match --module', function (): void {
 - [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/AI/tests/Feature/EvaluateDocumentationCommandTest.php`
-Expected: FAIL (command `ai:evaluate-documentation` not found).
+Expected: FAIL (command `test:ai:evaluate-documentation` not found).
 
 - [x] **Step 3: Write minimal implementation**
 
@@ -1294,7 +1294,7 @@ use Throwable;
 final class EvaluateDocumentationCommand extends Command
 {
     #[Override]
-    protected $signature = 'ai:evaluate-documentation
+    protected $signature = 'test:ai:evaluate-documentation
                             {--module= : Module that owns the dataset}
                             {--index=user : Documentation index profile (user|developer)}
                             {--dataset= : Path to an evaluation dataset}
@@ -1400,14 +1400,14 @@ $this->app->singleton(DocumentationEvaluationService::class);
 - [x] **Step 4: Run test to verify it passes**
 
 Run: `php artisan test --compact Modules/AI/tests/Feature/EvaluateDocumentationCommandTest.php`
-Expected: PASS. Also confirm registration: `php artisan list | grep ai:evaluate-documentation`.
+Expected: PASS. Also confirm registration: `php artisan list | grep test:ai:evaluate-documentation`.
 
 - [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
 git add Modules/AI/app/Console/EvaluateDocumentationCommand.php Modules/AI/app/Providers/AIServiceProvider.php Modules/AI/tests/Feature/EvaluateDocumentationCommandTest.php
-git commit -m "feat(ai): ai:evaluate-documentation command"
+git commit -m "feat(ai): test:ai:evaluate-documentation command"
 ```
 
 ---
@@ -1573,7 +1573,7 @@ Expected: FAILs first if the corpus stub or dataset is absent/misaligned; PASSes
 
 Run:
 ```bash
-php artisan ai:evaluate-documentation \
+php artisan test:ai:evaluate-documentation \
   --module=core --index=user \
   --dataset=Modules/Core/docs/rag/evaluations/2026-08-documentation-user.json \
   --output=Modules/Core/docs/rag/evaluations/2026-08-documentation-user.baseline.json --force
@@ -1594,7 +1594,7 @@ git commit -m "feat(core): Core/user documentation evaluation baseline + regress
 
 **Files:**
 - Modify: `laraplate/docs/rag/README.md` (add the documentation-evaluation command under the existing "Command" section)
-- Modify: `Modules/AI/docs/rag/MODULE.md` (add a short "Documentation evaluation" subsection referencing `ai:evaluate-documentation` and the spec)
+- Modify: `Modules/AI/docs/rag/MODULE.md` (add a short "Documentation evaluation" subsection referencing `test:ai:evaluate-documentation` and the spec)
 
 Per `AGENTS.md`, feature work updates affected RAG docs. This adds operator/developer pointers; no behavior change.
 
@@ -1607,7 +1607,7 @@ Under the `## Command` section, after the `ai:laraplate-help` block, add:
 
 Run a per-module documentation retrieval baseline (retrieval-only, no chat model):
 
-    php artisan ai:evaluate-documentation --module=core --index=user \
+    php artisan test:ai:evaluate-documentation --module=core --index=user \
       --dataset=Modules/Core/docs/rag/evaluations/<file>.json \
       --output=<report>.json
 
@@ -1622,9 +1622,9 @@ Add a `## Documentation evaluation` section:
 ```markdown
 ## Documentation evaluation
 
-`ai:evaluate-documentation` scores documentation retrieval per module and index
+`test:ai:evaluate-documentation` scores documentation retrieval per module and index
 profile (Level-1, deterministic, no chat model), mirroring
-`ai:evaluate-application-content`. Datasets are owned by each module under
+`test:ai:evaluate-application-content`. Datasets are owned by each module under
 `docs/rag/evaluations/`. The deterministic regression gate lives in
 `Modules/AI/tests/Feature/DocumentationBaselineGateTest.php`. Live-generation
 (Level-2) scoring is specified but opt-in. Design:
@@ -1635,7 +1635,7 @@ profile (Level-1, deterministic, no chat model), mirroring
 
 ```bash
 git add laraplate/docs/rag/README.md Modules/AI/docs/rag/MODULE.md
-git commit -m "docs(ai): document ai:evaluate-documentation baseline"
+git commit -m "docs(ai): document test:ai:evaluate-documentation baseline"
 ```
 
 (Path note: run `git add` from the `laraplate/` repo root — the two files are `docs/rag/README.md` and `Modules/AI/docs/rag/MODULE.md` relative to it.)
@@ -1649,11 +1649,11 @@ git commit -m "docs(ai): document ai:evaluate-documentation baseline"
 php artisan test --compact Modules/AI/tests/Unit/Services/Documentation Modules/AI/tests/Feature/EvaluateDocumentationCommandTest.php Modules/AI/tests/Feature/DocumentationBaselineGateTest.php
 ```
 - [x] `vendor/bin/pint --dirty` clean.
-- [x] `php artisan list | grep ai:evaluate-documentation` shows the command.
+- [x] `php artisan list | grep test:ai:evaluate-documentation` shows the command.
 
 ## Self-review notes (author)
 
-- **Spec coverage:** dataset schema + value objects (Tasks 1–2); deterministic retrieval-only harness via the `$search` seam (Tasks 3–4); `ai:evaluate-documentation` (Task 5); Core/user first dataset + regression gate (Task 6); RAG doc updates (Task 7). Level-2 and the assistant-level (R1) contract are spec-only and intentionally have no task.
+- **Spec coverage:** dataset schema + value objects (Tasks 1–2); deterministic retrieval-only harness via the `$search` seam (Tasks 3–4); `test:ai:evaluate-documentation` (Task 5); Core/user first dataset + regression gate (Task 6); RAG doc updates (Task 7). Level-2 and the assistant-level (R1) contract are spec-only and intentionally have no task.
 - **Determinism honesty:** the CI gate measures ranking + harness + the emulated permission/tenant/locale filter in the fixture; real Elasticsearch filtering and Level-2 generation are opt-in and out of scope, as the spec states. This is called out in Task 6.
 - **Type consistency:** the report metric keys (`source_hit_at_k`, `mean_reciprocal_rank`, `citation_precision`, `authorized_empty_accuracy`, `supported_answer_rate`, `refusal_accuracy`, `unavailable_rate`) and the case fields are used identically across Tasks 4–6. Grading identity is `Document::$sourceName` (= `safe_source_label`) everywhere.
 
@@ -1661,4 +1661,4 @@ php artisan test --compact Modules/AI/tests/Unit/Services/Documentation Modules/
 
 **Documented in:** `Modules/AI/docs/rag/DOCUMENTATION_EVALUATION_USER.md` and `Modules/AI/docs/rag/DOCUMENTATION_EVALUATION_DEVELOPER.md`.
 
-Verified against the code: `DocumentationEvaluation{Case,Dataset,Service}`, `ai:evaluate-documentation` and `DocumentationBaselineGateTest` exist and carry the behaviour the tasks specify. Level-2 live scoring stays opt-in, as the plan intended.
+Verified against the code: `DocumentationEvaluation{Case,Dataset,Service}`, `test:ai:evaluate-documentation` and `DocumentationBaselineGateTest` exist and carry the behaviour the tasks specify. Level-2 live scoring stays opt-in, as the plan intended.
