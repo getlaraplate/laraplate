@@ -371,7 +371,7 @@ Not oversights. Each would break the security model.
 | Excluded | Why |
 |----------|-----|
 | `auth.impersonate` / `leaveImpersonate` | Lets the model become another user. Destroys the entire per-user authorization design in one call. **Never expose.** |
-| Any Artisan passthrough (`cms:import`, reindex, `migrate`, `perf:bench`) | A `run_artisan(cmd)` tool is arbitrary remote code execution driven by untrusted text. If a specific command is ever needed, wrap it as a named tool with fixed arguments, queued — never a passthrough. |
+| Any Artisan passthrough (`cms:import`, reindex, `migrate`, `test:perf:bench`) | A `run_artisan(cmd)` tool is arbitrary remote code execution driven by untrusted text. If a specific command is ever needed, wrap it as a named tool with fixed arguments, queued — never a passthrough. |
 | `CrudService::doActivateOperation` raw / `domainAction` | `DomainActionDispatcher` resolves actions dynamically, so the reachable surface is not knowable at review time. |
 | `clearModelCache` | Operational lever with no read value; a plausible denial-of-service knob. |
 | `dev.php` (`phpinfo`, swagger merge) | Environment disclosure. |

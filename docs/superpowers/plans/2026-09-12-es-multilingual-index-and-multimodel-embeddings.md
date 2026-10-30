@@ -986,7 +986,7 @@ Run once after all tasks land (dev environment):
 2. `php artisan migrate --no-interaction` (locale + model_key).
 3. `php artisan ai:embeddings:repair "Modules\\CMS\\Models\\Content"` and `... "Modules\\SAO\\Models\\Ticket"`; wait until all have embeddings.
 4. `php artisan scout:delete-index "Modules\\CMS\\Models\\Content"` → `scout:index` → `scout:import` (Content, Ticket, Location).
-5. `php artisan ai:evaluate-retrieval-strategies` to confirm gains (especially `en_*` and lexical slices).
+5. `php artisan test:ai:evaluate-retrieval-strategies` to confirm gains (especially `en_*` and lexical slices).
 
 ## Self-Review notes
 
@@ -1007,7 +1007,7 @@ The post-implementation cutover (switch the service model, migrate, repair embed
 
 Step 1 is done and extended: the embedding service now serves `intfloat/multilingual-e5-small`, and it was made **multi-model + request-driven** — `EmbeddingsProviderFactory` sends the active profile's `service_model` on every `/embed` call, so `/health`↔config drift is structurally eliminated rather than merely reconciled once. The self-hosted service (lazy-load + LRU cache + `EMBEDDING_MODEL` default) is documented in `docs/SENTENCE_TRANSFORMERS_INSTALLATION.md of the AI module (replaced on 2026-10-23 by STANDARD_SERVERS_INSTALLATION.md)`. Two related fixes landed alongside: the embeddings HTTP client's timeout/batch became configurable (a hardcoded 10s/128 aborted indexing on a CPU service), and the RAG retrieval now applies the active profile's `query:` prefix (it embedded queries raw while documents carry `passage:`).
 
-The RAG **documentation** corpus was re-embedded with e5 and measured — tracked in `2026-07-16-rag-retrieval-strategy.md`. Steps 2-5 (migrate, `ai:embeddings:repair` for CMS Content / SAO Ticket, `scout:delete-index`/`index`/`import`, `ai:evaluate-retrieval-strategies`) remain outstanding for the **application-content** corpus: those tables are currently empty, so there are no `ModelEmbedding` rows to regenerate yet. Run steps 2-5 once real content exists.
+The RAG **documentation** corpus was re-embedded with e5 and measured — tracked in `2026-07-16-rag-retrieval-strategy.md`. Steps 2-5 (migrate, `ai:embeddings:repair` for CMS Content / SAO Ticket, `scout:delete-index`/`index`/`import`, `test:ai:evaluate-retrieval-strategies`) remain outstanding for the **application-content** corpus: those tables are currently empty, so there are no `ModelEmbedding` rows to regenerate yet. Run steps 2-5 once real content exists.
 
 ### Pre-cutover blocker: full mapping was rejected by ES — RESOLVED 2026-09-17
 

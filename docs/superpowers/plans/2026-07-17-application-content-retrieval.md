@@ -336,7 +336,7 @@ Use a fake Core retrieval service and assert hit@K, reciprocal rank, citation pr
 
 - [x] **Step 2: Implement the evaluation service and command**
 
-Add `ai:evaluate-application-content` with required `--dataset`, `--source`, and `--output` options plus `--force`. The command runs provider-level retrieval evaluation without calling the chat provider and refuses sources not registered by enabled modules. The dataset loader builds typed, evaluation-only `FiltersGroup` access cases; this path is unavailable to HTTP/tools and does not bypass the authenticated gateway in production.
+Add `test:ai:evaluate-application-content` with required `--dataset`, `--source`, and `--output` options plus `--force`. The command runs provider-level retrieval evaluation without calling the chat provider and refuses sources not registered by enabled modules. The dataset loader builds typed, evaluation-only `FiltersGroup` access cases; this path is unavailable to HTTP/tools and does not bypass the authenticated gateway in production.
 
 - [x] **Step 3: Create the CMS fixture**
 
@@ -346,7 +346,7 @@ Create at least 30 versioned cases: exact lookup, paraphrase, locale/translation
 
 ```bash
 rtk php artisan test --compact Modules/AI/tests/Unit/Services/ApplicationContent/Evaluation/ApplicationContentEvaluationServiceTest.php
-rtk php artisan ai:evaluate-application-content --dataset=Modules/CMS/tests/Fixtures/application-content/cms-contents.json --source=cms.contents --output=Modules/CMS/docs/evaluations/application-content/2026-07-record-baseline.json
+rtk php artisan test:ai:evaluate-application-content --dataset=Modules/CMS/tests/Fixtures/application-content/cms-contents.json --source=cms.contents --output=Modules/CMS/docs/evaluations/application-content/2026-07-record-baseline.json
 ```
 
 The report records driver, corpus revision, provider version, aggregate/sliced metrics, and latency. It contains no prompts, full content, user identifiers, ACL expressions, or secrets.

@@ -10,7 +10,7 @@
 
 Laraplate gains a **per-module documentation RAG evaluation baseline**: a versioned dataset of graded questions plus a deterministic, retrieval-only scoring harness and a report artifact. It answers one question for every future change: *did documentation retrieval get better or worse?*
 
-The application content retrieval surface already has a mature, retrieval-only evaluation harness (`ApplicationContentEvaluation*` + `ai:evaluate-application-content`). Documentation RAG has **no equivalent baseline**. This goal fills that gap by mirroring the existing pattern, adapted to the documentation retrieval contract, and starting with the **Core** module, **user** audience index.
+The application content retrieval surface already has a mature, retrieval-only evaluation harness (`ApplicationContentEvaluation*` + `test:ai:evaluate-application-content`). Documentation RAG has **no equivalent baseline**. This goal fills that gap by mirroring the existing pattern, adapted to the documentation retrieval contract, and starting with the **Core** module, **user** audience index.
 
 The harness is owned by the AI module. Each module owns its own dataset file. Datasets never mix modules: one agent lives in one module's app context, so one module has its own isolated "report card". This matches the module-isolation principle and the contextual/generic routing boundary already in the retrieval architecture.
 
@@ -28,7 +28,7 @@ The harness is owned by the AI module. Each module owns its own dataset file. Da
 
 - A documentation evaluation dataset schema and immutable value objects (`DocumentationEvaluationCase`, `DocumentationEvaluationDataset`), validated on load, mirroring the application-content equivalents.
 - A retrieval-only scoring service (`DocumentationEvaluationService`) computing Level-1 metrics and slices, deterministic and provider-free.
-- A console command `ai:evaluate-documentation` that runs a dataset against the documentation retrieval seam and writes a JSON report.
+- A console command `test:ai:evaluate-documentation` that runs a dataset against the documentation retrieval seam and writes a JSON report.
 - A deterministic in-memory corpus + fixed-embedding fake `search` closure used to drive `InAppDocumentationRetrieval` without Elasticsearch.
 - The **Core / user** dataset as the first report card, stored under `Modules/Core/docs/rag/evaluations/`.
 - A committed baseline report and a regression gate (a Pest test asserting Level-1 metrics stay at or above committed thresholds).
@@ -126,7 +126,7 @@ AI module owns the harness (mirroring `Modules/AI/app/Services/ApplicationConten
 - `Modules\AI\Services\Documentation\Evaluation\DocumentationEvaluationCase`
 - `Modules\AI\Services\Documentation\Evaluation\DocumentationEvaluationDataset`
 - `Modules\AI\Services\Documentation\Evaluation\DocumentationEvaluationService`
-- `Modules\AI\Console\EvaluateDocumentationCommand` — signature `ai:evaluate-documentation --module= --index=user --dataset= --output= --force`.
+- `Modules\AI\Console\EvaluateDocumentationCommand` — signature `test:ai:evaluate-documentation --module= --index=user --dataset= --output= --force`.
 - A deterministic corpus + fake `search` closure and stub embedding service under the AI module test-support namespace.
 
 Each business module owns its dataset content:

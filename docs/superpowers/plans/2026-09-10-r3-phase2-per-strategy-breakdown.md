@@ -137,7 +137,7 @@ Expected: all PASS. If a baseline artifact would change, the refactor altered be
 
 ---
 
-### Task 4: Command `ai:evaluate-retrieval-strategies`
+### Task 4: Command `test:ai:evaluate-retrieval-strategies`
 
 **Files:**
 - Create: `Modules/AI/app/Console/EvaluateApplicationContentRetrievalStrategiesCommand.php`
@@ -150,7 +150,7 @@ Expected: all PASS. If a baseline artifact would change, the refactor altered be
 
 - [x] **Step 2: Run, confirm fail.**
 
-- [x] **Step 3: Implement the command** — signature `ai:evaluate-retrieval-strategies {--dataset=} {--source=} {--output=} {--force}`, mirroring `EvaluateApplicationContentCommand` (dataset load+validate, driver from `config('scout.driver')`, atomic write with `JSON_PRESERVE_ZERO_FRACTION`, generic error swallow). Resolve the model via the provider's `permissionModel()` (error clearly if the provider doesn't implement `ProvidesPermissionModel`). Implement the retriever interface + real impl + provider binding.
+- [x] **Step 3: Implement the command** — signature `test:ai:evaluate-retrieval-strategies {--dataset=} {--source=} {--output=} {--force}`, mirroring `EvaluateApplicationContentCommand` (dataset load+validate, driver from `config('scout.driver')`, atomic write with `JSON_PRESERVE_ZERO_FRACTION`, generic error swallow). Resolve the model via the provider's `permissionModel()` (error clearly if the provider doesn't implement `ProvidesPermissionModel`). Implement the retriever interface + real impl + provider binding.
 
 - [x] **Step 4: Run, confirm pass.**
 
@@ -161,7 +161,7 @@ Run: `php artisan test --compact Modules/AI/tests/Unit/Services/ApplicationConte
 
 ## Out of scope (needs the corpus — later)
 
-- Running `ai:evaluate-retrieval-strategies` on Elasticsearch over the indexed Naxos + The Hacker News corpus for the real numbers.
+- Running `test:ai:evaluate-retrieval-strategies` on Elasticsearch over the indexed Naxos + The Hacker News corpus for the real numbers.
 - A gold dataset anchored to that real corpus + a stored reference compared with per-metric tolerances (ES ranking is not bit-deterministic).
 
 ## RAG docs
@@ -172,4 +172,4 @@ Update `Modules/AI/docs/rag/MODULE.md` (the eval section from Phase 1) to add th
 
 **Documented in:** `Modules/AI/docs/rag/MODULE.md` (section "Per-strategy retrieval quality breakdown") and `Modules/Core/docs/rag/SEARCH_RETRIEVAL_PIPELINE.md`.
 
-All 4 tasks verified against the code: `meta[per_strategy]` on `AdvancedSearchResult`, the shared `IrMetrics` helper, `ApplicationContentRetrievalStrategyEvaluationService`, and `ai:evaluate-retrieval-strategies` with its feature test.
+All 4 tasks verified against the code: `meta[per_strategy]` on `AdvancedSearchResult`, the shared `IrMetrics` helper, `ApplicationContentRetrievalStrategyEvaluationService`, and `test:ai:evaluate-retrieval-strategies` with its feature test.

@@ -12,7 +12,7 @@ verified_by: repo audit (declared files + tests present)
 
 **Goal:** Add real IR metrics (precision@k, recall@k, nDCG@k) to the application-content evaluation harness and give both registered sources (`cms.contents`, `sao.tickets`) a committed, deterministic ranking-quality baseline.
 
-**Architecture:** Additive change to `ApplicationContentEvaluationService::metrics()` (no ranking code touched). CMS reuses its existing curated dataset + baseline test (regenerate the artifact). SAO gets a new curated dataset + baseline test anchored to the deterministic `SAO-1..SAO-8` dev corpus. The live Elasticsearch (vector/hybrid/rerank) baseline is produced on-demand by the existing `ai:evaluate-application-content` command and is out of the CI gate.
+**Architecture:** Additive change to `ApplicationContentEvaluationService::metrics()` (no ranking code touched). CMS reuses its existing curated dataset + baseline test (regenerate the artifact). SAO gets a new curated dataset + baseline test anchored to the deterministic `SAO-1..SAO-8` dev corpus. The live Elasticsearch (vector/hybrid/rerank) baseline is produced on-demand by the existing `test:ai:evaluate-application-content` command and is out of the CI gate.
 
 **Tech Stack:** PHP 8.5, Laravel 12, Pest, Laravel Scout (database engine in the deterministic gate).
 
@@ -265,7 +265,7 @@ git commit -m "test(eval): add SAO application-content ranking baseline with @k 
 
 - [x] **Step 1: Extend the command feature test.**
 
-In `EvaluateApplicationContentCommandTest.php` the test writes a dataset JSON, runs `ai:evaluate-application-content`, and asserts the report `metrics`. Add assertions for at least one `precision_at_*`, `recall_at_*`, `ndcg_at_*` key so the command-level report is covered. If the existing assertion is an exact `toBe`/`toEqual` on the metrics block, extend the expected block with the new keys; if it is `toMatchArray`, just add the new keys.
+In `EvaluateApplicationContentCommandTest.php` the test writes a dataset JSON, runs `test:ai:evaluate-application-content`, and asserts the report `metrics`. Add assertions for at least one `precision_at_*`, `recall_at_*`, `ndcg_at_*` key so the command-level report is covered. If the existing assertion is an exact `toBe`/`toEqual` on the metrics block, extend the expected block with the new keys; if it is `toMatchArray`, just add the new keys.
 
 - [x] **Step 2: Run it, confirm pass.**
 
@@ -289,7 +289,7 @@ git commit -m "test(eval): assert @k metrics in evaluate-application-content com
 
 ## Out of scope (Phase 1) — recorded for later
 
-- **Live Elasticsearch baseline** (vector/hybrid/rerank ranking quality): produced on-demand with `ai:evaluate-application-content --source=... --dataset=... --output=...` against a dev-seeded + indexed corpus; compared to a stored reference with per-metric tolerances (not exact-match). Not a CI gate.
+- **Live Elasticsearch baseline** (vector/hybrid/rerank ranking quality): produced on-demand with `test:ai:evaluate-application-content --source=... --dataset=... --output=...` against a dev-seeded + indexed corpus; compared to a stored reference with per-metric tolerances (not exact-match). Not a CI gate.
 - **Phase 2** — per-strategy breakdown (surface `score`/`strategy`, compare keyword/vector/hybrid/reranked).
 - **Phase 3** — metadata filtering and graph→retrieval, each measured against this baseline.
 

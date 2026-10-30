@@ -428,7 +428,7 @@ or `scout:import` preflight). The service change lives on the server, not in thi
    (`ai:embeddings:repair` extended to (re)generate per locale + stamp).
 5. `scout:delete-index` → `scout:index` (recreates full mapping) → `scout:import`
    (embeddings must be complete before import; see `vector-search-knn-broken` memory).
-6. Re-run the R3 evaluation (`ai:evaluate-retrieval-strategies`) to confirm gains,
+6. Re-run the R3 evaluation (`test:ai:evaluate-retrieval-strategies`) to confirm gains,
    especially `en_*` slices (now indexed) and lexical slices (now analyzer-aware).
 
 ## Testing strategy
