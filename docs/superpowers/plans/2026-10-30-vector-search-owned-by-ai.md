@@ -104,15 +104,15 @@ module: core, ai, cms, sao
 **Interfaces:**
 - Consumes: `VectorProfileContext::using()` (Task 1), `features.embeddings.serving_model` (Task 3).
 
-- [ ] **Step 1: Failing tests**:
+- [x] **Step 1: Failing tests**:
   - Activation writes `features.embeddings.serving_model` and `features.embeddings.model` to the target and writes nothing under `search.vector.*`; the previous model's rows are deleted as today.
   - `EmbeddingSwitchStore` has no suspension methods; **the state is `running` before the first re-embed job is dispatched** (order assertion in `EmbeddingSwitchPhasesTest`).
   - `EmbeddingVectorSearchAvailability`: `suspended` while the state is `running` or `failed`; asks the inner guard when `idle`; runs no database query.
   - Indexes are built inside `VectorProfileContext::using(new VectorProfile($target->key, $target->dimensions, $target->similarity), ...)`: the mapping carries the target's dimensions while the serving profile is still the old one; no config key is overridden.
   - Verifier: the smoke vector runs when `EmbeddingsGate::enabled()`; `SearchOrchestratorAgent`: `use_vector` is false when the provider returns `null`.
-- [ ] **Step 2: Run** them; expect failure.
-- [ ] **Step 3: Implement.** Read each caller of `suspend()` / `clearSuspension()` first and keep the order (state before work); `VectorSearchAvailability::forget()` stays in activation.
-- [ ] **Step 4: Run** `php artisan test --compact Modules/AI/tests/Feature Modules/AI/tests/Unit/Embeddings Modules/AI/tests/Unit/Services Modules/AI/tests/Integration`; expect pass. Pint. Commit `refactor(ai): the switch writes AI settings only`.
+- [x] **Step 2: Run** them; expect failure.
+- [x] **Step 3: Implement.** Read each caller of `suspend()` / `clearSuspension()` first and keep the order (state before work); `VectorSearchAvailability::forget()` stays in activation.
+- [x] **Step 4: Run** `php artisan test --compact Modules/AI/tests/Feature Modules/AI/tests/Unit/Embeddings Modules/AI/tests/Unit/Services Modules/AI/tests/Integration`; expect pass. Pint. Commit `refactor(ai): the switch writes AI settings only`.
 
 ### Task 5: Remove the Core settings
 
