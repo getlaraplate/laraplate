@@ -46,7 +46,7 @@ module: core, cms
 **Interfaces:**
 - Produces: `MigrateUtils::liveUniqueIndex(string $table, array $columns, string $name, ?ConnectionInterface $connection = null): void`, `$columns` a `list<string>`. Called after `Schema::create()`, like `fuzzyIndex()`. The table must have `deleted_at`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```php
 it('liveUniqueIndex refuses a second live row with the same key', function (): void {
@@ -77,11 +77,11 @@ it('liveUniqueIndex lets deleted rows share the key with each other and with one
 });
 ```
 
-- [ ] **Step 2: Run them, expect FAIL** (`Call to undefined method ...liveUniqueIndex`)
+- [x] **Step 2: Run them, expect FAIL** (`Call to undefined method ...liveUniqueIndex`)
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Helpers/MigrateUtilsTest.php`
 
-- [ ] **Step 3: Implement `liveUniqueIndex()`**
+- [x] **Step 3: Implement `liveUniqueIndex()`**
 
 Validate every identifier with `assertIdentifier()`. Per driver:
 - `pgsql`, `sqlite`: a partial index, `CREATE UNIQUE INDEX <name> ON <table> (<columns>) WHERE deleted_at IS NULL`.
@@ -90,8 +90,8 @@ Validate every identifier with `assertIdentifier()`. Per driver:
 
 Wrap identifiers with the connection's grammar, as `createPostgresFuzzyIndex()` does. Document the method in `Modules/Core/docs/rag/MODULE.md`, with the reason it exists: `unique(..., deleted_at)` does not constrain live rows, because `deleted_at` is null on all of them.
 
-- [ ] **Step 4: Run the tests, expect PASS**; then the whole `MigrateUtilsTest.php`.
-- [ ] **Step 5: Pint, PHPStan on the file, commit** (`feat(migrate-utils): unique index over live rows only`), push, PR in laracore.
+- [x] **Step 4: Run the tests, expect PASS**; then the whole `MigrateUtilsTest.php`.
+- [x] **Step 5: Pint, PHPStan on the file, commit** (`feat(migrate-utils): unique index over live rows only`), push, PR in laracore.
 
 ### Task 2: CMS, the constraint and the identity lookup of a tag
 
@@ -111,7 +111,7 @@ Wrap identifiers with the connection's grammar, as `createPostgresFuzzyIndex()` 
   - `Tag::findFromString(string $name, ?string $type = null): ?Tag` (changed): `findByIdentity()` excluding trashed tags; with a type, the tag only if its type equals the normalized type. A null type means any type, no longer "no type".
   - `Tag::findOrCreateFromString(string $name, ?string $type = null): Tag` (changed): `findByIdentity()`; a trashed match is restored; then `adoptType()`, saving when it set the type, throwing `InvalidArgumentException` when it returns false; no match creates the tag as today.
 
-- [ ] **Step 1: Write the failing tests** in `TagTest.php`:
+- [x] **Step 1: Write the failing tests** in `TagTest.php`:
 
 ```php
 it('refuses a second live translation with the same slug in a locale', ...);
@@ -130,13 +130,13 @@ it('finds from string of any type when no type is given', ...);
     // 'Jazz' type 'genre': findFromString('Jazz') is the tag, findFromString('Jazz', 'era') is null
 ```
 
-- [ ] **Step 2: Run them, expect FAIL.**
+- [x] **Step 2: Run them, expect FAIL.**
 
 Run: `php artisan test --compact Modules/CMS/tests/Feature/Models/TagTest.php`
 
-- [ ] **Step 3: Implement.** In the translations create migration, after `Schema::create()`: `MigrateUtils::liveUniqueIndex($table_name, ['locale', 'slug'], "{$table_name}_locale_slug_UN")`, replacing the plain `locale_slug_IDX` index it duplicates. Fix the `cms_tags` comment to point at that constraint. Add the model methods of the Interfaces block. `findFromStringOfAnyType()` keeps its name-or-slug match in every locale: it is a search, not an identity lookup.
-- [ ] **Step 4: Run `TagTest.php`, `CmsImportersTest.php`, `tests/Feature/Models`, `tests/Feature/Controllers/ContentRelationsSyncTest.php`, expect PASS.** A test that relied on "null type means no type" is updated to the D2 semantics, never deleted.
-- [ ] **Step 5: Pint, commit** (`feat(tags): one live tag per locale and slug`).
+- [x] **Step 3: Implement.** In the translations create migration, after `Schema::create()`: `MigrateUtils::liveUniqueIndex($table_name, ['locale', 'slug'], "{$table_name}_locale_slug_UN")`, replacing the plain `locale_slug_IDX` index it duplicates. Fix the `cms_tags` comment to point at that constraint. Add the model methods of the Interfaces block. `findFromStringOfAnyType()` keeps its name-or-slug match in every locale: it is a search, not an identity lookup.
+- [x] **Step 4: Run `TagTest.php`, `CmsImportersTest.php`, `tests/Feature/Models`, `tests/Feature/Controllers/ContentRelationsSyncTest.php`, expect PASS.** A test that relied on "null type means no type" is updated to the D2 semantics, never deleted.
+- [x] **Step 5: Pint, commit** (`feat(tags): one live tag per locale and slug`).
 
 ### Task 3: CMS, slug validation on saves
 
@@ -148,7 +148,7 @@ Run: `php artisan test --compact Modules/CMS/tests/Feature/Models/TagTest.php`
 - Consumes: `Tag::slugTakenInLocale()` (Task 2).
 - Produces: a closure rule on `translations.*.slug` in `getRules()` (create and update), reading the item's `locale` from the validated data and ignoring `$this->id` on update; the same check on the form's `slug` field for `LocaleContext::get()` (the locale the form edits) and the edited record.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```php
 it('refuses in the form a slug another tag has in the edited locale', function (): void {
@@ -162,10 +162,10 @@ it('rejects through the model rules a translation slug already taken in its loca
     // getRules()['create'] validated with translations [['locale' => 'it', 'name' => 'Jazz', 'slug' => 'jazz']] fails on translations.0.slug
 ```
 
-- [ ] **Step 2: Run, expect FAIL.**
-- [ ] **Step 3: Implement the two rules.** The message is Laravel's `validation.unique` for the attribute; no new translation key.
-- [ ] **Step 4: Run `TagSlugValidationTest.php`, `TranslatedRecordFormsTest.php`, `TagTypeFieldTest.php`, expect PASS.**
-- [ ] **Step 5: Pint, commit** (`feat(tags): validate the slug of a tag in its locale`).
+- [x] **Step 2: Run, expect FAIL.**
+- [x] **Step 3: Implement the two rules.** The message is Laravel's `validation.unique` for the attribute; no new translation key.
+- [x] **Step 4: Run `TagSlugValidationTest.php`, `TranslatedRecordFormsTest.php`, `TagTypeFieldTest.php`, expect PASS.**
+- [x] **Step 5: Pint, commit** (`feat(tags): validate the slug of a tag in its locale`).
 
 ### Task 4: CMS, `TagUpserter` matches across sources
 
@@ -190,7 +190,7 @@ it('rejects through the model rules a translation slug already taken in its loca
 6. `$dto->deletedAt` soft-deletes the tag only when `hasOriginFromAnotherSource()` is false.
 7. Origin registration and `remember()` as today.
 
-- [ ] **Step 1: Write the failing tests**, with `ImportTagDto` from two `sourceType`s (`naxos_api@a`, `feed`):
+- [x] **Step 1: Write the failing tests**, with `ImportTagDto` from two `sourceType`s (`naxos_api@a`, `feed`):
 
 ```php
 it('reuses the tag another source created with the same slug and adds its origin', ...);
@@ -212,13 +212,13 @@ it('uses the tag a concurrent import created', ...);
     // feed imports 'jazz' → returns that tag's id; Tag::query()->count() is 1
 ```
 
-- [ ] **Step 2: Run, expect FAIL.**
+- [x] **Step 2: Run, expect FAIL.**
 
 Run: `php artisan test --compact Modules/CMS/tests/Feature/Import/TagUpserterTest.php`
 
-- [ ] **Step 3: Implement** `TagMatcher`, `hasOriginFromAnotherSource()` and the `upsert()` order above. Register `TagMatcher` the way `LocationMatcher` is resolved.
-- [ ] **Step 4: Run `TagUpserterTest.php` and the whole `tests/Feature/Import`, expect PASS.**
-- [ ] **Step 5: Update `IMPORTS.md` and `MODULE.md`; Pint, PHPStan on the touched files; commit** (`feat(import): one tag across several sources`).
+- [x] **Step 3: Implement** `TagMatcher`, `hasOriginFromAnotherSource()` and the `upsert()` order above. Register `TagMatcher` the way `LocationMatcher` is resolved.
+- [x] **Step 4: Run `TagUpserterTest.php` and the whole `tests/Feature/Import`, expect PASS.**
+- [x] **Step 5: Update `IMPORTS.md` and `MODULE.md`; Pint, PHPStan on the touched files; commit** (`feat(import): one tag across several sources`).
 
 ### Task 5: CMS, the CSV tag import on the same identity
 
@@ -231,7 +231,7 @@ Run: `php artisan test --compact Modules/CMS/tests/Feature/Import/TagUpserterTes
 
 `import()` looks up `Tag::findByIdentity($slug !== '' ? $slug : $name, $this->locale())`, restores a trashed match, applies `adoptType()` (false: keep and log, as Task 4), and writes the translation under rule 4 of Task 4. The row outcome stays `Created` / `Updated`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```php
 it('reuses by slug a tag of another type or of no type', ...);
@@ -240,10 +240,10 @@ it('does not rename from a CSV a tag another source brought', ...);
     // tag 'Libri' with a naxos origin; CSV row 'libri' → name stays 'Libri'
 ```
 
-- [ ] **Step 2: Run, expect FAIL.**
-- [ ] **Step 3: Implement.**
-- [ ] **Step 4: Run `CmsImportersTest.php` and `tests/Feature/Import`, expect PASS.**
-- [ ] **Step 5: Pint, commit** (`feat(import): the CSV tag import matches by slug`), push, PR in laracms covering Tasks 2 to 5.
+- [x] **Step 2: Run, expect FAIL.**
+- [x] **Step 3: Implement.**
+- [x] **Step 4: Run `CmsImportersTest.php` and `tests/Feature/Import`, expect PASS.**
+- [x] **Step 5: Pint, commit** (`feat(import): the CSV tag import matches by slug`), push, PR in laracms covering Tasks 2 to 5.
 
 ### Task 6: Rebuild and closure
 
