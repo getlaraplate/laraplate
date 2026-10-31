@@ -26,6 +26,7 @@ module: platform
 - Local PHP lacks `ext-oci8` and `ext-imagick` (the census scaffold declares both through `config.platform`): pass `--ignore-platform-req=ext-oci8 --ignore-platform-req=ext-imagick` on every Composer solve, never `--ignore-platform-reqs`.
 - Keep `config/cache.php` without `serializable_classes` (framework reads `null`, current behaviour) and `config/session.php` without `serialization` (framework default `php`, sessions stay valid). Hardening both is a separate decision, not part of this plan.
 - The CSRF middleware exclusion in the `web` group is intentional during development (`TODO` in `bootstrap/app.php`). It must survive the upgrade: `array_diff` in `Illuminate\Foundation\Configuration\Middleware` compares class strings, and Laravel 13's default `web` group lists `PreventRequestForgery`, so `remove: [ValidateCsrfToken::class]` silently stops removing anything.
+- **The full suite cannot run serially.** Measured 2026-10-30: `php artisan test` ran 42 minutes, reached ~4.900 tests, then exhausted the 4G `memory_limit` and died without a summary, with 4 failures already recorded. This predates the upgrade. Every suite run in this plan is therefore three processes (`composer test:unit`, `test:integration`, `test:feature`), never one. Budget roughly 45 minutes per verification pass and batch the fixes accordingly.
 - **Merge fast.** The repository took 241 commits on the root and 134 on Core in the 14 days to 2026-10-29. A branch left open for days will cost more in merges than in upgrading. Work the tasks in one block.
 - Every submodule works on branch `upgrade/laravel-13` inside that submodule; the root repo uses `upgrade/laravel-13` too. Touch only files named in the task. No `Co-Authored-By` trailer in commit messages.
 - Commands run from `/srv/http/laraplate-stack/laraplate`. Tests: `php artisan test --compact <path>`. Formatting: `vendor/bin/pint --dirty --format agent`.
@@ -64,14 +65,23 @@ git submodule foreach 'git switch -c upgrade/laravel-13'
 ```
 Expected: nine `Switched to a new branch 'upgrade/laravel-13'` lines.
 
-- [ ] **Step 4: Record the Laravel 12 baseline**
+- [ ] **Step 4: Record the Laravel 12 baseline, one suite per process**
 
+**Do not run `php artisan test` for the whole suite.** Measured on 2026-10-30 on this machine: it ran 2.501 seconds (42 minutes), reached roughly 4.900 tests, then died with `Allowed memory size of 4294967296 bytes exhausted` while a service provider loaded routes. It never produced a summary. That is a pre-existing condition on Laravel 12, not something this upgrade introduces: something accumulates across a run in which every test boots the application, and `memory_limit` is 4G.
+
+So the metronome for this plan is three processes, which the repository already wires:
 ```bash
 mkdir -p storage/logs/upgrade-l13
-php artisan test --compact 2>&1 | tee "storage/logs/upgrade-l13/baseline-l12.txt" | tail -5
-grep -E '^\s+(FAIL|⨯)' "storage/logs/upgrade-l13/baseline-l12.txt" > "storage/logs/upgrade-l13/baseline-failures.txt" || true
+php artisan optimize:clear
+for s in unit integration feature; do
+  php artisan optimize:clear
+  composer "test:$s" 2>&1 | tee "storage/logs/upgrade-l13/baseline-$s.txt" | tail -3
+done
+grep -hE '^\s+(FAIL|⨯)' storage/logs/upgrade-l13/baseline-*.txt > "storage/logs/upgrade-l13/baseline-failures.txt" || true
+wc -l storage/logs/upgrade-l13/baseline-failures.txt
 ```
-`storage/logs/` is gitignored, so these logs never reach a commit. Expected: the summary line with pass/fail counts. The suite is 1.357 files; this run is the slow one, and every later comparison is against this file. Tests failing here are not caused by the upgrade.
+`storage/logs/` is gitignored, so these logs never reach a commit. Expected: three summaries, each from its own process with its own 4G budget. If one of the three still exhausts memory, STOP and report which: the upgrade cannot be verified against a baseline that does not exist, and splitting that suite further (or raising `memory_limit` for the run) is a decision for the user.
+Tests failing here are not caused by the upgrade: the 2026-10-30 run showed 4 failures before it died, so expect a non-empty file.
 
 - [ ] **Step 5: Record the static-analysis baseline**
 
@@ -371,7 +381,172 @@ git commit -m "fix(http): use PreventRequestForgery and keep the web group CSRF 
 
 ---
 
-### Task 6: Full suite on Laravel 13 (Pest 4)
+### Task 6: Framework extension points (cache overrides, nwidart, manager drivers)
+
+**Files:**
+- Inspect, and modify only if a signature moved: `Modules/Core/app/Cache/CacheManager.php`, `Modules/Core/app/Cache/Repository.php`, `Modules/Core/app/Providers/CoreServiceProvider.php:860`
+- Inspect: `Modules/Core/app/Helpers/ModuleMultiActivator.php`, `Modules/Core/app/Helpers/ModuleDatabaseActivator.php`, `Modules/Core/app/Console/ModuleSeedCommand.php`, `Modules/Core/app/Overrides/ModuleDocGenerator.php`, `Modules/Core/app/Overrides/ModuleDocRoute.php`
+- Inspect: `config/modules.php` (the `stubs` block and the nine `paths.generator` keys)
+
+**Interfaces:**
+- Consumes: Laravel 13 and nwidart 13 installed (Task 4).
+- Produces: every class that extends or replaces a framework or nwidart class verified against its new parent, before the full suite runs.
+
+This task exists because these are the places where an upgrade fails quietly rather than loudly: a child class whose parent changed signature, a service binding that replaces a framework singleton, a package that moves its own internals between majors. The user flagged the cache overrides and nwidart specifically on 2026-10-31. Run it before Task 7: a signature mismatch here would otherwise surface as dozens of unrelated-looking test failures.
+
+- [ ] **Step 1: Compare the cache override signatures against their new parents**
+
+```bash
+php -r '
+require "vendor/autoload.php";
+$pairs = [
+    ["Modules\\Core\\Cache\\CacheManager", "Illuminate\\Cache\\CacheManager", ["repository"]],
+    ["Modules\\Core\\Cache\\Repository", "Illuminate\\Cache\\Repository", ["remember"]],
+];
+foreach ($pairs as [$child, $parent, $methods]) {
+    foreach ($methods as $method) {
+        $c = new ReflectionMethod($child, $method);
+        $p = new ReflectionMethod($parent, $method);
+        $render = static function (ReflectionMethod $m): string {
+            $params = array_map(static function (ReflectionParameter $x): string {
+                return ($x->getType() ? $x->getType() . " " : "") . "$" . $x->getName() . ($x->isDefaultValueAvailable() ? " = …" : "");
+            }, $m->getParameters());
+            return $m->getDeclaringClass()->getName() . "::" . $m->getName() . "(" . implode(", ", $params) . "): " . ($m->getReturnType() ?: "(none)");
+        };
+        printf("child  %s\nparent %s\n\n", $render($c), $render($p));
+    }
+}
+'
+```
+Expected: for each pair the parameter list and the return type are compatible (the child may narrow the return type, as `repository()` does by returning `Repository` instead of the framework one, and may widen nothing). A parameter added, removed, renamed in a way that breaks named arguments, or a return type the child no longer satisfies is a break: fix the child to match, keep the `#[Override]` attribute, and commit in `Modules/Core`.
+If PHP already fatals on the `require` because of an incompatible declaration, that is the same finding arriving sooner: read the error, fix the signature.
+
+- [ ] **Step 2: Check the `cache` singleton replacement still binds a usable manager**
+
+`Modules/Core/app/Providers/CoreServiceProvider.php:860` replaces the framework's `cache` binding wholesale:
+```php
+$this->app->singleton('cache', static fn ($app): CoreCacheManager => new CoreCacheManager($app));
+```
+A constructor parameter added to `Illuminate\Cache\CacheManager` in Laravel 13, or a second responsibility given to the `cache` binding, would be silently lost here.
+
+```bash
+php -r '
+require "vendor/autoload.php";
+$c = new ReflectionMethod("Illuminate\\Cache\\CacheManager", "__construct");
+foreach ($c->getParameters() as $p) { echo "parent __construct: ", ($p->getType() ?: "mixed"), " $", $p->getName(), "\n"; }
+'
+php artisan tinker --execute 'dump(get_class(app("cache")), get_class(cache()->store()), get_class(cache()->store("array")));'
+```
+Expected: the parent constructor still takes one container argument; `app("cache")` is `Modules\Core\Cache\CacheManager`; both stores are `Modules\Core\Cache\Repository`, not the framework repository. If a store comes back as the framework class, `repository()` is no longer the hook the manager uses and the Core macros (`tryByRequest`, `clearByEntity`, `clearByRequest`) are silently gone from that driver.
+
+- [ ] **Step 3: Check no custom store must implement `touch()`**
+
+Laravel 13 added `touch($key, $seconds)` to `Illuminate\Contracts\Cache\Store`. Both Core classes extend framework classes and inherit it, but a class implementing the contract directly would not.
+
+```bash
+grep -rn "implements.*Store\b\|Contracts\\\\Cache\\\\Store" --include=*.php app Modules/*/app
+php -r '
+require "vendor/autoload.php";
+echo method_exists("Modules\\Core\\Cache\\Repository", "touch") ? "Repository has touch\n" : "Repository MISSING touch\n";
+'
+```
+Expected: no class implements the contract directly, and `Repository` reports `touch`. If a direct implementor exists, add `touch($key, $seconds)` to it following the framework's own store as reference.
+
+- [ ] **Step 4: Run the cache tests**
+
+```bash
+php artisan optimize:clear
+php artisan test --compact --filter='Cache|Warm|Settings|Acl'
+```
+Expected: PASS, or the same result as the Task 1 baseline. These cover the four callers of `CacheManager::key()` (`WarmCacheCommand`, `SettingsCacheCoordinator`, `AclResolverService`, `PerModelSettingResolver`) plus the Core repository macros.
+Note on key prefixes: Laravel 13 changed the framework's *fallback* cache and Redis prefixes to hyphenated suffixes. This application does not rely on those fallbacks: `config/cache.php` sets `prefix` explicitly, `config/database.php` sets the Redis prefixes explicitly, and `CacheManager::key()` prefixes every key with `config('app.name')`. So no key should move. If a test asserts a literal key and fails, read the generated key before changing the assertion: a moved key means a cold cache in production, not a wrong test.
+
+- [ ] **Step 5: Verify the nwidart 13.2 configuration changes**
+
+nwidart 13.2.0 ships real upgrade notes for two things this repository uses. Both look benign and must be confirmed, not assumed.
+
+A custom `stubs.path` is ignored unless `stubs.enabled` is true:
+```bash
+grep -n "'stubs'" -A4 config/modules.php
+```
+Expected: `'enabled' => true` is present above `'path' => base_path('Modules/Core/stubs')`. It was on 2026-10-29. If it is missing, add it.
+
+The nine generator keys without a `namespace` (`actions`, `casts`, `enums`, `exceptions`, `helpers`, `interfaces`, `repository`, `services`, `traits`) now derive the namespace from their `path` instead of the old default:
+```bash
+php artisan module:make-service UpgradeProbeService Core --no-interaction
+head -5 Modules/Core/app/Services/UpgradeProbeService.php
+php artisan module:make-action UpgradeProbeAction Core --no-interaction 2>/dev/null && head -5 Modules/Core/app/Actions/UpgradeProbeAction.php
+```
+Expected: `namespace Modules\Core\Services;` and `namespace Modules\Core\Actions;`, matching what the existing files in those folders declare. The paths are `app/Services` and `app/Actions` with `app_folder => 'app/'`, so the derived namespace should be identical to today's. Then delete the probes:
+```bash
+rm -f Modules/Core/app/Services/UpgradeProbeService.php Modules/Core/app/Actions/UpgradeProbeAction.php
+git -C Modules/Core status --short
+```
+Expected: a clean submodule. If a generated namespace differs, add an explicit `namespace` key to that generator entry in `config/modules.php` to pin the old one, and say so in the delivery status: every future generated class depends on it.
+
+- [ ] **Step 6: Verify the nwidart extension points**
+
+These classes extend or implement nwidart types, which move between majors:
+
+```bash
+php -r '
+require "vendor/autoload.php";
+$targets = [
+    "Modules\\Core\\Helpers\\ModuleMultiActivator" => "Nwidart\\Modules\\Activators\\FileActivator",
+    "Modules\\Core\\Helpers\\ModuleDatabaseActivator" => "Nwidart\\Modules\\Contracts\\ActivatorInterface",
+    "Modules\\Core\\Console\\ModuleSeedCommand" => "Nwidart\\Modules\\Commands\\Database\\SeedCommand",
+];
+foreach ($targets as $child => $parent) {
+    if (!class_exists($parent) && !interface_exists($parent)) { echo "GONE: $parent (needed by $child)\n"; continue; }
+    $r = new ReflectionClass($child);
+    echo str_pad($child, 52), " ok against ", $parent, "\n";
+    foreach ($r->getMethods(ReflectionMethod::IS_PUBLIC) as $m) {
+        if ($m->getDeclaringClass()->getName() !== $child) { continue; }
+        $p = new ReflectionClass($parent);
+        if (!$p->hasMethod($m->getName())) { continue; }
+        $pm = $p->getMethod($m->getName());
+        if (count($pm->getParameters()) !== count($m->getParameters())) {
+            printf("  SIGNATURE MOVED: %s() child %d params, parent %d\n", $m->getName(), count($m->getParameters()), count($pm->getParameters()));
+        }
+    }
+}
+'
+```
+Expected: three `ok` lines and no `GONE` or `SIGNATURE MOVED`. A `GONE` means nwidart moved or renamed the type: find its replacement in `vendor/nwidart/laravel-modules/src` and update the child.
+Also read the two swagger overrides against their new parents, since they reach into another package's internals: `Modules/Core/app/Overrides/ModuleDocGenerator.php` and `ModuleDocRoute.php` extend `mtrajano/laravel-swagger` classes, whose version Task 4 Step 5 may have changed.
+
+```bash
+php artisan optimize:clear
+php artisan module:list
+php artisan test --compact --filter='Module|Activator|Seed'
+```
+Expected: all eight modules `Enabled`, and the module/activator/seeding tests pass or match the baseline. The activators decide which modules boot at all, so a silent failure here is the kind that makes every other test fail for the wrong reason.
+
+- [ ] **Step 7: Note the manager driver closures**
+
+Three Scout engine drivers are registered with `static` closures: `Modules/Core/app/Providers/SearchServiceProvider.php:53` and `Modules/Core/app/Providers/CoreServiceProvider.php:583,596`.
+
+Laravel 13's upgrade guide says manager `extend` callbacks are now bound to the manager instance. Verified on 2026-10-31 by reading `Illuminate\Support\Manager::callCustomCreator()` in the installed Laravel 13: it still calls `$this->customCreators[$driver]($this->container)` with no `bindTo`, and the binding is expressed only as a `@param-closure-this $this` annotation for static analysis. So these three are safe at runtime, and nothing needs changing.
+
+The annotation can still produce a new PHPStan finding, because a `static` closure cannot have `$this` bound:
+```bash
+composer test:types 2>&1 | grep -iE "closure-this|static closure|SearchServiceProvider|CoreServiceProvider" | head
+```
+Expected: no finding. If one appears, drop the `static` keyword from that closure rather than silencing it: the closures do not use `$this`, so losing `static` costs nothing.
+
+- [ ] **Step 8: Commit anything that moved**
+
+Only if a step above changed a file:
+```bash
+vendor/bin/pint --dirty --format agent
+git -C Modules/Core add -A
+git -C Modules/Core commit -m "fix(core): realign the cache and module extension points with Laravel 13"
+```
+If nothing changed, say so explicitly when reporting the task: "no signature moved" is the result, not an absence of work.
+
+---
+
+### Task 7: Full suite on Laravel 13 (Pest 4)
 
 **Files:**
 - Modify: only files a failing test points to; each fix is its own commit in the owning repo.
@@ -382,15 +557,18 @@ git commit -m "fix(http): use PreventRequestForgery and keep the web group CSRF 
 
 This is the task that decides how long the upgrade takes. The Laravel 13 changes below are small and enumerable; the twelve third-party majors from Task 3 are not, and `spatie/laravel-permission` 6 to 8 is the one Core leans on hardest.
 
-- [ ] **Step 1: Run the suite**
+- [ ] **Step 1: Run the suite, one process per suite**
 
+Same three processes as the baseline (Task 1 Step 4), for the same reason: a single serial run exhausts 4G before finishing.
 ```bash
-php artisan optimize:clear
-php artisan test --compact 2>&1 | tee "storage/logs/upgrade-l13/l13-pest4.txt" | tail -5
-grep -E '^\s+(FAIL|⨯)' "storage/logs/upgrade-l13/l13-pest4.txt" > "storage/logs/upgrade-l13/l13-failures.txt" || true
+for s in unit integration feature; do
+  php artisan optimize:clear
+  composer "test:$s" 2>&1 | tee "storage/logs/upgrade-l13/l13-$s.txt" | tail -3
+done
+grep -hE '^\s+(FAIL|⨯)' storage/logs/upgrade-l13/l13-*.txt > "storage/logs/upgrade-l13/l13-failures.txt" || true
 diff "storage/logs/upgrade-l13/baseline-failures.txt" "storage/logs/upgrade-l13/l13-failures.txt"
 ```
-Expected: `diff` prints nothing. Every `>` line is a regression to fix in Step 2.
+Expected: `diff` prints nothing. Every `>` line is a regression to fix in Step 2. Each pass costs roughly as long as the baseline did, so fix in batches: read every new failure first, group them by cause, then work the groups.
 
 - [ ] **Step 2: Fix regressions one at a time**
 
@@ -413,7 +591,7 @@ Repeat Step 1. Expected: `diff` prints nothing.
 
 ---
 
-### Task 7: Guidelines and documentation
+### Task 8: Guidelines and documentation
 
 **Files:**
 - Modify: `CLAUDE.md` and `AGENTS.md` (regenerated Boost blocks), `AGENTS.md:67`
@@ -446,7 +624,7 @@ Set `status: completed` in this file's front matter, next to the existing `modul
 
 **Documented in:** `AGENTS.md` (stack line), `README.md`, `Modules/AI/README.md`, `Modules/Core/README.md`, `Modules/ERP/README.md` (requirements).
 ```
-State there that the test toolchain stayed on Pest 4 by design and name `2026-10-29-test-toolchain-pest-5.md` as the plan that carries it, so the file does not read as if the toolchain was forgotten. Record every divergence from Tasks 4 to 6 there: the swagger decision, any constraint that had to differ from the tables, any PHPStan finding fixed along the way. Resolve every checkbox first, `- [x]` or `- [-]` with its reason on the same line (`.ai/rules/plans.md`). The `INDEX.md` entry carries no status.
+State there that the test toolchain stayed on Pest 4 by design and name `2026-10-29-test-toolchain-pest-5.md` as the plan that carries it, so the file does not read as if the toolchain was forgotten. Record every divergence from Tasks 4 to 7 there: the swagger decision, any constraint that had to differ from the tables, any PHPStan finding fixed along the way. Resolve every checkbox first, `- [x]` or `- [-]` with its reason on the same line (`.ai/rules/plans.md`). The `INDEX.md` entry carries no status.
 
 ```bash
 php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php
@@ -464,7 +642,7 @@ git commit -m "docs: record the Laravel 13 upgrade"
 
 ---
 
-### Task 8: Bump submodule pointers
+### Task 9: Bump submodule pointers
 
 **Files:**
 - Modify: root gitlinks `Modules/AI`, `Modules/CMS`, `Modules/CRM`, `Modules/Core`, `Modules/ERP`, `Modules/MES`, `Modules/SAO`, `Modules/Shop`
@@ -477,10 +655,12 @@ Expected: eight lines `... upgrade/laravel-13 0`.
 - [ ] **Step 2: Final suite**
 
 ```bash
-php artisan optimize:clear
-php artisan test --compact 2>&1 | tail -5
+for s in unit integration feature; do
+  php artisan optimize:clear
+  composer "test:$s" 2>&1 | tail -3
+done
 ```
-Expected: the same result as Task 6 Step 1.
+Expected: the same result as Task 7 Step 1.
 
 - [ ] **Step 3: Commit the pointers**
 
@@ -489,6 +669,20 @@ git add Modules/AI Modules/CMS Modules/CRM Modules/Core Modules/ERP Modules/MES 
 git commit -m "chore(modules): bump all modules to their Laravel 13 upgrade"
 ```
 
-- [ ] **Step 4: Hand over**
+- [ ] **Step 4: Delete the census scaffold**
 
-Report to the user: the branches to merge (root plus eight submodules, submodules first), the swagger decision, that `2026-10-29-test-toolchain-pest-5.md` is now unblocked, and that pushing and merging are theirs to do. Do not push or merge.
+The user asked on 2026-10-31 for `../laraplate13` to be removed once the upgrade is through, even with things still to review: it existed only to census package versions, and it is already out of date. Nothing in the repository references it except this plan's own prose, which keeps it as a dated record of where the version tables came from.
+
+```bash
+grep -rn "laraplate13" --include=*.php --include=*.json --include=*.neon --include=*.xml --include=*.sh . 2>/dev/null | grep -v "^./docs/" | grep -v node_modules | grep -v "^./vendor"
+```
+Expected: no output. Only then:
+```bash
+rm -rf /srv/http/laraplate-stack/laraplate13
+ls /srv/http/laraplate-stack/
+```
+Expected: the folder is gone. If the grep found a reference, report it and do not delete: something started depending on the scaffold.
+
+- [ ] **Step 5: Hand over**
+
+Report to the user: the branches to merge (root plus eight submodules, submodules first), the swagger decision, the result of Task 6 (whether any extension point had moved), that `2026-10-29-test-toolchain-pest-5.md` is now unblocked, that the census scaffold is deleted, and that pushing and merging are theirs to do. Do not push or merge.
