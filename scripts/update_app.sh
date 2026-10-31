@@ -54,7 +54,7 @@ php artisan optimize:clear
 
 read -p "Do you want to run the optimize command? (y/N): " choice
 
-if [[ ! "$choice" =~ ^[Yy]$ ]]; then
+if [[ "$choice" =~ ^[Yy]$ ]]; then
     php artisan optimize
 fi
 
