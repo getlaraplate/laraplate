@@ -161,10 +161,10 @@ module: ai, core
 **Interfaces:**
 - Produces: analytics fields `tokens_in_{role}` and `tokens_out_{role}` (int, absent when the provider reports none); `AiServers`-based `RoleEgress::leavesInstallation(string $role): ?bool` (`null` when unknown).
 
-- [ ] **Step 1: Confirm the seams**: where token usage is available on a response, and where the settings page names a role's provider.
-- [ ] **Step 2: Failing tests**: `usage is recorded per role when the provider reports it`; `missing usage records nothing`; `a role served by a configured self-hosted server does not leave the installation`; `an external provider does`; `an unknown provider shows no claim`.
-- [ ] **Step 3: Implement** and add the fields to the analytics index mapping (new index only; existing indexes keep working).
-- [ ] **Step 4: Run** the tests; expect pass. Pint. Commit `feat(ai): tokens per role in analytics and a data egress indicator`.
+- [x] **Step 1: Confirm the seams**: where token usage is available on a response, and where the settings page names a role's provider.
+- [x] **Step 2: Failing tests**: `usage is recorded per role when the provider reports it`; `missing usage records nothing`; `a role served by a configured self-hosted server does not leave the installation`; `an external provider does`; `an unknown provider shows no claim`.
+- [x] **Step 3: Implement** and add the fields to the analytics index mapping (new index only; existing indexes keep working).
+- [x] **Step 4: Run** the tests; expect pass. Pint. Commit `feat(ai): tokens per role in analytics and a data egress indicator`.
 
 ### Task 10: Documentation and closing
 
