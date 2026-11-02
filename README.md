@@ -69,7 +69,8 @@ provider therefore lists no module: it only declares the application's own group
 -   `MAIL_*`, `AWS_*`: mail and S3 (commented out by default).
 -   `ELASTIC_*`, `SCOUT_DRIVER`, `SCOUT_QUEUE`: advanced search (`elasticsearch` driver, queued indexing).
 -   `OPENAI_API_KEY`: AI key (commented out).
--   Core env toggles: `FORCE_HTTPS`. User, CRUD, retention and search toggles (`auth.email_verification.enabled`, `auth.registration.enabled`, `auth.two_factor.enabled`, `auth.licenses.enabled`, `auth.social_login.enabled`, `crud.dynamic_entities`, `expose_api` (gates every `/api` route, Core and modules), `soft_deletes.expiration_days`, `search.vector.enabled`) are runtime settings managed from Filament > Settings. Settings are listed without the module prefix (the module is a column) and read from config as `core.<name>`.
+-   Core env toggles: `FORCE_HTTPS`. User, CRUD and retention toggles (`auth.email_verification.enabled`, `auth.registration.enabled`, `auth.two_factor.enabled`, `auth.licenses.enabled`, `auth.social_login.enabled`, `crud.dynamic_entities`, `expose_api` (gates every `/api` route, Core and modules), `soft_deletes.expiration_days`) are runtime settings managed from Filament > Settings. Settings are listed without the module prefix (the module is a column) and read from config as `core.<name>`.
+-   Vector search has no Core setting. The single switch is `features.embeddings.enabled` in the AI module (read as `ai.features.embeddings.enabled`); the model whose vectors the indexes hold is `features.embeddings.serving_model`. Core asks the AI module for the vector profile (model, dimensions, similarity) and runs keyword search when there is none, for instance without the AI module.
 
 ### Deprecations
 

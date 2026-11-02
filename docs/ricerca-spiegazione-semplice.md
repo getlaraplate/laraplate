@@ -92,14 +92,14 @@ Il **planner** decide quali strategie eseguire. Nella versione senza AI sono due
 ```php
 $is_short    = lunghezza query < 20 caratteri;
 $has_numbers = la query contiene una cifra;
-$use_vector  = config("core.search.vector.enabled") && ! $has_numbers;
+$use_vector  = (il modulo AI fornisce un profilo vettoriale) && ! $has_numbers;
 ```
 
 Da cui:
 
 | Situazione | Strategie eseguite |
 |------------|--------------------|
-| vettoriale spento | solo `keyword` |
+| vettoriale spento (nessun profilo vettoriale) | solo `keyword` |
 | query con una cifra dentro | solo `keyword` |
 | motore senza kNN | solo `keyword` |
 | modulo AI assente | solo `keyword` |
@@ -122,7 +122,10 @@ if (! $this->app->bound(ITextEmbedder::class)) {
 ```
 
 `ITextEmbedder` è registrato **solo** dal modulo AI. Quindi per avere la ricerca semantica servono
-due cose insieme: il setting `core.search.vector.enabled` a true **e** il modulo AI installato e attivo.
+due cose insieme: il modulo AI installato e attivo **e** il suo unico interruttore `features.embeddings.enabled` acceso.
+Core non ha nessun setting sul vettoriale: chiede al modulo AI il profilo vettoriale (modello, dimensioni,
+similarità) e, se non ne riceve uno, fa solo keyword. Il modello i cui vettori sono negli indici adesso è
+`features.embeddings.serving_model`, scritto solo dalla procedura di cambio modello.
 
 Attenzione a non confondere: senza AI non perdi la tokenizzazione del testo (quella la fa
 Elasticsearch e il codice in Core), perdi solo la traduzione della query in numeri.

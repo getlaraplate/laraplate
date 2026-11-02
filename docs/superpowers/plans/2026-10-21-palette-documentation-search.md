@@ -3,6 +3,8 @@ status: in-progress
 ---
 # Palette Documentation Search Implementation Plan
 
+> **Superseded in part (2026-11-02):** The `core.search.vector.model` setting it names no longer exists; the cache is keyed by `features.embeddings.serving_model`. Superseded by `../specs/2026-10-30-vector-search-owned-by-ai-design.md`: the AI module owns the vector profile and Core keeps no `search.vector.*` setting. This plan stays true about its moment.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Give the command palette a documentation-passages group through `GET /app/crud/search/{module}/documentation`, and make the palette's parallel search requests compute the query embedding once.

@@ -3,6 +3,8 @@ status: completed
 ---
 # Embedding Model Switch Implementation Plan
 
+> **Superseded in part (2026-11-02):** The Core settings `search.vector.*`, `suspended_reason`, `VectorModelContext` and `features.embeddings.active` it names no longer exist. Superseded by `../specs/2026-10-30-vector-search-owned-by-ai-design.md`: the AI module owns the vector profile and Core keeps no `search.vector.*` setting. This plan stays true about its moment.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** An operator changes the embedding model from a Settings dropdown, is told what it costs, and a guided procedure rebuilds vectors and indexes and activates the model only when verified, with vector search off meanwhile and a guard that disables it on any mismatch.

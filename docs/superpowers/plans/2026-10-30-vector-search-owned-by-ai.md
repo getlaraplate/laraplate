@@ -1,4 +1,5 @@
 ---
+status: completed
 created_on: 2026-10-30
 module: core, ai, cms, sao
 ---
@@ -128,7 +129,19 @@ module: core, ai, cms, sao
 
 **Files:** the lists of section 8 of the spec. Modify only what names the old keys.
 
-- [ ] **Step 1: Module and root documents**, rewritten for the present state: AI `README.md`, `CHANGELOG.md`, `docs/DESIGN_DECISIONS.md`, `docs/SEARCH_AND_TRANSLATION.md`, `docs/rag/MODULE.md`, `docs/rag/MODERATION_AND_SEARCH.md`; Core `README.md`, `CHANGELOG.md`, `docs/EVENT_ORCHESTRATION.md`, `docs/rag/EVENT_ORCHESTRATION.md`, `docs/rag/MODULE.md`, `docs/rag/SEARCH_MATCHING_DEVELOPER.md`, `docs/rag/SEARCH_RETRIEVAL_PIPELINE.md`, `docs/rag/SETTING_ACTIONS_DEVELOPER.md`; root `README.md`, `docs/ricerca-spiegazione-semplice.md`. Say that the AI switch is the single switch, name `features.embeddings.serving_model`, and give the upgrade note with the SQL of Task 5.
-- [ ] **Step 2: Superseded notes** (one line each, pointing to the spec, no rewrite): specs `2026-10-05-embedding-model-switch-design.md` (decision 2, sections 4.2 and 4.5), `2026-09-12-es-multilingual-index-and-multimodel-embeddings-design.md`, `2026-10-22-ai-standard-servers-design.md`; plans `2026-10-05-embedding-model-switch.md`, `2026-10-06-embedding-switch-chunked-indexes.md`, `2026-09-12-es-multilingual-index-and-multimodel-embeddings.md`, `2026-10-06-ai-module-neuron-review.md`, `2026-10-07-ai-module-review-decisions.md`, `2026-10-21-palette-documentation-search.md`. Set the spec's status to `Implemented` with the divergences found.
-- [ ] **Step 3: Indexes and closing.** Add this plan to `plans/INDEX.md` (name and what it covers, no status); when every box is ticked add `status: completed` to the front matter, a `## Delivery status (date): ...` section and a `**Documented in:**` line naming the module docs, as `ClosedPlansPointToDocumentationTest` requires.
-- [ ] **Step 4: Run** `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php` and `bash plan-status --open` from the stack root. Commit `docs: vector search owned by the AI module`.
+- [x] **Step 1: Module and root documents**, rewritten for the present state: AI `README.md`, `CHANGELOG.md`, `docs/DESIGN_DECISIONS.md`, `docs/SEARCH_AND_TRANSLATION.md`, `docs/rag/MODULE.md`, `docs/rag/MODERATION_AND_SEARCH.md`; Core `README.md`, `CHANGELOG.md`, `docs/EVENT_ORCHESTRATION.md`, `docs/rag/EVENT_ORCHESTRATION.md`, `docs/rag/MODULE.md`, `docs/rag/SEARCH_MATCHING_DEVELOPER.md`, `docs/rag/SEARCH_RETRIEVAL_PIPELINE.md`, `docs/rag/SETTING_ACTIONS_DEVELOPER.md`; root `README.md`, `docs/ricerca-spiegazione-semplice.md`. Say that the AI switch is the single switch, name `features.embeddings.serving_model`, and give the upgrade note with the SQL of Task 5.
+- [x] **Step 2: Superseded notes** (one line each, pointing to the spec, no rewrite): specs `2026-10-05-embedding-model-switch-design.md` (decision 2, sections 4.2 and 4.5), `2026-09-12-es-multilingual-index-and-multimodel-embeddings-design.md`, `2026-10-22-ai-standard-servers-design.md`; plans `2026-10-05-embedding-model-switch.md`, `2026-10-06-embedding-switch-chunked-indexes.md`, `2026-09-12-es-multilingual-index-and-multimodel-embeddings.md`, `2026-10-06-ai-module-neuron-review.md`, `2026-10-07-ai-module-review-decisions.md`, `2026-10-21-palette-documentation-search.md`. Set the spec's status to `Implemented` with the divergences found.
+- [x] **Step 3: Indexes and closing.** Add this plan to `plans/INDEX.md` (name and what it covers, no status); when every box is ticked add `status: completed` to the front matter, a `## Delivery status (date): ...` section and a `**Documented in:**` line naming the module docs, as `ClosedPlansPointToDocumentationTest` requires.
+- [x] **Step 4: Run** `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php` and `bash plan-status --open` from the stack root. Commit `docs: vector search owned by the AI module`.
+
+## Delivery status (2026-11-02): shipped
+
+**Documented in:** `Modules/AI/docs/SEARCH_AND_TRANSLATION.md` (search and the vector profile), `Modules/AI/docs/rag/MODULE.md` (the single switch, `features.embeddings.serving_model`, the model switch), `Modules/Core/docs/rag/SEARCH_RETRIEVAL_PIPELINE.md` (the profile contract and where the pipeline reads it), `Modules/Core/docs/rag/SEARCH_MATCHING_DEVELOPER.md` (engines and the profile), `Modules/Core/docs/rag/MODULE.md`, plus the READMEs of the AI and Core modules (upgrade note), the root `README.md` and `docs/ricerca-spiegazione-semplice.md`.
+
+Shipped in getlaraplate/laracore#24 (contract, context, call sites, removal of the five `search.vector.*` settings), laraai#12 (provider, `features.embeddings.serving_model`, switch, readers) and its follow-up laraai#13, laracms#16 and larasao#11 (embeddings option from the profile), laraplate#51 and #53 (submodule pointers and plan progress). The documentation sync of Task 6 is this commit.
+
+Divergences from the design are numbered in section 11 of the spec; the ones that touch the plan:
+- The setting is `features.embeddings.serving_model`, not `features.embeddings.active` (spec section 11, divergence 1).
+- Task 5 Step 4 (owner-gated deletion of the five rows) was covered by the owner's `migrate:fresh`, which recreates the settings from the seeders; no manual `DELETE` was run. The SQL stays in the upgrade note of the AI and Core READMEs for existing databases.
+- laraai#13 is a follow-up fix outside the design: `FileDocumentReader` skips a markdown file with no body after its front matter, because Neuron 4 rejects empty documents.
+- The superseded note of Task 6 Step 2 was not added to `2026-10-06-ai-module-neuron-review.md`: it names none of the removed keys (its only match is `features.embeddings.enabled`, still valid).
