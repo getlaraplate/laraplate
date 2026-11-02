@@ -43,10 +43,10 @@ module: ai, core
 **Interfaces:**
 - Produces: `DateExpressionResolver::resolve(string $query, DateTimeImmutable $now, string $locale): ?array{from: string, to: string}` (ISO dates, inclusive); a model property `$searchDateField` (`?string`, default `null`) read through a public `Searchable::searchDateField(): ?string`; config `core.search.recency_windows_days` (default `[90, 365]`).
 
-- [ ] **Step 1: Failing tests**: `resolve` maps "of 2024" to the year, "March 2025" to the month, "last month" and "last year" relative to `$now`, and returns `null` for text with no date; both Italian and English patterns; `use explicit request dates over text dates`; `null date field means no filter`; `an interval with no hit widens through recency_windows_days and ends unfiltered`.
-- [ ] **Step 2: Run** them; expect failure.
-- [ ] **Step 3: Implement** the resolver (pattern tables per locale, no model call), feed `date_range` in `SimpleQueryIntentParser` and the planner, apply it as a range filter on `searchDateField()` in both engines; "recent" phrases use the windows in order and stop at the first with enough sources; `LlmQueryIntentParser` may supply the interval when rules found none.
-- [ ] **Step 4: Run** the tests; expect pass. Pint. Commit `feat(core): dates in the query become a filter`.
+- [x] **Step 1: Failing tests**: `resolve` maps "of 2024" to the year, "March 2025" to the month, "last month" and "last year" relative to `$now`, and returns `null` for text with no date; both Italian and English patterns; `use explicit request dates over text dates`; `null date field means no filter`; `an interval with no hit widens through recency_windows_days and ends unfiltered`.
+- [x] **Step 2: Run** them; expect failure.
+- [x] **Step 3: Implement** the resolver (pattern tables per locale, no model call), feed `date_range` in `SimpleQueryIntentParser` and the planner, apply it as a range filter on `searchDateField()` in both engines; "recent" phrases use the windows in order and stop at the first with enough sources; `LlmQueryIntentParser` may supply the interval when rules found none.
+- [x] **Step 4: Run** the tests; expect pass. Pint. Commit `feat(core): dates in the query become a filter`.
 
 ### Task 2: Optional relevance judge (AI)
 
