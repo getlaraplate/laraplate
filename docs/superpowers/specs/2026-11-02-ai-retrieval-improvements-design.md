@@ -1,6 +1,6 @@
 # AI retrieval improvements: design
 
-**Status:** Proposed (2026-11-02), awaiting review. Plan: `docs/superpowers/plans/2026-11-02-ai-retrieval-improvements.md`.
+**Status:** Implemented (2026-11-02). Plan: `docs/superpowers/plans/2026-11-02-ai-retrieval-improvements.md` (closed). Divergences and the resolved open points are in section 8.
 **Related:** `2026-10-30-vector-search-owned-by-ai-design.md` (the profile these checks build on), `2026-10-05-embedding-model-switch-design.md` (probe, verifier, repair).
 
 ## 1. Purpose
@@ -52,8 +52,14 @@ Unit and feature tests per item in the module that owns it. Retrieval behaviour 
 
 AI `README.md`, `docs/SEARCH_AND_TRANSLATION.md`, `docs/rag/MODULE.md`; Core `docs/rag/SEARCH_RETRIEVAL_PIPELINE.md` and `docs/rag/SEARCH_MATCHING_DEVELOPER.md`; env or setting changes in the affected module README.
 
-## 7. Open points
+## 7. Open points (resolved)
 
 1. How a model declares its date field (property on the model, like `$embed`, or a method). Proposed: a property.
 2. Where the judge sits for application-content search, which today has no answer stage; proposed first home is the documentation answer pipeline, application content follows if a consumer appears.
 3. Whether the drift reference lives on disk or in the database. Proposed: a JSON file under `storage/app`, since vectors are large and per installation.
+
+## 8. As built: divergences and resolved points
+
+Resolved points: (1) the date field is a model property, `$searchDateField`, read through `Searchable::searchDateField()`; (2) the judge sits in the in-app documentation path (`InAppAssistanceService::respond()`); (3) the drift reference is a JSON file on the `local` disk (`storage/app/private/ai/embedding-references/` by default).
+
+Divergences: (1) CMS `Content` declares `valid_from` as its date field and an embedding header, which the plan did not list. (2) `DocumentationAgent` is not judged. (3) The language warning shows in the confirmation modals and the probe, not as permanent field text. (4) Core gained `IReportsVectorSimilarity`; `l2_norm` gets no similarity floor; on MySQL and SQLite a cosine floor replaces the fixed 0.7 cut. (5) The context header is a method, `Searchable::embedHeader()`; CMS leaves categories, tags and contributors out so the hash does not depend on the code path; `ai:embeddings:repair` does not detect a header change. (6) Tokens are recorded for the answer and judge roles only, since the other providers report no usage. (7) The egress indicator reflects configuration, not the network. (8) The reranker receives the keyword query, without request words and date words. (9) Near-duplicate images add a scan cap (`near_duplicate_scan_limit`, 50000) and never copy a person-written description. (10) The on/off comparisons with the evaluation commands were not run (they need a live index and a model server).

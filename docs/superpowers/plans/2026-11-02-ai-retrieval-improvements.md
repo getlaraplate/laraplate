@@ -1,6 +1,7 @@
 ---
 created_on: 2026-11-02
-module: ai, core
+status: completed
+module: ai, core, cms
 ---
 # AI retrieval improvements. Implementation Plan
 
@@ -170,6 +171,25 @@ module: ai, core
 
 **Files:** the lists of spec section 6; `plans/INDEX.md` and `specs/INDEX.md` (one line each); the superseded or related notes only where a document names behaviour that changed.
 
-- [ ] **Step 1: Module documents**, rewritten for the present state, including every new setting, config key and probe option, and the on/off comparison numbers.
-- [ ] **Step 2: Indexes and closing.** When every box is ticked: `status: completed`, a `## Delivery status (date): ...` section with the comparison numbers and divergences, and a `**Documented in:**` line naming the module docs, as `ClosedPlansPointToDocumentationTest` requires.
-- [ ] **Step 3: Run** `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php` and `bash plan-status --open`. Commit `docs: AI retrieval improvements`.
+- [x] **Step 1: Module documents**, rewritten for the present state, including every new setting, config key and probe option, and the on/off comparison numbers.
+- [x] **Step 2: Indexes and closing.** When every box is ticked: `status: completed`, a `## Delivery status (date): ...` section with the comparison numbers and divergences, and a `**Documented in:**` line naming the module docs, as `ClosedPlansPointToDocumentationTest` requires.
+- [x] **Step 3: Run** `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php` and `bash plan-status --open`. Commit `docs: AI retrieval improvements`.
+
+## Delivery status (2026-11-02): shipped, three comparisons left to the owner
+
+Code and documentation are in getlaraplate/laracore#27, getlaraplate/laraai#15 and getlaraplate/laracms#17, with this plan and the spec in getlaraplate/laraplate#56. Task 1 added the declared date field to CMS `Content` (not in the plan: without it the date filter does nothing in production).
+
+**Not run, by design:** the on/off comparisons with the evaluation commands (Tasks 2, 5 and 7, marked `- [-]`). They need a live index and a model server. The judge is off by default and stays so until the owner has compared; the unstemmed field, request words and chunk context apply on the next reindex and should be compared then.
+
+**Divergences from the plan** (details in section 8 of the spec):
+- The relevance judge sits in `InAppAssistanceService::respond()` only; `DocumentationAgent` (`ai:help`) is not judged. A failure after round 1 falls back to the round 1 candidates, as the spec says.
+- The language warning appears in the change-confirmation modals and the probe, not as permanent text under the field (Core's `SettingForm` has no per-setting hook).
+- `IReportsVectorSimilarity` was added to Core so the tuning command can express scores on the profile's scale. `l2_norm` gets no floor. On MySQL and SQLite a cosine floor replaces the fixed 0.7 cut.
+- The context header is a method, `Searchable::embedHeader()`, not a property; CMS `Content` uses `type | title | valid_from` and leaves categories, tags and contributors out so the hash does not depend on the code path. `ai:embeddings:repair` does not pick up a header change (it never compares hashes).
+- The drift reference file lives on the `local` disk, which is `storage/app/private/ai/embedding-references/` by default.
+- Near-duplicate images: distance choices 0 to 10, a scan cap of 50000 rows (config only), no backfill, descriptions copied only when machine-written, source recorded in the `analysis` JSON.
+- Tokens per role are recorded for the answer and judge roles; intent and embedding providers report no usage today. The egress indicator reflects configuration, not the network.
+- The reranker now receives the keyword query without request words and date words.
+- A test of Task 1 of the previous plan (default vector provider) failed with AI installed and was corrected in laracore#27.
+
+**Documented in:** `Modules/AI/docs/rag/MODULE.md`, `Modules/AI/docs/SEARCH_AND_TRANSLATION.md`, `Modules/AI/docs/rag/query-analytics-privacy-review.md`, `Modules/Core/docs/rag/SEARCH_RETRIEVAL_PIPELINE.md`, `Modules/Core/docs/rag/SEARCH_MATCHING_DEVELOPER.md`, `Modules/CMS/docs/rag/MODULE.md`.
