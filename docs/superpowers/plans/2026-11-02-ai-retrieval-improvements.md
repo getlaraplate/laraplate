@@ -74,10 +74,10 @@ module: ai, core
 **Interfaces:**
 - Produces: `EmbeddingDriftReference::save(EmbeddingModelProfile $profile, array $vectors): void`, `::compare(EmbeddingModelProfile $profile, array $vectors): float` (lowest cosine over the sample), stored as JSON under `storage/app/ai/embedding-references/{key}.json`; probe option `--reference=save|compare`; config `ai.features.embeddings.drift_floor` (default `0.999`).
 
-- [ ] **Step 1: Failing tests**: `save then compare of identical vectors is 1.0`; `compare fails below the floor and names the lowest text`; `compare without a saved reference is a clear error`; `references are per profile key`.
-- [ ] **Step 2: Run** them; expect failure.
-- [ ] **Step 3: Implement** a fixed sample of short multilingual texts shipped with the module; the probe embeds them through the profile's provider.
-- [ ] **Step 4: Run** the tests; expect pass. Pint. Commit `feat(ai): embedding drift reference in the probe`.
+- [x] **Step 1: Failing tests**: `save then compare of identical vectors is 1.0`; `compare fails below the floor and names the lowest text`; `compare without a saved reference is a clear error`; `references are per profile key`.
+- [x] **Step 2: Run** them; expect failure.
+- [x] **Step 3: Implement** a fixed sample of short multilingual texts shipped with the module; the probe embeds them through the profile's provider.
+- [x] **Step 4: Run** the tests; expect pass. Pint. Commit `feat(ai): embedding drift reference in the probe`.
 
 ### Task 4: Declared languages on profiles (AI)
 
