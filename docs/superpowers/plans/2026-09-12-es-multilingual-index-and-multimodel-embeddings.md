@@ -5,6 +5,8 @@ verified_by: repo audit (declared files + tests present)
 ---
 # ES Multilingual Index & Multi-Model Embeddings — Implementation Plan
 
+> **Superseded in part (2026-11-02):** The `search.vector.dimensions` and `search.vector.similarity` keys it names no longer exist; dimensions and similarity come from the embedding profile. Superseded by `../specs/2026-10-30-vector-search-owned-by-ai-design.md`: the AI module owns the vector profile and Core keeps no `search.vector.*` setting. This plan stays true about its moment.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Refactor Elasticsearch multilingual indexing (per-language analyzers, locale-keyed text objects, index all content) and make embeddings per-translation, model-aware, and searched by a single cross-lingual kNN.

@@ -1,6 +1,7 @@
 # ES Multilingual Index & Multi-Model Embeddings — Design
 
 **Status:** Implemented 2026-09-15; see the delivery status of `docs/superpowers/plans/2026-09-12-es-multilingual-index-and-multimodel-embeddings.md`. Was: Draft (for review).
+**Superseded in part (2026-11-02):** The keys it names (`search.vector.dimensions`, `features.embeddings.active`) no longer exist. Superseded by `2026-10-30-vector-search-owned-by-ai-design.md`: the AI module owns the vector profile and Core keeps no `search.vector.*` setting.
 **Date:** 2026-09-12
 **Author:** swolley + Claude
 **Related:**

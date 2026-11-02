@@ -1,6 +1,6 @@
 # Vector search owned by the AI module: design
 
-**Status:** Proposed (2026-10-30), awaiting review. Plan: `docs/superpowers/plans/2026-10-30-vector-search-owned-by-ai.md`.
+**Status:** Implemented (2026-11-02). Plan: `docs/superpowers/plans/2026-10-30-vector-search-owned-by-ai.md` (closed). Divergences found while building are in section 11.
 **Related:** `2026-10-05-embedding-model-switch-design.md` (decisions 2 and 4, sections 4.2 and 4.5 are superseded in part by this spec, see section 3), `2026-09-12-es-multilingual-index-and-multimodel-embeddings-design.md` (the profile registry and the `model_key` stamp), `2026-10-22-ai-standard-servers-design.md` (the servers the profiles point at).
 
 ## 1. Purpose
@@ -96,7 +96,7 @@ DELETE FROM core_settings WHERE name IN (
   'search.vector.similarity', 'search.vector.suspended_reason');
 ```
 
-then flush the settings cache. `features.embeddings.serving_model` is seeded by the AI seeder; an existing database receives it from the next seed or from the first switch (open point 2). `CoreDatabaseSeeder` stops creating the five keys. The `managed` column is untouched (`features.embeddings.switch` and the new `active` use it).
+then flush the settings cache. `features.embeddings.serving_model` is seeded by the AI seeder; an existing database receives it from the next AI seed (section 11, divergence 2). `CoreDatabaseSeeder` stops creating the five keys. The `managed` column is untouched (`features.embeddings.switch` and the new `serving_model` use it).
 
 ## 6. Error handling
 
@@ -129,7 +129,21 @@ Moving engines or query building to the AI module; pausing generation separately
 
 ## 10. Open points
 
-1. **Shape of the contract.** A separate provider (this spec) against extending `IVectorSearchAvailability::check()` to return the profile. Chosen separate because indexing needs the profile with no model at hand and the guard needs a model; the plan can still merge them if the call sites turn out to be one.
-2. **Seed of `features.embeddings.serving_model` on an existing database**, and how `features.embeddings.model` is seeded today (the plan reads it and mirrors it).
-3. **Typesense.** Whether its `float[]` field needs the dimension; read in the plan.
+1. **Shape of the contract.** A separate provider (this spec) against extending `IVectorSearchAvailability::check()` to return the profile. Chosen separate because indexing needs the profile with no model at hand and the guard needs a model; built separate (`IVectorProfileProvider` next to `IVectorSearchAvailability`).
+2. **Seed of `features.embeddings.serving_model` on an existing database.** Resolved (section 11, divergence 2): the AI seeder seeds it, from the stored value or else the first configured profile; `features.embeddings.model` defaults to it. The idea of seeding it from the first switch was not built.
+3. **Typesense.** Resolved (section 11, divergence 2): its `float[]` field needs no dimension, so the engine reads no profile.
 4. **The settings page.** Whether the AI group shows the active profile's dimensions and similarity read-only. Nice to have, not required.
+
+## 11. As built: divergences (2026-11-02)
+
+Delivered by getlaraplate/laracore#24, laraai#12 and #13, laracms#16, larasao#11 and laraplate#51 and #53. What differs from the design above:
+
+1. The serving-model setting is `features.embeddings.serving_model`, not `.active`: renamed on 2026-10-30 so it does not read as a synonym of `enabled`.
+2. Open points 2 and 3: the AI seeder seeds `serving_model` (stored value, else the first configured profile), so activation needs the row; the "or from the first switch" idea was not built. Typesense needs no dimension, so no profile is read there.
+3. A switch that failed in phase `preflight` does not suspend vector search: a choice refused by the settings page must not turn hybrid search off. `EmbeddingSwitchStore::isSwitching()` is true when the status is `running`, or `failed` in any other phase.
+4. The orchestrator resolves the target profile before every phase, so a profile that disappears from config between start and the first job fails in `preflight` (clear it with `--abandon`), not in `embeddings`.
+5. Without a profile `Searchable::toSearchableArray()` emits no `embeddings` at all (it used to serialise every row), and `EmbeddingsGate::handles()` is false with the feature off unless a profile is pinned with `VectorProfileContext::using()`.
+6. `EmbeddingVectorSearchAvailability` and `EmbeddingSwitchVerifier` gained optional constructor arguments (the switch store, the gate); new helper `EmbeddingModelProfile::vectorProfile()`.
+7. The test that the default binding is the null provider lives in `tests/Integration/Providers/SearchServiceProviderTest.php`, because unit tests run without the provider.
+8. `DatabaseEngine` keeps the empty-model-key branch (`vector_dims = N` instead of a `model_key` filter) for a profile whose key is empty.
+9. Related fix, not part of the design (laraai#13): `FileDocumentReader` skips a markdown file with no body after its front matter, because Neuron 4 rejects empty documents.

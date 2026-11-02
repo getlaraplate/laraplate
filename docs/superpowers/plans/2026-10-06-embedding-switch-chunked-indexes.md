@@ -3,6 +3,8 @@ status: completed
 ---
 # Embedding Switch: Chunked Index Writes Implementation Plan
 
+> **Superseded in part (2026-11-02):** `VectorModelContext` is now `VectorProfileContext` (Core). Superseded by `../specs/2026-10-30-vector-search-owned-by-ai-design.md`: the AI module owns the vector profile and Core keeps no `search.vector.*` setting. This plan stays true about its moment.
+
 > **For agentic workers:** Steps use checkbox syntax for tracking. Tick each step when it finishes.
 
 **Goal:** The `indexes` and `verify` phases of an embedding model switch stop rewriting every searchable document inside one run of `SwitchEmbeddingModelJob`. The documents are written by short, idempotent chunk jobs on a dedicated queue, so no job rewrites a whole corpus.

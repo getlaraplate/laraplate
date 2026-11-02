@@ -4,6 +4,8 @@ created_on: 2026-10-07
 ---
 # AI Module Review: the Owner's Decisions — Implementation Plan
 
+> **Superseded in part (2026-11-02):** The `core.search.vector.enabled` setting it names no longer exists; `features.embeddings.enabled` is the single switch. Superseded by `../specs/2026-10-30-vector-search-owned-by-ai-design.md`: the AI module owns the vector profile and Core keeps no `search.vector.*` setting. This plan stays true about its moment.
+
 > **For agentic workers:** steps use checkbox (`- [ ]`) syntax. Tick each step when it is done, in the same work block. A step dropped on purpose is `- [-]` with its reason on the same line.
 
 **Status:** Open. Tasks 1 and 3 are delivered, and Task 2 except its Step 3: `AI_SEARCH_ORCHESTRATION_ENABLED` needs a decision of the owner (see that step). The plan closes after it.

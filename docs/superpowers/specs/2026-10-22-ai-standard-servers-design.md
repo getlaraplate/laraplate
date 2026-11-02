@@ -1,6 +1,7 @@
 # AI module on standard servers
 
 **Status:** Built 2026-10-23, plan `../plans/2026-10-22-ai-standard-servers.md` (closed). The hands-on verification of section 9 is done for Infinity (test A, see Verification); TEI and speaches are not yet run, and the guide says so.
+**Superseded in part (2026-11-02):** The Core setting `search.vector.model` it names no longer exists; the serving model is `features.embeddings.serving_model`. Superseded by `2026-10-30-vector-search-owned-by-ai-design.md`: the AI module owns the vector profile and Core keeps no `search.vector.*` setting.
 
 **Date:** 2026-10-22
 

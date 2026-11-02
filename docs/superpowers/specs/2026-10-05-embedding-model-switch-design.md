@@ -1,6 +1,7 @@
 # Embedding model switch: design
 
 **Status:** Implemented (2026-10-05) for what Tasks 1 to 10, 12 and 13 of the plan delivered (`docs/superpowers/plans/2026-10-05-embedding-model-switch.md`, closed on 2026-10-05). Divergences found while building are recorded inline, marked *As built*, and in section 11. PostgreSQL and the Elasticsearch branches are not verified against a real server (section 10).
+**Superseded in part (2026-11-02):** Decision 2 and sections 4.2 and 4.5 (Core's `search.vector.*` settings, `suspended_reason`, `VectorModelContext`) no longer describe the code; the removal of `features.embeddings.active` (ruling R17) is replaced by `features.embeddings.serving_model`. Superseded by `2026-10-30-vector-search-owned-by-ai-design.md`: the AI module owns the vector profile and Core keeps no `search.vector.*` setting.
 **Related:** `2026-09-12-es-multilingual-index-and-multimodel-embeddings-design.md` (the profile registry and the `model_key` stamp this builds on), `2026-09-29-ai-model-selection-and-setting-actions-design.md` (the Settings pattern, which excluded embeddings for the reason this spec answers).
 
 ## 1. Purpose
