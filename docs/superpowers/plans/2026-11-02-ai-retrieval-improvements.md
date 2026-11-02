@@ -147,10 +147,10 @@ module: ai, core
 **Interfaces:**
 - Produces: `ImageFingerprint::of(string $imageBytes): string` (64-bit difference hash, hex) and `::distance(string $a, string $b): int`; setting `features.media_analysis.near_duplicate_distance` (`0` = off, default).
 
-- [ ] **Step 1: Failing tests**: `the same image resized has distance within the threshold`; `different images exceed it`; `with distance 0 the job behaves as today`; `within the distance the earlier description is reused and no model call is made`.
-- [ ] **Step 2: Run** them; expect failure.
-- [ ] **Step 3: Implement**; the exact `content_hash` lookup stays first.
-- [ ] **Step 4: Run** the tests; expect pass. Pint. Commit `feat(ai): reuse the description of near-duplicate images`.
+- [x] **Step 1: Failing tests**: `the same image resized has distance within the threshold`; `different images exceed it`; `with distance 0 the job behaves as today`; `within the distance the earlier description is reused and no model call is made`.
+- [x] **Step 2: Run** them; expect failure.
+- [x] **Step 3: Implement**; the exact `content_hash` lookup stays first.
+- [x] **Step 4: Run** the tests; expect pass. Pint. Commit `feat(ai): reuse the description of near-duplicate images`.
 
 ### Task 9: Tokens per role and data egress indicator (AI)
 
