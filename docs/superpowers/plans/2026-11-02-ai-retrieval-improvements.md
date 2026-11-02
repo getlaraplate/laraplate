@@ -105,7 +105,7 @@ module: ai, core
 - [x] **Step 1: Failing tests**: `request words are dropped from the keyword terms and kept in the vector query`; `a query made only of request words keeps its terms`; `the mapping of a localised text field has an exact sub-field`; `the text match queries the stemmed and the exact field together`; `a proper name matches through the exact field`.
 - [x] **Step 2: Run** them; expect failure.
 - [x] **Step 3: Implement**; the mapping difference is picked up by the mapping comparator, which reports the rebuild.
-- [x] **Step 4: Compare** before and after with `test:ai:evaluate-application-content-retrieval-strategies`.
+- [-] **Step 4: Compare** before and after with `test:ai:evaluate-application-content-retrieval-strategies`. *Not run by the agent: it needs a live index (rebuilt for the new sub-field) and a model server. The owner runs it after the rebuild.*
 - [x] **Step 5: Run** the tests; expect pass. Pint. Commit `feat(core): request words and an unstemmed field in keyword search`.
 
 ### Task 6: Similarity floor per profile (Core, AI)
