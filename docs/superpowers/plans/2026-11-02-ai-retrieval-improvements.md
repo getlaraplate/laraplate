@@ -102,11 +102,11 @@ module: ai, core
 **Interfaces:**
 - Produces: `SearchQueryAnalyzer::analyze()` drops per-locale request words from the keyword branch only, config `core.search.request_words` (map of locale to list); each analysed text field gains `fields.exact` with an analyzer that does not stem.
 
-- [ ] **Step 1: Failing tests**: `request words are dropped from the keyword terms and kept in the vector query`; `a query made only of request words keeps its terms`; `the mapping of a localised text field has an exact sub-field`; `the text match queries the stemmed and the exact field together`; `a proper name matches through the exact field`.
-- [ ] **Step 2: Run** them; expect failure.
-- [ ] **Step 3: Implement**; the mapping difference is picked up by the mapping comparator, which reports the rebuild.
-- [ ] **Step 4: Compare** before and after with `test:ai:evaluate-application-content-retrieval-strategies`.
-- [ ] **Step 5: Run** the tests; expect pass. Pint. Commit `feat(core): request words and an unstemmed field in keyword search`.
+- [x] **Step 1: Failing tests**: `request words are dropped from the keyword terms and kept in the vector query`; `a query made only of request words keeps its terms`; `the mapping of a localised text field has an exact sub-field`; `the text match queries the stemmed and the exact field together`; `a proper name matches through the exact field`.
+- [x] **Step 2: Run** them; expect failure.
+- [x] **Step 3: Implement**; the mapping difference is picked up by the mapping comparator, which reports the rebuild.
+- [x] **Step 4: Compare** before and after with `test:ai:evaluate-application-content-retrieval-strategies`.
+- [x] **Step 5: Run** the tests; expect pass. Pint. Commit `feat(core): request words and an unstemmed field in keyword search`.
 
 ### Task 6: Similarity floor per profile (Core, AI)
 
