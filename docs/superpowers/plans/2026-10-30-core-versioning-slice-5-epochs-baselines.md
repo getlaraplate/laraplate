@@ -49,9 +49,9 @@
 **Interfaces:**
 - Produces: `public function aggregateImage(VersionChangeType $rootType, VersionChangeType $partType, VersionChangeType $linkType): list<VersionChange>` on `HasVersions`: one `SNAPSHOT` row of the root read back (`filterVersionableImage()` of the refreshed raw attributes), one `SNAPSHOT` row per locale read back (`relation_path = translations`, `subject_key = {locale}`), one row per link of each registered relation (`relation_path` = the relation, `subject_key = {id}`, contents = its declared pivot columns). The image goes in `contents`; `hardDeleteSnapshot()` maps it to `original_contents` and adds the origin rows.
 
-- [ ] **Step 1:** Extract the root, locale and membership parts of `hardDeleteSnapshot()` into `aggregateImage()`; `hardDeleteSnapshot()` keeps its row format (D55) and its origin rows.
-- [ ] **Step 2:** Run `HardDeleteSnapshotTest`, `ClearExpiredSnapshotTest` and the CMS `ContentExtensionHardDeleteSnapshotTest`: green, unchanged.
-- [ ] **Step 3:** Commit (`refactor(versioning): read the aggregate as rows once`).
+- [x] **Step 1:** Extract the root, locale and membership parts of `hardDeleteSnapshot()` into `aggregateImage()`; `hardDeleteSnapshot()` keeps its row format (D55) and its origin rows.
+- [x] **Step 2:** Run `HardDeleteSnapshotTest`, `ClearExpiredSnapshotTest` and the CMS `ContentExtensionHardDeleteSnapshotTest`: green, unchanged.
+- [x] **Step 3:** Commit (`refactor(versioning): read the aggregate as rows once`).
 
 ### Task A2: A baseline is due, and the writer appends it (D45 rule 1, D52, D53, D60)
 
@@ -65,21 +65,26 @@
 - Produces: `ActiveVersionSet::isBaselineDue(): bool`.
 - Rule (D45, D22): the baseline rows are written after the set's own rows, in the same set, through the writer, with change type `updated` for root and locales and `created` for links; the set is stored as `baseline` (D53). A set whose options kind is `Revert` never writes it and leaves it due (D60). A set that wrote no row of its own writes no baseline either (an empty set is removed as today). The creation set is already whole: no extra rows.
 
-- [ ] **Step 1: Write the failing tests** (`BaselineAfterBestEffortTest`, stubs `TranslatedDocument` and `VersionedRelationRoot`):
+- [x] **Step 1: Write the failing tests** (`BaselineAfterBestEffortTest`, stubs `TranslatedDocument` and `VersionedRelationRoot`):
   - `it writes a baseline with the root, every locale and every link at the first atomic write after a best_effort set`: a write through `runAfterTheFact()` with no transaction gives a `best_effort` set; the next `save()` gives a set of kind `baseline` holding its own diff row first, then one root `SNAPSHOT`, one `SNAPSHOT` per locale, one `created` row per link.
   - `it writes the baseline once`: a second save after it writes a plain `change` set.
   - `it writes a baseline at the first write of a record that has sets but no baseline`: delete the record's `baseline` set rows directly, save, expect a `baseline` set.
   - `it never writes the baseline in a revert set and writes it at the next save (D60)`: after a `best_effort` set, `revertToVersion()` writes a `revert` set with no baseline rows; the next save writes a `baseline` set.
   - `it joins a set stored as baseline from a nested run with ordinary options`.
-  - `it adds at most one query to the write of a plain versioned model`: count queries of a `VersionedArticle` update before and after with `DB::enableQueryLog()`; record the numbers in the plan.
-- [ ] **Step 2:** Run them: they fail (no baseline written after `best_effort`).
-- [ ] **Step 3:** Implement `BaselinePolicy::isDue()`, the due flag in `ActiveVersionSet`, and the append in the manager before `finish()`.
-- [ ] **Step 4:** Run `Modules/Core/tests/Integration/Versioning`, then the CMS suite (translations write in the owner's set): green.
-- [ ] **Step 5:** Commit (`feat(versioning): a whole-aggregate baseline after a best_effort set (D45, D52, D60)`).
+  - `it adds at most one query to the write of a plain versioned model`: count queries of a `VersionedArticle` update before and after with `DB::enableQueryLog()`; record the numbers in the plan. Measured 2026-11-02: 5 queries before, at most 6 after (the policy query); a `best_effort` write asks nothing.
+- [x] **Step 2:** Run them: they fail (no baseline written after `best_effort`).
+- [x] **Step 3:** Implement `BaselinePolicy::isDue()`, the due flag in `ActiveVersionSet`, and the append in the manager before `finish()`.
+- [x] **Step 4:** Run `Modules/Core/tests/Integration/Versioning`, then the CMS suite (translations write in the owner's set): green.
+- [x] **Step 5:** Commit (`feat(versioning): a whole-aggregate baseline after a best_effort set (D45, D52, D60)`).
 
 ### Part A closing
 
-- [ ] Regression per suite (Core per folder, CMS, ERP, MES); `MODULE.md` of Core (when a baseline is written and what it holds).
+- [x] Regression per suite (Core per folder, CMS, ERP, MES); `MODULE.md` of Core (when a baseline is written and what it holds). Run 2026-11-02: all green but `Integration/Providers/SearchServiceProviderTest` (the null vector profile binding), which fails the same way on master and is unrelated.
+- Part A divergences from this plan, by ruling:
+  - The policy is asked before `finish()`, only for an atomic `change` set that wrote rows of its own and whose root still exists, not when the set opens: no query for empty sets, reverts, `best_effort` sets or hard deletes. `finish()` writes the stored kind (`ActiveVersionSet::storeAsBaselineAfterItsRows()`); `isBaselineDue()` was not added, nothing would read it.
+  - Any capture other than `atomic` (`best_effort`, `incomplete`) makes the baseline due.
+  - A `best_effort` creation set stored as `baseline` counts as the anchor (the plan's strict rule).
+  - The root image of `aggregateImage()` is read back from the database for the hard-delete snapshot too.
 
 ---
 
