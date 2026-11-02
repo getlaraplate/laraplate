@@ -81,15 +81,12 @@
 
 - [x] Regression per suite (Core per folder, CMS, ERP, MES); `MODULE.md` of Core (when a baseline is written and what it holds). Run 2026-11-02: all green but `Integration/Providers/SearchServiceProviderTest` (the null vector profile binding), which fails the same way on master and is unrelated.
 - Part A divergences from this plan, by ruling:
-  - The policy is asked before `finish()`, only for an atomic `change` set that wrote rows of its own and whose root still exists, not when the set opens: no query for empty sets, reverts, `best_effort` sets or hard deletes. `finish()` writes the stored kind (`ActiveVersionSet::storeAsBaselineAfterItsRows()`); `isBaselineDue()` was not added, nothing would read it.
+  - The policy is asked before `finish()`, only for an atomic `change` set that wrote rows of its own and whose root still exists, not when the set opens: no query for empty sets, reverts, `best_effort` sets or hard deletes. `finish()` writes the stored kind (`ActiveVersionSet::storeAsBaselineFromNextRow()`); `isBaselineDue()` was not added, nothing would read it.
   - Any capture other than `atomic` (`best_effort`, `incomplete`) makes the baseline due.
-  - A `best_effort` creation set stored as `baseline` counts as the anchor (the plan's strict rule).
+  - A `best_effort` creation set stored as `baseline` counted as the anchor at first; replaced after the branch review, see below.
   - The root image of `aggregateImage()` is read back from the database for the hard-delete snapshot too.
   - After the branch review: the policy reads a root's sets by class, key and table (`root_table_ref`), and a root whose row is gone by the end of its set gets no baseline (`aggregateImage()` returns no rows).
-- Open for Slice 6, from the branch review:
-  - A `best_effort` baseline is no complete anchor under D47. Counting only atomic baselines would make the first atomic write after every `best_effort` creation of a plain model a baseline, a trash included; decide it with the complete-revert gate.
-  - A baseline written in a set opened by `setFor()` reads the aggregate without that root's lock; a concurrent uncommitted change of the root can be missing from it.
-  - `CrudService::history()` lists rows latest first with a limit, so a baseline's image rows can fill a page; group by set or hide them.
+  - After the branch review, agreed with the user on 2026-11-02: only an `atomic` baseline anchors (D47), so the first atomic write of a plain model created outside a transaction, a move to the bin included, carries the root's image. A set opened by `setFor()` (root not locked) never carries the baseline; the root's next own scope does. The set row records `baseline_from_sequence` (create migration), and `history()` leaves the image rows out. `BaselinePolicy` is injected into the manager. Core tests that counted sets or read the latest row were adjusted: their records are created inside a transaction, or the expectation includes the image row.
 
 ---
 
