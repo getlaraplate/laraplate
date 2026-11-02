@@ -133,8 +133,8 @@ module: ai, core
 
 - [x] **Step 1: Confirm the declaration style** by reading how `$embed` is declared and read.
 - [x] **Step 2: Failing tests**: `without a header chunks are unchanged apart from structure`; `every chunk of a long text starts with the header`; `paragraph breaks survive until the split`; `changing the header changes the content hash, so the locale is re-embedded`.
-- [x] **Step 3: Implement**; re-embedding stays hash-driven, so `ai:embeddings:repair` picks it up.
-- [x] **Step 4: Compare** before and after with the application-content evaluation command.
+- [x] **Step 3: Implement**; re-embedding is hash-driven: the next save, a `scout:import` or reindex (its bulk path skips by hash) and the switch corpus pick a header change up. `ai:embeddings:repair` does not, because it never compares `content_hash`.
+- [-] **Step 4: Compare** before and after with the application-content evaluation command. *Not run by the agent: it needs a live index and a model server. The owner runs it after reindexing.*
 - [x] **Step 5: Run** the tests; expect pass. Pint. Commit `feat(ai): chunk context header for application content`.
 
 ### Task 8: Near-duplicate images (AI)
