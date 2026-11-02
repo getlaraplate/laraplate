@@ -58,11 +58,11 @@ module: ai, core
 **Interfaces:**
 - Produces: `RelevanceJudge::judge(string $question, array $candidates, int $round): JudgeVerdict`; `JudgeVerdict { list<int> $relevant; ?string $nextQuery }`; settings `features.rag.judge.enabled` (false), `.max_rounds` (3), `.min_sources` (3), `.excerpt_chars` (600).
 
-- [ ] **Step 1: Confirm the seam**: read where retrieved documents are handed to the answering agent, and the analytics record, and note the class and method here.
-- [ ] **Step 2: Failing tests**: `off by default leaves candidates untouched`; `keeps only the relevant ids`; `stops once min_sources are accepted`; `stops at max_rounds`; `a failure or timeout returns the unjudged candidates`; `a candidate is judged once`; `each round is logged with query, candidates and kept ids`.
-- [ ] **Step 3: Implement** with temperature 0 and a fixed JSON schema, excerpt bounded by `excerpt_chars`, next query "more precise" on the first round and "broader, with synonyms" after; the settings text carries the mid-size-model hint.
-- [ ] **Step 4: Compare** judge off and on with `test:ai:evaluate-documentation`; record the numbers for the delivery status.
-- [ ] **Step 5: Run** the tests; expect pass. Pint. Commit `feat(ai): optional relevance judge`.
+- [x] **Step 1: Confirm the seam**: read where retrieved documents are handed to the answering agent, and the analytics record, and note the class and method here.
+- [x] **Step 2: Failing tests**: `off by default leaves candidates untouched`; `keeps only the relevant ids`; `stops once min_sources are accepted`; `stops at max_rounds`; `a failure or timeout returns the unjudged candidates`; `a candidate is judged once`; `each round is logged with query, candidates and kept ids`.
+- [x] **Step 3: Implement** with temperature 0 and a fixed JSON schema, excerpt bounded by `excerpt_chars`, next query "more precise" on the first round and "broader, with synonyms" after; the settings text carries the mid-size-model hint.
+- [x] **Step 4: Compare** judge off and on with `test:ai:evaluate-documentation`; record the numbers for the delivery status.
+- [x] **Step 5: Run** the tests; expect pass. Pint. Commit `feat(ai): optional relevance judge`.
 
 ### Task 3: Embedding drift guard (AI)
 
