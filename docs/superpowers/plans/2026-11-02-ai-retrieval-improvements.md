@@ -131,11 +131,11 @@ module: ai, core
 **Interfaces:**
 - Produces: model property `$embedHeader` (`?string` or a closure-returning method `embedHeader(): ?string`, confirm against `$embed` style in step 1); every chunk text is `header . "\n" . chunk`; the splitter receives the original line structure and whitespace is normalised after splitting.
 
-- [ ] **Step 1: Confirm the declaration style** by reading how `$embed` is declared and read.
-- [ ] **Step 2: Failing tests**: `without a header chunks are unchanged apart from structure`; `every chunk of a long text starts with the header`; `paragraph breaks survive until the split`; `changing the header changes the content hash, so the locale is re-embedded`.
-- [ ] **Step 3: Implement**; re-embedding stays hash-driven, so `ai:embeddings:repair` picks it up.
-- [ ] **Step 4: Compare** before and after with the application-content evaluation command.
-- [ ] **Step 5: Run** the tests; expect pass. Pint. Commit `feat(ai): chunk context header for application content`.
+- [x] **Step 1: Confirm the declaration style** by reading how `$embed` is declared and read.
+- [x] **Step 2: Failing tests**: `without a header chunks are unchanged apart from structure`; `every chunk of a long text starts with the header`; `paragraph breaks survive until the split`; `changing the header changes the content hash, so the locale is re-embedded`.
+- [x] **Step 3: Implement**; re-embedding stays hash-driven, so `ai:embeddings:repair` picks it up.
+- [x] **Step 4: Compare** before and after with the application-content evaluation command.
+- [x] **Step 5: Run** the tests; expect pass. Pint. Commit `feat(ai): chunk context header for application content`.
 
 ### Task 8: Near-duplicate images (AI)
 
