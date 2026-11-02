@@ -117,10 +117,10 @@ module: ai, core
 **Interfaces:**
 - Produces: `VectorProfile::$minSimilarity` (`?float`, default `null`: no floor); the Elasticsearch kNN clause carries `similarity` when set; the Database engine adds the matching distance condition.
 
-- [ ] **Step 1: Failing tests**: `no floor leaves the kNN clause unchanged`; `a floor is sent in the kNN clause`; `the database engine drops rows beyond the floor`; `the profile passes its floor through vectorProfile()`; `switching profile switches the floor`.
-- [ ] **Step 2: Run** them; expect failure.
-- [ ] **Step 3: Implement**; the tuning command prints the recommended floor next to its other output and never writes it.
-- [ ] **Step 4: Run** the tests; expect pass. Pint. Commit `feat(core): optional similarity floor carried by the vector profile`.
+- [x] **Step 1: Failing tests**: `no floor leaves the kNN clause unchanged`; `a floor is sent in the kNN clause`; `the database engine drops rows beyond the floor`; `the profile passes its floor through vectorProfile()`; `switching profile switches the floor`.
+- [x] **Step 2: Run** them; expect failure.
+- [x] **Step 3: Implement**; the tuning command prints the recommended floor next to its other output and never writes it.
+- [x] **Step 4: Run** the tests; expect pass. Pint. Commit `feat(core): optional similarity floor carried by the vector profile`.
 
 ### Task 7: Chunk context for application content (AI, Core)
 
