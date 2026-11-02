@@ -88,10 +88,10 @@ module: ai, core
 **Interfaces:**
 - Produces: `EmbeddingModelProfile::$languages` (`list<string>`, default `[]` meaning unknown; `['*']` any); `EmbeddingModelProfile::coversLanguages(array $locales): bool`; registry reads `languages` from each profile in `ai.features.embeddings.models`.
 
-- [ ] **Step 1: Confirm the seam**: find where the settings page renders profiles and where installation locales are listed.
-- [ ] **Step 2: Failing tests**: `unknown languages warn nothing`; `a profile declaring only some of the installation locales warns and names the missing ones`; `* covers everything`; `probe prints the warning and still succeeds`.
-- [ ] **Step 3: Implement** the attribute, the check, the warning in the settings page and in the probe; optional `--cross-language` flag embeds one sentence in two locales and reports their cosine.
-- [ ] **Step 4: Run** the tests; expect pass. Pint. Commit `feat(ai): profiles declare their languages`.
+- [x] **Step 1: Confirm the seam**: find where the settings page renders profiles and where installation locales are listed.
+- [x] **Step 2: Failing tests**: `unknown languages warn nothing`; `a profile declaring only some of the installation locales warns and names the missing ones`; `* covers everything`; `probe prints the warning and still succeeds`.
+- [x] **Step 3: Implement** the attribute, the check, the warning in the settings page and in the probe; optional `--cross-language` flag embeds one sentence in two locales and reports their cosine.
+- [x] **Step 4: Run** the tests; expect pass. Pint. Commit `feat(ai): profiles declare their languages`.
 
 ### Task 5: Keyword branch cleanup and unstemmed sub-field (Core)
 
