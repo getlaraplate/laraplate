@@ -1,6 +1,6 @@
 # CMS imports: one record across several sources
 
-**Status:** Draft for written review
+**Status:** Implemented (2026-11-02), see `../plans/2026-10-30-cms-import-cross-source-identity.md`
 
 **Date:** 2026-10-30
 
