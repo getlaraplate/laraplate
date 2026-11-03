@@ -17,13 +17,6 @@
     }
   ],
   "license": "AGPL-3.0-or-later",
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/swolley/license-compliance-checker.git",
-      "no-api": true
-    }
-  ],
   "require": {
     "php": ">=8.5",
     "coolsam/modules": "^5.1",
@@ -37,7 +30,6 @@
     "symfony/http-client": "^7.4.9"
   },
   "require-dev": {
-    "swolley/license-compliance-checker": "dev-master",
     "barryvdh/laravel-ide-helper": "^3.7",
     "dg/bypass-finals": "^1.11",
     "driftingly/rector-laravel": "^2.6",
@@ -134,7 +126,7 @@
     "test:pest:parallel": "vendor/bin/pest --parallel --compact",
     "test:types": "phpstan",
     "test:refactor": "rector",
-    "test:licenses": "@php vendor/bin/check-licenses",
+    "test:licenses": "bash scripts/check-licenses",
     "test": [
       "@test:type-coverage",
       "@test:coverage",

@@ -1,0 +1,7 @@
+# Config of scripts/check-licenses (composer test:licenses). The project license is read from composer.json.
+
+# Dev-only dependency of tomasvotruba/type-coverage; its license allows use as a dependency of tomasvotruba/* packages.
+allow  entropy/entropy  proprietary
+
+# Rector's bundled copy of nette/utils is offered under BSD-3-Clause or GPL-2.0/3.0, but its license text is read as GPL-2.0-only.
+allow  vendor/rector/rector/vendor/nette/utils  GPL-2.0-only
