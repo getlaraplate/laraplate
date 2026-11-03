@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e97246a44c07492bb668c9fe8fbe72c3",
+    "content-hash": "c8626511bbb423dd011b2f1942da4c3c",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -19102,62 +19102,6 @@
             "published-time": "2024-10-20T05:09:39+00:00"
         },
         {
-            "name": "swolley/license-compliance-checker",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/swolley/license-compliance-checker.git",
-                "reference": "e212000737ab6e34a82172cbdbd9d8e3a24a2df7"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/swolley/license-compliance-checker/zipball/e212000737ab6e34a82172cbdbd9d8e3a24a2df7",
-                "reference": "e212000737ab6e34a82172cbdbd9d8e3a24a2df7",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^8.2"
-            },
-            "require-dev": {
-                "pestphp/pest": "^3.0",
-                "phpunit/phpunit": "^11.0"
-            },
-            "default-branch": true,
-            "bin": [
-                "bin/check-licenses"
-            ],
-            "type": "library",
-            "scripts": {
-                "test": [
-                    "@php vendor/bin/pest"
-                ],
-                "test:coverage": [
-                    "@php vendor/bin/pest --coverage"
-                ],
-                "test:coverage:min": [
-                    "@php vendor/bin/pest --coverage --min=99"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "Check Composer and npm dependency licenses against project license",
-            "homepage": "https://github.com/swolley/license-compliance-checker#readme",
-            "keywords": [
-                "compliance",
-                "composer",
-                "dependencies",
-                "license",
-                "npm",
-                "spdx"
-            ],
-            "support": {
-                "issues": "https://github.com/swolley/license-compliance-checker/issues",
-                "source": "https://github.com/swolley/license-compliance-checker"
-            },
-            "time": "2026-09-27T22:04:38+00:00"
-        },
-        {
             "name": "symfony/yaml",
             "version": "v8.1.10",
             "source": {
@@ -19481,9 +19425,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "swolley/license-compliance-checker": 20
-    },
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
@@ -19499,8 +19441,5 @@
         "ext-sockets": "*"
     },
     "platform-dev": {},
-    "platform-overrides": {
-        "ext-oci8": "3.0.1"
-    },
     "plugin-api-version": "2.11.0"
 }
