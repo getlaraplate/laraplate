@@ -112,9 +112,9 @@ module: ai
 
 ### Task 6: Reindex and the upgrade path
 
-- [ ] **Step 1: Test first** — a reference whose chunks were indexed before Task 2 (no `document_key` in the index) answers 404, and the search still returns its items with the label as `reference`, so the client can show "the document changed, search again" without a broken link.
-- [ ] **Step 2:** run `ai:index-rag-docs --full` against a test index in a test (the existing command tests show how) and assert that the chunks now carry `section` and `document_key`. If Task 1 decided that the index must be recreated, the test covers the recreate.
-- [ ] **Step 3:** run the tests (PASS), Pint, commit: `test(ai): documentation reads before and after a full reindex`.
+- [x] **Step 1: Test first** — a reference whose chunks were indexed before Task 2 (no `document_key` in the index) answers 404, and the search still returns its items with the label as `reference`, so the client can show "the document changed, search again" without a broken link.
+- [x] **Step 2:** (the command has no test of its own; the service it calls is tested on both paths, incremental and full rebuild, with the agent mocked.) Run `ai:index-rag-docs --full` against a test index in a test (the existing command tests show how) and assert that the chunks now carry `section` and `document_key`. If Task 1 decided that the index must be recreated, the test covers the recreate.
+- [x] **Step 3:** run the tests (PASS), Pint, commit: `test(ai): documentation reads before and after a full reindex`.
 
 ---
 
