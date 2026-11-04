@@ -1,6 +1,7 @@
 ---
 created_on: 2026-11-04
 module: ai
+status: completed
 ---
 # Documentation reader route. Implementation Plan
 
@@ -126,7 +127,24 @@ module: ai
 - Modify: `Modules/AI/README.md` (upgrade note: run `ai:index-rag-docs --full` once, and the throttle key if Task 5 added one).
 - Modify: `docs/superpowers/plans/INDEX.md` (one line for this plan).
 
-- [ ] **Step 1:** document the route, the response, the access rules, the 404 rule, the cap on sections, and the fields added to a search item and a citation.
-- [ ] **Step 2:** write the upgrade note: before a full reindex an old reference answers 404 and the palette shows that the document changed.
-- [ ] **Step 3:** add the plan line to the index (name and what it covers, no status).
-- [ ] **Step 4:** at the end of the plan add `status: completed` to the front matter, a `## Delivery status (date): ...` section and the `**Documented in:**` line naming the files above.
+- [x] **Step 1:** document the route, the response, the access rules, the 404 rule, the cap on sections, and the fields added to a search item and a citation.
+- [x] **Step 2:** write the upgrade note: before a full reindex an old reference answers 404 and the palette shows that the document changed.
+- [x] **Step 3:** add the plan line to the index (name and what it covers, no status).
+- [x] **Step 4:** at the end of the plan add `status: completed` to the front matter, a `## Delivery status (date): ...` section and the `**Documented in:**` line naming the files above.
+
+## Delivery status (2026-11-04): shipped
+
+**Documented in:** `Modules/AI/docs/SEARCH_AND_TRANSLATION.md`, `Modules/AI/docs/rag/MODULE.md`, `Modules/AI/docs/rag/ASSISTANT_PROPOSALS_DEVELOPER.md`, `Modules/AI/README.md`.
+
+The user index chunks carry `section` and `document_key`, search items and citations carry `kind`, the opaque `reference` and `section`, and `GET /app/crud/detail/{module}/documentation` reads a document or the section a search found under the access filter of the search. The client plan at the stack root (`docs/superpowers/plans/2026-11-04-reference-reader.md`) can now be built against it.
+
+Divergences from the plan:
+
+- Position and key are written by `DocumentationService::splitDocuments()` through `DocumentationMetadata::markPositions()`, not by the splitter, because `SplitterFactory` can return the `sentence` and `delimiter` splitters of Neuron.
+- `AssistanceContextPolicy` had to change: it admitted only `/app/...` references and a closed key set, so it now admits `kind` and `section` and takes the document key as the reference of a `documentation` citation.
+- The read is `DocumentationSearchController::read()` and builds its body from `DocumentationRead`; there is no resource class, as the search has none.
+- A `reference` that is not a document key is 404 and not 422, so the label an item carried before the first reindex lands on the same "document changed" path as any unreadable document.
+- The new throttle is its own limiter, `documentation-read`, default 120 a minute.
+- The read of the index is covered with a mocked Elasticsearch client and an injected reader: no live index exists in the development environment. What no test shows is the dynamic mapping of an index created before this change (`section` as `long`, `document_key` as analysed text matched by a `term` on its single lowercase token); the decision rests on Elasticsearch's documented behaviour and the spec records it. Run a read against a real index before relying on it, and recreate the index with `ai:create-rag-index --force` if a read ever misses a document that exists.
+- `ai:index-rag-docs` has no command test; the service it calls is tested on the incremental and the full path.
+- The development environment has no Elasticsearch, so `ai:index-rag-docs --full` was not run end to end.
