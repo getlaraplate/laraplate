@@ -28,8 +28,8 @@ module: platform
 - The CSRF middleware exclusion in the `web` group is intentional during development (`TODO` in `bootstrap/app.php`). It must survive the upgrade: `array_diff` in `Illuminate\Foundation\Configuration\Middleware` compares class strings, and Laravel 13's default `web` group lists `PreventRequestForgery`, so `remove: [ValidateCsrfToken::class]` silently stops removing anything.
 - **The full suite cannot run serially.** Measured 2026-10-30: `php artisan test` ran 42 minutes, reached ~4.900 tests, then exhausted the 4G `memory_limit` and died without a summary, with 4 failures already recorded. This predates the upgrade. Every suite run in this plan is therefore three processes (`composer test:unit`, `test:integration`, `test:feature`), never one. Budget roughly 45 minutes per verification pass and batch the fixes accordingly.
 - **Merge fast.** The repository took 241 commits on the root and 134 on Core in the 14 days to 2026-10-29. A branch left open for days will cost more in merges than in upgrading. Work the tasks in one block.
-- **Branch lazily, one repository at a time.** Every repository the plan modifies uses a branch named `upgrade/laravel-13`, created by the first task that touches that repository, not before: `git -C <repo> checkout master && git -C <repo> pull --ff-only && git -C <repo> switch -c upgrade/laravel-13`. A branch created early only ages. Each task's commit steps assume its own repository is already on that branch, and say so.
-- **The upgrade cannot land in pieces.** `composer-merge-plugin` ANDs every `Modules/*/composer.json` into the root solve, so a module on master requiring `laravel/framework ^13.0` while the root still requires `^12.59` makes the solve unsatisfiable and breaks `composer install` for everyone. Nothing from Tasks 2 to 4 may be merged to master alone: the nine branches merge together or not at all. This is also why the work must run in one block rather than spread across days.
+- **Work on `master` in every repository.** Decided with the user on 2026-11-05, after the root upgrade had already been committed to `master`: branches existed to keep `master` installable until the whole upgrade landed at once, and once `master` carries the upgrade they protect nothing while splitting the work across two places. Open a branch only to isolate something genuinely risky, and merge it back the same day. Two earlier rounds of nine upfront branches (2026-10-31, 2026-11-02) were deleted unused.
+- **The upgrade cannot land in pieces.** `composer-merge-plugin` ANDs every `Modules/*/composer.json` into the root solve, so a module requiring `laravel/framework ^13.0` while the root still requires `^12.59` makes the solve unsatisfiable and breaks `composer install` for everyone. The root manifests and the module manifests have to move together, and a root commit that bumps gitlinks must reference module commits that include the fixes the upgrade needs: `9f30cf4` referenced the manifest commits only and left `master` fatal on every artisan command until `0199996` corrected it.
 - Touch only files named in the task. No `Co-Authored-By` trailer in commit messages.
 - Commands run from `/srv/http/laraplate-stack/laraplate`. Tests: `php artisan test --compact <path>`. Formatting: `vendor/bin/pint --dirty --format agent`.
 
@@ -43,7 +43,7 @@ module: platform
 **Interfaces:**
 - Produces: `storage/logs/upgrade-l13/baseline-failures.txt` (tests already failing on Laravel 12), with all nine repositories on their latest `master`. No branch is created here.
 
-- [ ] **Step 1: Check the trees are clean**
+- [x] **Step 1: Check the trees are clean**
 
 ```bash
 git status --short
@@ -51,7 +51,7 @@ git submodule foreach --quiet 'echo "$name $(git status --short | wc -l)"'
 ```
 Expected: the root shows no `M`/`??` outside this plan file; every submodule prints `0`. On 2026-10-29 all eight were clean and on `master`. If a submodule is dirty, STOP and ask the user to commit or stash that work. Do not stash it yourself.
 
-- [ ] **Step 2: Clear the cached config, or the suite aborts**
+- [x] **Step 2: Clear the cached config, or the suite aborts**
 
 ```bash
 php artisan optimize:clear
@@ -59,7 +59,7 @@ ls bootstrap/cache/
 ```
 Expected: no `config.php` and no `routes-v7.php` left. Both existed on 2026-10-29, and `tests/Support/TestEnvironmentGuard.php:26` aborts the whole suite while `bootstrap/cache/config.php` is present (a cached config makes tests read the `.env` database instead of `phpunit.xml`). This must stay cleared for every test run in this plan.
 
-- [ ] **Step 3: Pull every repository to its latest master**
+- [x] **Step 3: Pull every repository to its latest master**
 
 Do **not** create branches here. Each task opens `upgrade/laravel-13` in the repository it is about to touch, at the moment it touches it (see Global Constraints). Creating nine branches upfront was tried on 2026-10-31 and again on 2026-11-02: both times they sat on an ageing base while development continued on master, carried zero commits, and had to be deleted and recreated.
 
@@ -70,7 +70,7 @@ git status --short
 ```
 Expected: nine repositories on `master`, up to date, and a clean `git status` apart from gitlinks the root has not bumped yet. If a pull is not a fast-forward, STOP and ask the user: local master has diverged from the remote and that is not this plan's business.
 
-- [ ] **Step 4: Record the Laravel 12 baseline, one suite per process**
+- [x] **Step 4: Record the Laravel 12 baseline, one suite per process**
 
 **Do not run `php artisan test` for the whole suite.** Measured on 2026-10-30 on this machine: it ran 2.501 seconds (42 minutes), reached roughly 4.900 tests, then died with `Allowed memory size of 4294967296 bytes exhausted` while a service provider loaded routes. It never produced a summary. That is a pre-existing condition on Laravel 12, not something this upgrade introduces: something accumulates across a run in which every test boots the application, and `memory_limit` is 4G.
 
@@ -105,7 +105,7 @@ Expected: green, or the same failures you will accept for the rest of the plan. 
 **Interfaces:**
 - Produces: every light module requires `laravel/framework: ^13.0`. Task 4 depends on it: one module left on `^12.0` pins the whole solve to Laravel 12.
 
-- [ ] **Step 1: Edit the constraints**
+- [x] **Step 1: Edit the constraints**
 
 In each of the seven files change:
 ```json
@@ -117,23 +117,22 @@ to:
 ```
 Change nothing else. Every other requirement in these modules is framework-agnostic and already verified: `Modules/AI` (`neuron-core/neuron-ai ^4.1`, `aws/aws-sdk-php ^3.399`, `google/auth ^1.55`), `Modules/CMS` (`php-ffmpeg/php-ffmpeg ^1.4`, `ext-gd`, `ext-exif`), `Modules/MES` (`php-mqtt/client ^2.3`). `Modules/CRM`, `Modules/ERP`, `Modules/SAO` and `Modules/Shop` require only `php` and the framework. None of these modules has a `require-dev` block any more: the test toolchain lives in the root manifest and is Task 7's business.
 
-- [ ] **Step 2: Validate the manifests**
+- [x] **Step 2: Validate the manifests**
 
 ```bash
 for m in AI CMS CRM ERP MES SAO Shop; do composer validate --no-check-publish --no-check-lock "Modules/$m/composer.json" || echo "INVALID $m"; done
 ```
 Expected: seven `is valid` lines, no `INVALID`.
 
-- [ ] **Step 3: Commit inside each submodule, opening its branch first**
+- [x] **Step 3: Commit inside each submodule**
 
 ```bash
 for m in AI CMS CRM ERP MES SAO Shop; do
-  git -C "Modules/$m" switch -c upgrade/laravel-13
   git -C "Modules/$m" add composer.json
   git -C "Modules/$m" commit -m "chore(deps): require Laravel 13"
 done
 ```
-Expected: seven branches created and seven commits. If `switch -c` fails because the branch already exists from an earlier attempt, delete it first (`git -C "Modules/$m" branch -D upgrade/laravel-13`) after checking it carries no commits you need: `git -C "Modules/$m" log --oneline master..upgrade/laravel-13`.
+Expected: seven commits on `master`.
 
 ---
 
@@ -167,15 +166,14 @@ Apply exactly these changes in `Modules/Core/composer.json` `require`. The "to" 
 
 Leave unchanged, already L13-compatible at the current floor: `doctrine/dbal`, `filament/spatie-laravel-media-library-plugin` (L13 from 5.4.0), `lab404/laravel-impersonate`, `laravel/fortify` (from 1.34.1), `laravel/horizon` (from 5.44.0), `laravel/socialite` (from 5.24.3), `livewire/livewire` (from 4.2.0), `matanyadaev/laravel-eloquent-spatial` (from 4.7.0), `spatie/fork`, `spatie/laravel-medialibrary` (from 11.21.0), `james-heinrich/getid3`, `smalot/pdfparser`, every `ext-*`. Leave `mtrajano/laravel-swagger: ^0.6.4` as is: Task 4 decides.
 
-- [ ] **Step 2: Validate**
+- [x] **Step 2: Validate**
 
 Run: `composer validate --no-check-publish --no-check-lock Modules/Core/composer.json`
 Expected: `is valid`.
 
-- [ ] **Step 3: Commit inside Core, opening its branch first**
+- [x] **Step 3: Commit inside Core**
 
 ```bash
-git -C Modules/Core switch -c upgrade/laravel-13
 git -C Modules/Core add composer.json
 git -C Modules/Core commit -m "chore(deps): require Laravel 13 and its compatible package majors"
 ```
@@ -191,7 +189,7 @@ git -C Modules/Core commit -m "chore(deps): require Laravel 13 and its compatibl
 - Consumes: Tasks 2 and 3 manifests.
 - Produces: `composer.lock` on `laravel/framework 13.x`, with `pestphp/pest 4.x` still in place (Task 7 moves it).
 
-- [ ] **Step 1: Edit the root constraints**
+- [x] **Step 1: Edit the root constraints**
 
 In `composer.json` `require`:
 
@@ -204,7 +202,7 @@ In `composer.json` `require`:
 
 Leave `coolsam/modules`, `filament/filament`, `joshbrw/laravel-module-installer`, `laravel/sanctum`, `php-mqtt/client` and all of `require-dev` unchanged in this task. `coolsam/modules ^5.1` and `filament/filament ^5.6.3` already admit the census versions (`v5.3.2`, `v5.10.3`); `laravel/sanctum ^4.3.2` admits `v4.3.3`.
 
-- [ ] **Step 2: Dry-run the solve**
+- [x] **Step 2: Dry-run the solve**
 
 ```bash
 composer update -W --dry-run --no-scripts \
@@ -214,14 +212,14 @@ composer update -W --dry-run --no-scripts \
 Expected: `Lock file operations: ...` and no `Your requirements could not be resolved`. The solve takes several minutes; run it in the background if needed.
 If it fails, read the first `Problem` block, fix the named constraint in the manifest that owns it (tables in Task 3 and this task), commit that fix in the owning repo, rerun. Do not add `--ignore-platform-reqs` or loosen `minimum-stability`.
 
-- [ ] **Step 3: Resolve for real**
+- [x] **Step 3: Resolve for real**
 
 ```bash
 composer update -W --ignore-platform-req=ext-oci8 --ignore-platform-req=ext-imagick
 ```
 Expected: ends with `package:discover` output and `filament:upgrade` without errors.
 
-- [ ] **Step 4: Check nothing stayed on a Laravel 12 line**
+- [x] **Step 4: Check nothing stayed on a Laravel 12 line**
 
 This replaces a diff against the census: the census is a different application, so equality is not the goal. What matters is that no installed package still declares Laravel 12 only.
 
@@ -249,13 +247,13 @@ composer why symfony/http-client
 ```
 Expected: framework `v13.x`; socialite `v5.31.x`; driver-plus `v7.0.x`; sanctum `v4.3.x`; Guzzle `7.x` (expected, see Global Constraints); `symfony/http-client` reported as not required by anything (if a package now requires it, that is fine: it just stops being a root requirement).
 
-- [ ] **Step 5: Decision gate for `mtrajano/laravel-swagger`**
+- [-] **Step 5: Decision gate for `mtrajano/laravel-swagger`** Not needed: the solve produced no downgrade at all and the package stayed at v0.6.4.
 
 Run: `composer show mtrajano/laravel-swagger | grep versions`
 - If it is `v0.6.4`: nothing to do.
 - If the solve failed on it, or Composer picked an older version: run `composer why-not mtrajano/laravel-swagger 0.6.4` and report the blocking package to the user (expected cause: `phpdocumentor/reflection-docblock ^6`, which `v0.6.4` excludes with `^4.3|^5.2`). STOP and ask the user whether to (a) accept the downgrade after Step 6 proves the swagger command still works, (b) replace the package, or (c) drop swagger generation. Do not choose alone.
 
-- [ ] **Step 6: Boot and smoke check**
+- [x] **Step 6: Boot and smoke check**
 
 ```bash
 php artisan --version
@@ -271,14 +269,13 @@ php artisan test --compact --filter=Swagger
 ```
 Expected: PASS, or the same result as in `baseline-failures.txt`.
 
-- [ ] **Step 7: Commit (root), opening its branch first**
+- [x] **Step 7: Commit (root)**
 
 ```bash
-git switch -c upgrade/laravel-13
 git add composer.json composer.lock
 git commit -m "chore(deps): upgrade to Laravel 13"
 ```
-This is the root repository's first change, so this is where its branch is created. Leave the gitlinks alone: Task 9 bumps them.
+Leave the gitlinks alone here: Task 9 bumps them, and it must reference module commits that already carry the fixes from Tasks 5 and 6.
 
 ---
 
@@ -657,10 +654,10 @@ git commit -m "docs: record the Laravel 13 upgrade"
 **Files:**
 - Modify: root gitlinks `Modules/AI`, `Modules/CMS`, `Modules/CRM`, `Modules/Core`, `Modules/ERP`, `Modules/MES`, `Modules/SAO`, `Modules/Shop`
 
-- [ ] **Step 1: Check each submodule is clean and on the branch**
+- [ ] **Step 1: Check each submodule is clean and on master**
 
 Run: `git submodule foreach --quiet 'echo "$name $(git rev-parse --abbrev-ref HEAD) $(git status --short | wc -l)"'`
-Expected: eight lines `... upgrade/laravel-13 0`.
+Expected: eight lines `... master 0`.
 
 - [ ] **Step 2: Final suite**
 
@@ -695,4 +692,4 @@ Expected: the folder is gone. If the grep found a reference, report it and do no
 
 - [ ] **Step 5: Hand over**
 
-Report to the user: the branches to merge (root plus eight submodules, submodules first), the swagger decision, the result of Task 6 (whether any extension point had moved), that `2026-10-29-test-toolchain-pest-5.md` is now unblocked, that the census scaffold is deleted, and that pushing and merging are theirs to do. Do not push or merge.
+Report to the user: the commits waiting to be pushed in all nine repositories, the swagger decision, the result of Task 6 (whether any extension point had moved), that `2026-10-29-test-toolchain-pest-5.md` is now unblocked, that the census scaffold is deleted, and that pushing and merging are theirs to do. Do not push or merge.
