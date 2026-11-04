@@ -103,9 +103,9 @@
 **Interfaces:**
 - Produces: table `core_versions_epochs` with `id`, `root_type` (string), `fingerprint` (string 64), `definition` (json), `first_seen_at` (timestamp); unique `(root_type, fingerprint)` named `vepochs_type_fingerprint_UN`. `core_versions.epoch_id` nullable foreign key to it, `restrictOnDelete` (epochs are never removed). `VersionEpoch` casts `definition` to array, no `updated_at`, no soft delete.
 
-- [ ] **Step 1: Failing schema tests:** the table and its unique key exist; `core_versions.epoch_id` references it; deleting a referenced epoch fails.
-- [ ] **Step 2–4:** run and fail, implement, `php artisan migrate:fresh` on the test database through the suite, run.
-- [ ] **Step 5:** Commit.
+- [x] **Step 1: Failing schema tests:** the table and its unique key exist; `core_versions.epoch_id` references it; deleting a referenced epoch fails.
+- [x] **Step 2–4:** run and fail, implement, `php artisan migrate:fresh` on the test database through the suite, run.
+- [x] **Step 5:** Commit.
 
 ### Task B2: The fingerprint, detected at the first write per process
 
@@ -118,9 +118,9 @@
 - Produces: `final readonly class EpochFingerprint` with `public function definitionOf(Model $root): array{columns: list<array{name: string, type: string, nullable: bool}>, translation_columns: list<array{name: string, type: string, nullable: bool}>, relations: list<array{relation: string, ownership: string, coverage: string, pivot_columns: list<string>}>}` and `public function fingerprintOf(array $definition): string` (sha256 of the definition JSON with sorted keys and lists). Columns come from `Schema::getColumns()` of the root's table, kept when versionable (`getVersionable()` when declared, otherwise every column minus `getDontVersionable()`); translation columns from the translation model's table restricted to `ownerImageKeys()`; relations from `versionedRelations()`. Defaults, non-versionable columns and the inside of JSON columns are left out (D33).
 - Produces: `final class VersionEpochs` (container singleton) with `public function currentFor(Model $root): VersionEpoch` (cached per root class for the process; `firstOrCreate` on `(root_type, fingerprint)` with `first_seen_at = now()`, retried once on a unique violation) and `public function hasSeveral(string $rootType): bool` (cached per process), `public function flush(): void` (called by the `MigrationsEnded` listener in `CommandListenerProvider` and by the tests).
 
-- [ ] **Step 1: Failing tests:** two writes of a class in one process create one epoch; adding a versionable column (Schema change in the test, then `flush()`) creates a second epoch and the next row carries it; adding a column listed in `$dontVersionable`, or changing a default, keeps the epoch; a new registered relation or a changed coverage changes the fingerprint (D57); the same fingerprint coming back reuses its epoch; two classes on one table get an epoch each.
-- [ ] **Step 2–4:** run and fail, implement, run.
-- [ ] **Step 5:** Commit.
+- [x] **Step 1: Failing tests:** two writes of a class in one process create one epoch; adding a versionable column (Schema change in the test, then `flush()`) creates a second epoch and the next row carries it; adding a column listed in `$dontVersionable`, or changing a default, keeps the epoch; a new registered relation or a changed coverage changes the fingerprint (D57); the same fingerprint coming back reuses its epoch; two classes on one table get an epoch each.
+- [x] **Step 2–4:** run and fail, implement, run.
+- [x] **Step 5:** Commit.
 
 ### Task B3: An epoch change makes a baseline due (D33 lazy baseline)
 
@@ -132,13 +132,19 @@
 - Consumes: `VersionEpochs::hasSeveral(string $rootType)`, `VersionEpochs::currentFor(Model)`.
 - Rule: only when the root's class has several epochs, read the `epoch_id` of the root's latest row; a different epoch makes the baseline due. With one epoch nothing more is queried.
 
-- [ ] **Step 1: Failing tests:** after an epoch change the first save of a record writes a `baseline` set whose rows carry the new epoch; the first pivot change after an epoch change writes the baseline too (D45); with a single epoch the query count of a write is the one measured in Task A2.
-- [ ] **Step 2–4:** run and fail, implement, run.
-- [ ] **Step 5:** Commit.
+- [x] **Step 1: Failing tests:** after an epoch change the first save of a record writes a `baseline` set whose rows carry the new epoch; the first pivot change after an epoch change writes the baseline too (D45); with a single epoch the query count of a write is the one measured in Task A2.
+- [x] **Step 2–4:** run and fail, implement, run.
+- [x] **Step 5:** Commit.
 
 ### Part B closing
 
 - [ ] Regression per suite; `MODULE.md` of Core (epochs, what the fingerprint covers, the workers that must restart after a deploy so the per-process cache is rebuilt).
+- Part B divergences from this plan, by ruling:
+  - `HasVersionedRelations::versionedRelationDescriptors()` was added and `RecordsChangesOnOwner::ownerImageKeys()` made public: the fingerprint reads them from outside the model.
+  - An epoch belongs to a class on a table: `core_versions_epochs.root_table`, unique `vepochs_root_fingerprint_UN` on `(root_type, root_table, fingerprint)`, so a class whose table varies per instance (`DynamicEntity`) has epochs per table. `hasSeveral()` takes the root model, not its type, and reads on its connection.
+  - `currentFor()` reads every epoch of the class on the table in one query and derives `hasSeveral()` from it: a single-epoch write keeps the Part A query count. The first write of a class in a process costs three queries more, pinned in `VersionEpochTest`.
+  - The epoch change is measured against the epoch of the root's latest `atomic` baseline, not its latest row: a revert or a write through another root's scope stamps the new epoch without carrying the baseline and leaves it due (D60).
+  - After the branch review: an epoch inserted inside a transaction is cached only after commit; a concurrent insert of the same shape is read back with a locking read (InnoDB repeatable read). The fingerprint reads a column's declared type without length, precision or sign, and a relation's table and key columns.
 - [-] The migration declaration of D13 (a migration that drops, renames or retypes a versioned column declares it, enforced by an architecture test) moves to Slice 6 with the classification it feeds: nothing reads it before the revert classifies columns.
 
 ---
