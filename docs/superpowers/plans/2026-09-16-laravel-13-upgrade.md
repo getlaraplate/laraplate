@@ -28,7 +28,9 @@ module: platform
 - The CSRF middleware exclusion in the `web` group is intentional during development (`TODO` in `bootstrap/app.php`). It must survive the upgrade: `array_diff` in `Illuminate\Foundation\Configuration\Middleware` compares class strings, and Laravel 13's default `web` group lists `PreventRequestForgery`, so `remove: [ValidateCsrfToken::class]` silently stops removing anything.
 - **The full suite cannot run serially.** Measured 2026-10-30: `php artisan test` ran 42 minutes, reached ~4.900 tests, then exhausted the 4G `memory_limit` and died without a summary, with 4 failures already recorded. This predates the upgrade. Every suite run in this plan is therefore three processes (`composer test:unit`, `test:integration`, `test:feature`), never one. Budget roughly 45 minutes per verification pass and batch the fixes accordingly.
 - **Merge fast.** The repository took 241 commits on the root and 134 on Core in the 14 days to 2026-10-29. A branch left open for days will cost more in merges than in upgrading. Work the tasks in one block.
-- Every submodule works on branch `upgrade/laravel-13` inside that submodule; the root repo uses `upgrade/laravel-13` too. Touch only files named in the task. No `Co-Authored-By` trailer in commit messages.
+- **Branch lazily, one repository at a time.** Every repository the plan modifies uses a branch named `upgrade/laravel-13`, created by the first task that touches that repository, not before: `git -C <repo> checkout master && git -C <repo> pull --ff-only && git -C <repo> switch -c upgrade/laravel-13`. A branch created early only ages. Each task's commit steps assume its own repository is already on that branch, and say so.
+- **The upgrade cannot land in pieces.** `composer-merge-plugin` ANDs every `Modules/*/composer.json` into the root solve, so a module on master requiring `laravel/framework ^13.0` while the root still requires `^12.59` makes the solve unsatisfiable and breaks `composer install` for everyone. Nothing from Tasks 2 to 4 may be merged to master alone: the nine branches merge together or not at all. This is also why the work must run in one block rather than spread across days.
+- Touch only files named in the task. No `Co-Authored-By` trailer in commit messages.
 - Commands run from `/srv/http/laraplate-stack/laraplate`. Tests: `php artisan test --compact <path>`. Formatting: `vendor/bin/pint --dirty --format agent`.
 
 ---
@@ -39,7 +41,7 @@ module: platform
 - None modified.
 
 **Interfaces:**
-- Produces: `storage/logs/upgrade-l13/baseline-failures.txt` (tests already failing on Laravel 12), branches `upgrade/laravel-13` in the root and in the eight submodules.
+- Produces: `storage/logs/upgrade-l13/baseline-failures.txt` (tests already failing on Laravel 12), with all nine repositories on their latest `master`. No branch is created here.
 
 - [ ] **Step 1: Check the trees are clean**
 
@@ -57,13 +59,16 @@ ls bootstrap/cache/
 ```
 Expected: no `config.php` and no `routes-v7.php` left. Both existed on 2026-10-29, and `tests/Support/TestEnvironmentGuard.php:26` aborts the whole suite while `bootstrap/cache/config.php` is present (a cached config makes tests read the `.env` database instead of `phpunit.xml`). This must stay cleared for every test run in this plan.
 
-- [ ] **Step 3: Create the branches**
+- [ ] **Step 3: Pull every repository to its latest master**
+
+Do **not** create branches here. Each task opens `upgrade/laravel-13` in the repository it is about to touch, at the moment it touches it (see Global Constraints). Creating nine branches upfront was tried on 2026-10-31 and again on 2026-11-02: both times they sat on an ageing base while development continued on master, carried zero commits, and had to be deleted and recreated.
 
 ```bash
-git switch -c upgrade/laravel-13
-git submodule foreach 'git switch -c upgrade/laravel-13'
+git checkout master && git pull --ff-only
+git submodule foreach 'git checkout master && git pull --ff-only'
+git status --short
 ```
-Expected: nine `Switched to a new branch 'upgrade/laravel-13'` lines.
+Expected: nine repositories on `master`, up to date, and a clean `git status` apart from gitlinks the root has not bumped yet. If a pull is not a fast-forward, STOP and ask the user: local master has diverged from the remote and that is not this plan's business.
 
 - [ ] **Step 4: Record the Laravel 12 baseline, one suite per process**
 
@@ -119,14 +124,16 @@ for m in AI CMS CRM ERP MES SAO Shop; do composer validate --no-check-publish --
 ```
 Expected: seven `is valid` lines, no `INVALID`.
 
-- [ ] **Step 3: Commit inside each submodule**
+- [ ] **Step 3: Commit inside each submodule, opening its branch first**
 
 ```bash
 for m in AI CMS CRM ERP MES SAO Shop; do
+  git -C "Modules/$m" switch -c upgrade/laravel-13
   git -C "Modules/$m" add composer.json
   git -C "Modules/$m" commit -m "chore(deps): require Laravel 13"
 done
 ```
+Expected: seven branches created and seven commits. If `switch -c` fails because the branch already exists from an earlier attempt, delete it first (`git -C "Modules/$m" branch -D upgrade/laravel-13`) after checking it carries no commits you need: `git -C "Modules/$m" log --oneline master..upgrade/laravel-13`.
 
 ---
 
@@ -165,9 +172,10 @@ Leave unchanged, already L13-compatible at the current floor: `doctrine/dbal`, `
 Run: `composer validate --no-check-publish --no-check-lock Modules/Core/composer.json`
 Expected: `is valid`.
 
-- [ ] **Step 3: Commit inside Core**
+- [ ] **Step 3: Commit inside Core, opening its branch first**
 
 ```bash
+git -C Modules/Core switch -c upgrade/laravel-13
 git -C Modules/Core add composer.json
 git -C Modules/Core commit -m "chore(deps): require Laravel 13 and its compatible package majors"
 ```
@@ -263,12 +271,14 @@ php artisan test --compact --filter=Swagger
 ```
 Expected: PASS, or the same result as in `baseline-failures.txt`.
 
-- [ ] **Step 7: Commit (root)**
+- [ ] **Step 7: Commit (root), opening its branch first**
 
 ```bash
+git switch -c upgrade/laravel-13
 git add composer.json composer.lock
 git commit -m "chore(deps): upgrade to Laravel 13"
 ```
+This is the root repository's first change, so this is where its branch is created. Leave the gitlinks alone: Task 9 bumps them.
 
 ---
 
