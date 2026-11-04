@@ -40,9 +40,9 @@ module: ai
 
 ### Task 1: Settle the checks that change the schema
 
-- [ ] **Step 1:** Read how `canonical_source` is declared in a user document (front matter) and write the answer under a *Decision* line in the spec section 6, check 1: is it unique per locale, or must the key hash `module`, `locale` and `canonical_source` together? Default to hashing all three.
-- [ ] **Step 2:** Confirm in a test against a real index, or in the Elasticsearch documentation, that the `metadata` object accepts two new keywords and an integer without recreating the index (spec check 4). Write the answer under the same *Decision* section. If the index must be recreated, Task 6 carries the recreate and the upgrade note says so.
-- [ ] **Step 3:** Read `ASSISTANT_EVALUATION.md` and the evaluation service for what it compares in a citation (spec check 3). Write whether `kind` and the opaque `reference` break it, and what the harness must compare instead (the label).
+- [x] **Step 1:** Read how `canonical_source` is declared in a user document (front matter) and write the answer under a *Decision* line in the spec section 6, check 1: is it unique per locale, or must the key hash `module`, `locale` and `canonical_source` together? Default to hashing all three.
+- [x] **Step 2:** Confirm in a test against a real index, or in the Elasticsearch documentation, that the `metadata` object accepts two new keywords and an integer without recreating the index (spec check 4). Write the answer under the same *Decision* section. If the index must be recreated, Task 6 carries the recreate and the upgrade note says so.
+- [x] **Step 3:** Read `ASSISTANT_EVALUATION.md` and the evaluation service for what it compares in a citation (spec check 3). Write whether `kind` and the opaque `reference` break it, and what the harness must compare instead (the label).
 
 ---
 
