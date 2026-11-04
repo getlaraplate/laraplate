@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c8626511bbb423dd011b2f1942da4c3c",
+    "content-hash": "e97246a44c07492bb668c9fe8fbe72c3",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -19102,6 +19102,49 @@
             "published-time": "2024-10-20T05:09:39+00:00"
         },
         {
+            "name": "swolley/license-compliance-checker",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/swolley/license-compliance-checker.git",
+                "reference": "d41eb4de96b2148ce2a342f8c909d20b179da810"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/swolley/license-compliance-checker/zipball/d41eb4de96b2148ce2a342f8c909d20b179da810",
+                "reference": "d41eb4de96b2148ce2a342f8c909d20b179da810",
+                "shasum": ""
+            },
+            "default-branch": true,
+            "bin": [
+                "check-licenses"
+            ],
+            "type": "library",
+            "archive": {
+                "exclude": [
+                    "/.github",
+                    "/docs",
+                    "/tests"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Check the licenses of a project's dependencies against the project license. A bash script (bash 4.4+ and jq): Composer only installs it.",
+            "homepage": "https://github.com/swolley/license-compliance-checker#readme",
+            "keywords": [
+                "compliance",
+                "dependencies",
+                "license",
+                "spdx"
+            ],
+            "support": {
+                "issues": "https://github.com/swolley/license-compliance-checker/issues",
+                "source": "https://github.com/swolley/license-compliance-checker"
+            },
+            "time": "2026-11-04T11:35:57+00:00"
+        },
+        {
             "name": "symfony/yaml",
             "version": "v8.1.10",
             "source": {
@@ -19425,7 +19468,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "swolley/license-compliance-checker": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
