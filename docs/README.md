@@ -26,6 +26,10 @@ This avoids accidentally indexing every Markdown file under `docs/` that was nev
 - Copy or move into `*/docs/rag/` only what you want the assistant to see.
 - Run `php artisan ai:index-rag-docs` (or `--full` when you need a full rebuild of the vector store).
 
+## Architecture
+
+- [Search and retrieval architecture](search-and-retrieval-architecture.md): application search, documentation RAG, application content and Core Graph, how each is measured, and what is deliberately not built
+
 ## Engineering audits
 
 - [Database connection affinity audit](database-connection-affinity-audit.md)
