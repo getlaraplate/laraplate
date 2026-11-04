@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
@@ -18,7 +18,11 @@ abstract class TestCase extends BaseTestCase
 
         // A test that pretends to run over HTTP (runningInConsole() false) would otherwise be
         // checked for a CSRF token, which no test request carries.
-        $this->withoutMiddleware(ValidateCsrfToken::class);
+        //
+        // The class name matters: withoutMiddleware() binds that exact abstract to a passthrough, and the
+        // middleware groups resolve PreventRequestForgery. Naming the deprecated ValidateCsrfToken alias here,
+        // as this did on Laravel 12 where the alias was what the web group listed, excluded nothing at all.
+        $this->withoutMiddleware(PreventRequestForgery::class);
     }
 
     /**

@@ -10,7 +10,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\RegisterProviders;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
@@ -78,7 +78,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
             StartSession::class,
             ShareErrorsFromSession::class,
             EnsureFrontendRequestsAreStateful::class,
-            VerifyCsrfToken::class,
+            PreventRequestForgery::class,
             SubstituteBindings::class,
             'auth.session',
         ]);
