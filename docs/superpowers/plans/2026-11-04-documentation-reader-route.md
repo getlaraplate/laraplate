@@ -55,11 +55,11 @@ module: ai
 - Modify: `Modules/AI/app/Ai/Rag/Retrieval/InAppDocumentationRetrieval.php` (the safe subset).
 - Test: `Modules/AI/tests/Unit/` and `Modules/AI/tests/Feature/` next to the existing splitter and retrieval tests.
 
-- [ ] **Step 1: Test first** — a document split into n chunks gives `section` 0 to n-1 in order and the same `document_key` on every chunk; two documents of different locale or module get different keys; the same document twice gets the same key; the key matches a fixed-length pattern and contains no part of the path; a chunk of a document without `canonical_source` gets no key (so the user corpus, which admits only declared metadata, still refuses it).
-- [ ] **Step 2: Implement** `DocumentationMetadata::documentKey(array $metadata): ?string` (a hash of the decision of Task 1), prefixed `d_`. The splitter sets `section` on each chunk it emits and the key on all of them.
-- [ ] **Step 3: Mapping.** Add `section` (integer) and `document_key` (keyword) to the `metadata` properties of the user index, per the decision of Task 1.
-- [ ] **Step 4: Safe subset.** `safeDocuments()` keeps `section` and `document_key` among the metadata it hands on. Nothing else is added.
-- [ ] **Step 5:** run the tests (PASS), Pint, commit: `feat(ai): documentation chunks carry their position and an opaque document key`.
+- [x] **Step 1: Test first** — a document split into n chunks gives `section` 0 to n-1 in order and the same `document_key` on every chunk; two documents of different locale or module get different keys; the same document twice gets the same key; the key matches a fixed-length pattern and contains no part of the path; a chunk of a document without `canonical_source` gets no key (so the user corpus, which admits only declared metadata, still refuses it).
+- [x] **Step 2: Implement** `DocumentationMetadata::documentKey(array $metadata): ?string` (a hash of the decision of Task 1), prefixed `d_`. The splitter sets `section` on each chunk it emits and the key on all of them. *Done differently:* `DocumentationMetadata::markPositions()` is called from `DocumentationService::splitDocuments()` instead, because `SplitterFactory` can return the `sentence` or `delimiter` splitter of Neuron too, and the position must not depend on the driver.
+- [x] **Step 3: Mapping.** Add `section` (integer) and `document_key` (keyword) to the `metadata` properties of the user index, per the decision of Task 1.
+- [x] **Step 4: Safe subset.** `safeDocuments()` keeps `section` and `document_key` among the metadata it hands on. Nothing else is added.
+- [x] **Step 5:** run the tests (PASS), Pint, commit: `feat(ai): documentation chunks carry their position and an opaque document key`.
 
 ---
 
