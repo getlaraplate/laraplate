@@ -277,7 +277,10 @@ lcc__detect_text() {
         if ((pos < bestpos)); then bestpos=$pos best="$title"; fi
     done
 
-    if [[ "$t" == *"mozilla public license"* && "$t" == *"version 2.0"* ]]; then
+    # A choice offered at the top (Nette packages, dg/bypass-finals): read whole, before the GNU title it quotes.
+    if [[ "$g" == *"either the new bsd license or the gnu general public license (gpl) version 2 or 3"* ]]; then
+        id="BSD-3-Clause OR GPL-2.0-only OR GPL-3.0-only"
+    elif [[ "$t" == *"mozilla public license"* && "$t" == *"version 2.0"* ]]; then
         id="MPL-2.0"
     elif [[ "$t" == *"apache license"* && "$t" == *"version 2.0"* ]]; then
         id="Apache-2.0"
