@@ -138,7 +138,7 @@
 
 ### Part B closing
 
-- [ ] Regression per suite; `MODULE.md` of Core (epochs, what the fingerprint covers, the workers that must restart after a deploy so the per-process cache is rebuilt).
+- [x] Regression per suite; `MODULE.md` of Core (epochs, what the fingerprint covers, the workers that must restart after a deploy so the per-process cache is rebuilt). Done 2026-11-04: every suite green but failures that are not Part B's. `SearchServiceProviderTest` and the AI `DocumentationServiceTest` batch test also fail on master; CMS and AI ran against Core master merged into this branch, since their master uses Core methods newer than this branch (CMS green, AI green per folder, one run of the whole AI suite exhausts 2 GB). The ERP affinity tests build the versioning schema by hand and gained the epochs table and `epoch_id` (ERP `738fcb6`). Commits: Core `6b194631`, `e1da4b8c`, `c702398e`, `af0c48c3`, `4ba53a6f`, `fa8e4c94`.
 - Part B divergences from this plan, by ruling:
   - `HasVersionedRelations::versionedRelationDescriptors()` was added and `RecordsChangesOnOwner::ownerImageKeys()` made public: the fingerprint reads them from outside the model.
   - An epoch belongs to a class on a table: `core_versions_epochs.root_table`, unique `vepochs_root_fingerprint_UN` on `(root_type, root_table, fingerprint)`, so a class whose table varies per instance (`DynamicEntity`) has epochs per table. `hasSeveral()` takes the root model, not its type, and reads on its connection.
