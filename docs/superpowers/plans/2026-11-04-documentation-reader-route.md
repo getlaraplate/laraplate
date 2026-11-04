@@ -71,10 +71,10 @@ module: ai
 - Modify: `Modules/AI/app/Services/ApplicationContent/ApplicationContentCitationMapper.php` (`kind: content`).
 - Test: the existing tests of those classes, and a new Feature test.
 
-- [ ] **Step 1: Test first** — a search item and an assistant documentation citation carry `kind: documentation`, `reference` equal to the document key (never the label), `section` as an integer and the unchanged `label`, `excerpt`, `heading_breadcrumb`, `module`; an application-content citation carries `kind: content` and its canonical `/app/...` reference unchanged; a chunk indexed before Task 2 (no key) is still returned, with the label as `reference` and no `section`, and the item says `kind: documentation`.
-- [ ] **Step 2: Implement.** `DocumentationPassage::fromDocument()` reads the key and the section from the document metadata. The citation projection does the same. A chunk with no key keeps the old behaviour so that nothing breaks before the first reindex.
-- [ ] **Step 3: Evaluation harness.** Apply the decision of Task 1, step 3, so the harness still compares what it compared.
-- [ ] **Step 4:** run the tests (PASS), including `AssistantBaselineGateTest` and the assistant evaluation tests; Pint; commit: `feat(ai): documentation and content citations carry their kind and an opaque reference`.
+- [x] **Step 1: Test first** — a search item and an assistant documentation citation carry `kind: documentation`, `reference` equal to the document key (never the label), `section` as an integer and the unchanged `label`, `excerpt`, `heading_breadcrumb`, `module`; an application-content citation carries `kind: content` and its canonical `/app/...` reference unchanged; a chunk indexed before Task 2 (no key) is still returned, with the label as `reference` and no `section`, and the item says `kind: documentation`.
+- [x] **Step 2: Implement.** `DocumentationPassage::fromDocument()` reads the key and the section from the document metadata. The citation projection does the same. A chunk with no key keeps the old behaviour so that nothing breaks before the first reindex.
+- [x] **Step 3: Evaluation harness.** Apply the decision of Task 1, step 3, so the harness still compares what it compared. Nothing to change: it compares labels only. *Also needed:* `AssistanceContextPolicy` accepted only `/app/...` references and a closed key set, so it now admits `kind` and `section` and takes the document key as the reference of a `documentation` citation.
+- [x] **Step 4:** run the tests (PASS), including `AssistantBaselineGateTest` and the assistant evaluation tests; Pint; commit: `feat(ai): documentation and content citations carry their kind and an opaque reference`.
 
 ---
 
