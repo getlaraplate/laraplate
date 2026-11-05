@@ -65,7 +65,7 @@
 
 - Laravel modular app.
 - Stack: PHP 8.5+, Laravel 13, Filament 5, Livewire 4, Sanctum 4, Tailwind 4.
-- Laravel 13 structure. `bootstrap/app.php` configures routing, middleware groups and exception handling through `Application::configure()`; there is no `app/Console/Kernel.php` and no `app/Exceptions/Handler.php`. `app/Http/Kernel.php` still exists but is a 20-line stub of placeholder comments that nothing references: do not add to it, and do not take it as evidence of the old structure.
+- Laravel 13 structure. `bootstrap/app.php` configures routing, middleware groups and exception handling through `Application::configure()`; there is no `app/Console/Kernel.php` and no `app/Exceptions/Handler.php`. `app/Http/Kernel.php` was a 20-line stub of placeholder comments that nothing referenced and was deleted on 2026-11-05: middleware groups and aliases are configured in `bootstrap/app.php`, not in a kernel class.
 - Modules use `nwidart/laravel-modules`.
 - `Core` is foundation. Other modules reuse Core contracts/services.
 - Module dependencies must be explicit in `module.json`.
