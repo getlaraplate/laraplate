@@ -670,14 +670,14 @@ done
 ```
 Expected: the same result as Task 7 Step 1.
 
-- [ ] **Step 3: Commit the pointers**
+- [x] **Step 3: Commit the pointers**
 
 ```bash
 git add Modules/AI Modules/CMS Modules/CRM Modules/Core Modules/ERP Modules/MES Modules/SAO Modules/Shop
 git commit -m "chore(modules): bump all modules to their Laravel 13 upgrade"
 ```
 
-- [ ] **Step 4: Delete the census scaffold**
+- [x] **Step 4: Delete the census scaffold**
 
 The user asked on 2026-10-31 for `../laraplate13` to be removed once the upgrade is through, even with things still to review: it existed only to census package versions, and it is already out of date. Nothing in the repository references it except this plan's own prose, which keeps it as a dated record of where the version tables came from.
 
@@ -691,7 +691,7 @@ ls /srv/http/laraplate-stack/
 ```
 Expected: the folder is gone. If the grep found a reference, report it and do not delete: something started depending on the scaffold.
 
-- [ ] **Step 5: Hand over**
+- [x] **Step 5: Hand over**
 
 Report to the user: the commits waiting to be pushed in all nine repositories, the swagger decision, the result of Task 6 (whether any extension point had moved), that `2026-10-29-test-toolchain-pest-5.md` is now unblocked, that the census scaffold is deleted, and that pushing and merging are theirs to do. Do not push or merge.
 
