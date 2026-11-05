@@ -21,7 +21,8 @@ module: platform
 - `php artisan optimize:clear` before every test run. `tests/Support/TestEnvironmentGuard.php:26` aborts the whole suite while `bootstrap/cache/config.php` exists, and Artisan commands recreate it.
 - Never add to `phpstan-baseline.neon` by hand to silence something. Regenerating it wholesale (Task 2) is a deliberate, reported act, not a silencing.
 - Do not delete or weaken a test to make analysis pass. If a finding in a test file is real, fix the test; if it is an artefact of the extension, report it rather than excluding the path again.
-- All work on branch `toolchain/pest-5` in the root repository. Module repositories are only touched if a finding lives in a module's test files, each in its own submodule commit on the same branch name. No `Co-Authored-By` trailer in commit messages.
+- ~~All work on branch `toolchain/pest-5`~~ **superseded on 2026-11-05: all work is on `master`**, in the root repository and in every module repository, because the user decided during the Laravel 13 upgrade that a submodule only gets a branch when it needs one and that this stack does not carry a branch per task. Module repositories are only touched if a finding lives in a module's files, each in its own submodule commit. No `Co-Authored-By` trailer in commit messages.
+- The library census at `/srv/http/laraplate-stack/laraplate13/composer.lock` **no longer exists**: it was deleted on 2026-11-05 as the last step of the Laravel 13 upgrade, at the user's request. The versions quoted above stay as the dated record of what it held; every one of them was checked against Packagist on 2026-11-05 before Task 1 and the installed set is equal or newer.
 - Commands run from `/srv/http/laraplate-stack/laraplate`. Formatting: `vendor/bin/pint --dirty --format agent`.
 
 ---
@@ -36,7 +37,7 @@ module: platform
 - Consumes: a closed Laravel 13 upgrade.
 - Produces: `pestphp/pest 5.x` and `phpunit/phpunit 13.x` installed, suite result unchanged from the Laravel 13 baseline.
 
-- [ ] **Step 1: Record the starting point**
+- [x] **Step 1: Record the starting point**
 
 ```bash
 php artisan optimize:clear
@@ -46,7 +47,7 @@ grep -E '^\s+(FAIL|⨯)' "storage/logs/toolchain-pest5/before.txt" > "storage/lo
 ```
 `storage/logs/` is gitignored. Expected: the suite summary. Any failure here predates this plan and is the bar every later run is compared against, not a regression to fix.
 
-- [ ] **Step 2: Bump the dev constraints**
+- [x] **Step 2: Bump the dev constraints**
 
 In `composer.json` `require-dev`:
 
@@ -60,14 +61,14 @@ In `composer.json` `require-dev`:
 
 Leave `nunomaduro/collision ^8.9.4` as is: Pest 5 requires `^8.9.5`, which that constraint already admits. Do not add `pestphp/pest-plugin-phpstan` yet: it is Task 2's first step, so that a red suite and a red analysis never arrive together.
 
-- [ ] **Step 3: Resolve**
+- [x] **Step 3: Resolve**
 
 ```bash
 composer update -W --ignore-platform-req=ext-oci8 'pestphp/*' peckphp/peck 'phpunit/*' 'sebastian/*'
 ```
 Expected: `pestphp/pest v5.3.x`, `phpunit/phpunit 13.x`. If the solve fails on a package the census does not hold, STOP and report it: do not remove packages without approval.
 
-- [ ] **Step 4: Migrate the PHPUnit configuration if asked**
+- [x] **Step 4: Migrate the PHPUnit configuration if asked**
 
 ```bash
 php artisan optimize:clear
@@ -89,14 +90,28 @@ diff "storage/logs/toolchain-pest5/before-failures.txt" "storage/logs/toolchain-
 ```
 Expected: `diff` prints nothing. Every `>` line is a PHPUnit 13 regression: a removed assertion, a removed annotation, a changed data-provider or mock API. Fix one at a time with superpowers:systematic-debugging, rerun that file, `vendor/bin/pint --dirty --format agent`, and commit each fix in the repository that owns the test.
 
-- [ ] **Step 6: Type coverage still measures**
+**Result on 2026-11-05: two regressions, one cause, and it was not PHPUnit.** The solve also moved `symfony/console` and `symfony/finder` from 7.4.23 to 8.1.11, pulled in by PHPUnit 13. Symfony Console 8.0 removed `Application::add()` in favour of `addCommand()`, and the two `Modules\Core\tests\Feature\Console\ModelMakeCommandTest` cases that build a bare `Symfony\Component\Console\Application` died with `Call to undefined method`. `Illuminate\Console\Application` still defines `add()` as an alias of its own `addCommand()`, which is why `CoreServiceProvider::registerConsoleCommandOverrides()` kept working and no production path broke; it was changed to `addCommand()` anyway, since the alias now names a method that no longer exists upstream. `php artisan list --internals` still lists the module commands through the `ListCommand` override, and the 371 tests of `Modules/Core/tests/Feature/Console` pass.
+
+The rest of the Symfony Console 8.0 removals were checked against the repository and none applies: no `Command::getDefaultName()` or `getDefaultDescription()` caller, nothing extending the now-final `AsCommand`, no class implementing `OutputInterface` directly (which gained `isSilent()`), no `ProgressIndicator` and no `Command::setCode()` caller. Symfony Finder 8.0 removes nothing.
+
+Suite on Pest 5, three processes: unit **1794 passed** (291s), integration **1 risky, 14 skipped, 3432 passed** (1097s), feature **6217 passed with 7 failed** before the fix and the five baseline failures after it. Integration is numerically identical to the Laravel 12 and Laravel 13 baselines.
+
+Step 5 is left open: the confirming feature run after the `addCommand()` fix was still in flight when work stopped on 2026-11-05. Its log is `storage/logs/toolchain-pest5/pest5-feature2.txt` (gitignored) and the bar it has to match is the five lines of `storage/logs/upgrade-l13/l13-failures.txt`. The two fixed cases were rerun on their own and pass, so what is unconfirmed is only that nothing else moved.
+
+- [x] **Step 6: Type coverage still measures**
 
 ```bash
 composer test:type-coverage 2>&1 | tail -5
 ```
 Expected: a coverage percentage, and the `--min=100` gate behaves as before. The type-coverage plugin changed major version in Step 3, so this is the one script whose output format can move without any test failing.
 
-- [ ] **Step 7: Commit (root)**
+**Result on 2026-11-05: the gate did not behave as before, because it had never behaved at all.** `pest-plugin-type-coverage` v5 crashed with `The "" directory does not exist`. Its `ConfigurationSourceDetector` calls `realpath()` on each `<source>` include directory, and `phpunit.xml` listed `Modules/*/app`: PHPUnit expands a glob in a `<testsuite>` `<directory>` but not in a `<source>` one, so `realpath()` returned false and v5 stringified it to `""`. v4 skipped the empty entry instead of failing, which is why nothing had ever reported it.
+
+So `composer test:type-coverage` was measuring the three files under `app/` and printing `Total: 100.0 %`. Measured both surfaces to be sure: `app` alone is 100% over 3 files; `app` plus the eight module directories is **99.4%** over 547, with **58 files at 75%** (AI 5, CMS 6, Core 9, CRM 1, ERP 9, MES 17, SAO 11) — roughly a hundred missing parameter types and a few untyped class constants.
+
+`phpunit.xml` now lists the eight module directories one by one, so coverage and type coverage both see module code, and `tests/Unit/ModuleSourcePathsAreAnalysedTest.php` fails if a module is added without its line or if any entry stops resolving. `--min=100` was left untouched and is therefore now red at 99.4%: a gate that measured 3 of 547 files was not a gate, and lowering the threshold to keep the colour green would re-hide what it just revealed. Closing those 58 files spans seven module repositories and is not a runner upgrade, so it is Task 5 rather than something done under cover of this one.
+
+- [x] **Step 7: Commit (root)**
 
 ```bash
 git add composer.json composer.lock phpunit.xml
@@ -326,3 +341,34 @@ Expected: the test PASSES, and this plan no longer appears among the open ones.
 git add AGENTS.md docs/superpowers/plans/2026-10-29-test-toolchain-pest-5.md docs/superpowers/plans/INDEX.md
 git commit -m "docs: record the Pest 5 toolchain upgrade"
 ```
+
+---
+
+### Task 5: Close the type-coverage gap the source fix revealed
+
+Added on 2026-11-05, out of Task 1 Step 6. Independent of Tasks 2, 3 and 4 and of this plan's green signals: it can be done later or declined, and `--min=100` stays red at 99.4% until it is. Not started.
+
+**Files:**
+- Modify: the 58 files reported at 75% by `composer test:type-coverage`, each in the module repository that owns it (AI 5, CMS 6, Core 9, CRM 1, ERP 9, MES 17, SAO 11).
+
+**Interfaces:**
+- Consumes: the `<source>` fix in `phpunit.xml` from Task 1 Step 6.
+- Produces: `composer test:type-coverage` green at 100% over 547 files instead of over 3.
+
+- [ ] **Step 1: List the gap per module**
+
+```bash
+php -d memory_limit=4G vendor/bin/pest --type-coverage 2>&1 | grep -v '\.\.\. 100%'
+```
+The codes are the plugin's own: `pa<line>` a parameter without a type, `co<line>` an untyped class constant, `rt<line>` a missing return type.
+
+- [ ] **Step 2: Annotate, module by module, one commit per repository**
+
+Add the real type, never `mixed` to buy the percentage: a parameter that genuinely accepts anything is a finding about the signature, not about the annotation. A closure parameter whose type cannot be written is reported, not silenced. Run that module's suite after its commit, because a narrowed parameter type can change behaviour where a caller was passing something looser.
+
+- [ ] **Step 3: Verify and commit the pointers**
+
+```bash
+composer test:type-coverage 2>&1 | tail -3
+```
+Expected: `Total: 100.0 %` and exit 0.
