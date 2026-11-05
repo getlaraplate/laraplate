@@ -145,7 +145,7 @@ Expected: seven commits on `master`.
 - Consumes: nothing.
 - Produces: Core constraints that admit the Laravel 13 majors.
 
-- [ ] **Step 1: Edit the constraints**
+- [x] **Step 1: Edit the constraints**
 
 Apply exactly these changes in `Modules/Core/composer.json` `require`. The "to" column is the version the census holds on 2026-10-29; the "why" column is why the current floor cannot stay.
 
@@ -292,7 +292,7 @@ Leave the gitlinks alone here: Task 9 bumps them, and it must reference module c
 - Consumes: Laravel 13 installed (Task 4).
 - Produces: all CSRF references point to `Illuminate\Foundation\Http\Middleware\PreventRequestForgery`; the `web` group keeps CSRF disabled as before.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `tests/Feature/Http/MiddlewareGroupsTest.php`:
 ```php
@@ -338,12 +338,12 @@ it('protects the admin panel with the non-deprecated forgery middleware', functi
 });
 ```
 
-- [ ] **Step 2: Run them and see them fail**
+- [x] **Step 2: Run them and see them fail**
 
 Run: `php artisan test --compact tests/Feature/Http/MiddlewareGroupsTest.php tests/Feature/Filament/AdminPanelMiddlewareTest.php`
 Expected: 3 FAIL: the web group contains `PreventRequestForgery` (the silent regression), the auth group and the panel still list `VerifyCsrfToken`.
 
-- [ ] **Step 3: Fix `bootstrap/app.php`**
+- [x] **Step 3: Fix `bootstrap/app.php`**
 
 Replace the import of `Illuminate\Foundation\Http\Middleware\VerifyCsrfToken` (line 13) with:
 ```php
@@ -353,7 +353,7 @@ In the `web(remove: [...])` list replace the CSRF entry with `PreventRequestForg
 In the `appendToGroup('auth', [...])` list replace `VerifyCsrfToken::class,` with `PreventRequestForgery::class,`.
 If an import of `ValidateCsrfToken` is also present, remove it: one import covers both call sites now.
 
-- [ ] **Step 4: Fix the panel and the Sanctum config**
+- [x] **Step 4: Fix the panel and the Sanctum config**
 
 `app/Providers/Filament/AdminPanelProvider.php`: replace
 `use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;` (line 24) with `use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;`
@@ -368,17 +368,17 @@ with
 'validate_csrf_token' => Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class,
 ```
 
-- [ ] **Step 5: Check nothing else references the aliases**
+- [x] **Step 5: Check nothing else references the aliases**
 
 Run: `grep -rn "VerifyCsrfToken\|ValidateCsrfToken" app bootstrap/app.php config routes Modules/*/app Modules/*/config Modules/*/routes`
 Expected: no output. Ignore `bootstrap/cache/*`: generated files, cleared in Task 1 Step 2. If a module matches, fix it the same way and commit inside that submodule.
 
-- [ ] **Step 6: Run the tests and see them pass**
+- [x] **Step 6: Run the tests and see them pass**
 
 Run: `php artisan test --compact tests/Feature/Http/MiddlewareGroupsTest.php tests/Feature/Filament/AdminPanelMiddlewareTest.php`
 Expected: all PASS.
 
-- [ ] **Step 7: Format and commit**
+- [x] **Step 7: Format and commit**
 
 ```bash
 vendor/bin/pint --dirty --format agent
@@ -401,7 +401,7 @@ git commit -m "fix(http): use PreventRequestForgery and keep the web group CSRF 
 
 This task exists because these are the places where an upgrade fails quietly rather than loudly: a child class whose parent changed signature, a service binding that replaces a framework singleton, a package that moves its own internals between majors. The user flagged the cache overrides and nwidart specifically on 2026-10-31. Run it before Task 7: a signature mismatch here would otherwise surface as dozens of unrelated-looking test failures.
 
-- [ ] **Step 1: Compare the cache override signatures against their new parents**
+- [x] **Step 1: Compare the cache override signatures against their new parents**
 
 ```bash
 php -r '
@@ -428,7 +428,7 @@ foreach ($pairs as [$child, $parent, $methods]) {
 Expected: for each pair the parameter list and the return type are compatible (the child may narrow the return type, as `repository()` does by returning `Repository` instead of the framework one, and may widen nothing). A parameter added, removed, renamed in a way that breaks named arguments, or a return type the child no longer satisfies is a break: fix the child to match, keep the `#[Override]` attribute, and commit in `Modules/Core`.
 If PHP already fatals on the `require` because of an incompatible declaration, that is the same finding arriving sooner: read the error, fix the signature.
 
-- [ ] **Step 2: Check the `cache` singleton replacement still binds a usable manager**
+- [x] **Step 2: Check the `cache` singleton replacement still binds a usable manager**
 
 `Modules/Core/app/Providers/CoreServiceProvider.php:860` replaces the framework's `cache` binding wholesale:
 ```php
@@ -446,7 +446,7 @@ php artisan tinker --execute 'dump(get_class(app("cache")), get_class(cache()->s
 ```
 Expected: the parent constructor still takes one container argument; `app("cache")` is `Modules\Core\Cache\CacheManager`; both stores are `Modules\Core\Cache\Repository`, not the framework repository. If a store comes back as the framework class, `repository()` is no longer the hook the manager uses and the Core macros (`tryByRequest`, `clearByEntity`, `clearByRequest`) are silently gone from that driver.
 
-- [ ] **Step 3: Check no custom store must implement `touch()`**
+- [x] **Step 3: Check no custom store must implement `touch()`**
 
 Laravel 13 added `touch($key, $seconds)` to `Illuminate\Contracts\Cache\Store`. Both Core classes extend framework classes and inherit it, but a class implementing the contract directly would not.
 
@@ -459,7 +459,7 @@ echo method_exists("Modules\\Core\\Cache\\Repository", "touch") ? "Repository ha
 ```
 Expected: no class implements the contract directly, and `Repository` reports `touch`. If a direct implementor exists, add `touch($key, $seconds)` to it following the framework's own store as reference.
 
-- [ ] **Step 4: Run the cache tests**
+- [x] **Step 4: Run the cache tests**
 
 ```bash
 php artisan optimize:clear
@@ -468,7 +468,7 @@ php artisan test --compact --filter='Cache|Warm|Settings|Acl'
 Expected: PASS, or the same result as the Task 1 baseline. These cover the four callers of `CacheManager::key()` (`WarmCacheCommand`, `SettingsCacheCoordinator`, `AclResolverService`, `PerModelSettingResolver`) plus the Core repository macros.
 Note on key prefixes: Laravel 13 changed the framework's *fallback* cache and Redis prefixes to hyphenated suffixes. This application does not rely on those fallbacks: `config/cache.php` sets `prefix` explicitly, `config/database.php` sets the Redis prefixes explicitly, and `CacheManager::key()` prefixes every key with `config('app.name')`. So no key should move. If a test asserts a literal key and fails, read the generated key before changing the assertion: a moved key means a cold cache in production, not a wrong test.
 
-- [ ] **Step 5: Verify the nwidart 13.2 configuration changes**
+- [x] **Step 5: Verify the nwidart 13.2 configuration changes**
 
 nwidart 13.2.0 ships real upgrade notes for two things this repository uses. Both look benign and must be confirmed, not assumed.
 
@@ -491,7 +491,7 @@ git -C Modules/Core status --short
 ```
 Expected: a clean submodule. If a generated namespace differs, add an explicit `namespace` key to that generator entry in `config/modules.php` to pin the old one, and say so in the delivery status: every future generated class depends on it.
 
-- [ ] **Step 6: Verify the nwidart extension points**
+- [x] **Step 6: Verify the nwidart extension points**
 
 These classes extend or implement nwidart types, which move between majors:
 
@@ -541,7 +541,7 @@ composer test:types 2>&1 | grep -iE "closure-this|static closure|SearchServicePr
 ```
 Expected: no finding. If one appears, drop the `static` keyword from that closure rather than silencing it: the closures do not use `$this`, so losing `static` costs nothing.
 
-- [ ] **Step 8: Commit anything that moved**
+- [x] **Step 8: Commit anything that moved**
 
 Only if a step above changed a file:
 ```bash
@@ -609,12 +609,12 @@ Repeat Step 1. Expected: `diff` prints nothing.
 **Interfaces:**
 - Consumes: finished upgrade.
 
-- [ ] **Step 1: Regenerate the Boost guidelines**
+- [x] **Step 1: Regenerate the Boost guidelines**
 
 Run: `php artisan boost:update --no-interaction`
 Expected: the `=== laravel/v12 rules ===` blocks in `CLAUDE.md` and `AGENTS.md` become Laravel 13 rules. Review the diff: only the `<laravel-boost-guidelines>` block may change. If Boost drops the "Laravel 10 structure is intentional" guidance, the project rule in `AGENTS.md` (`Laravel 10-style structure is intentional. Do not migrate.`) still stands; do not edit it.
 
-- [ ] **Step 2: Update the stack line, the badges and the requirement lines**
+- [x] **Step 2: Update the stack line, the badges and the requirement lines**
 
 `AGENTS.md:67`: `- Stack: PHP 8.5+, Laravel 12, Filament 5, Livewire 4, Sanctum 4, Tailwind 4.` becomes the same line with `Laravel 13`.
 `README.md:22`: `-   Laravel 12.x` becomes `-   Laravel 13.x`.
