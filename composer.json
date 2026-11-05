@@ -3,7 +3,7 @@
   "name": "getlaraplate/laraplate",
   "vendor": "getlaraplate",
   "type": "project",
-  "description": "Modular Laravel platform with a Filament backoffice: install only the modules you need (CMS, CRM, ERP, MES, Shop, AI).",
+  "description": "Modular Laravel platform with a Filament backoffice: install only the modules you need.",
   "version": "v1.14.1",
   "keywords": [
     "laravel",
