@@ -21,12 +21,22 @@
     </testsuites>
     <!--
         Used by PHPUnit code coverage and by pestphp/pest-plugin-type-coverage (include dirs only).
-        Module application code lives under Modules/*/app.
+        Module application code lives under Modules/*/app and every module is listed one by one:
+        PHPUnit globs a <testsuite> <directory> but not a <source> one, so "Modules/*/app" resolved
+        to nothing here and both coverage and type coverage silently measured only the three files
+        under app/. ModuleSourcePathsAreAnalysedTest keeps this list complete as modules are added.
     -->
     <source>
         <include>
             <directory suffix=".php">app</directory>
-            <directory suffix=".php">Modules/*/app</directory>
+            <directory suffix=".php">Modules/AI/app</directory>
+            <directory suffix=".php">Modules/CMS/app</directory>
+            <directory suffix=".php">Modules/CRM/app</directory>
+            <directory suffix=".php">Modules/Core/app</directory>
+            <directory suffix=".php">Modules/ERP/app</directory>
+            <directory suffix=".php">Modules/MES/app</directory>
+            <directory suffix=".php">Modules/SAO/app</directory>
+            <directory suffix=".php">Modules/Shop/app</directory>
         </include>
     </source>
     <php>
