@@ -65,12 +65,12 @@
 
 - Laravel modular app.
 - Stack: PHP 8.5+, Laravel 13, Filament 5, Livewire 4, Sanctum 4, Tailwind 4.
-- Laravel 10-style structure is intentional. Do not migrate.
+- Laravel 13 structure. `bootstrap/app.php` configures routing, middleware groups and exception handling through `Application::configure()`; there is no `app/Console/Kernel.php` and no `app/Exceptions/Handler.php`. `app/Http/Kernel.php` still exists but is a 20-line stub of placeholder comments that nothing references: do not add to it, and do not take it as evidence of the old structure.
 - Modules use `nwidart/laravel-modules`.
 - `Core` is foundation. Other modules reuse Core contracts/services.
 - Module dependencies must be explicit in `module.json`.
 - Table names are prefixed by lowercase module name.
-- Native modules (Core, CMS, AI, ERP, MES, SAO) share one schema, one connection.
+- Native modules (Core, CMS, AI, CRM, ERP, MES, SAO, Shop) share one schema, one connection.
 - Cross-module foreign keys and cross-module `whereHas`/`join` are allowed.
 - Multiple connections only at driver level (read replica, `sticky`).
 - `core.model_connections` and `erp.model_connections` are frozen. Add no entries.
