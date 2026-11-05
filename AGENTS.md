@@ -64,7 +64,7 @@
 ## Project
 
 - Laravel modular app.
-- Stack: PHP 8.5+, Laravel 12, Filament 5, Livewire 4, Sanctum 4, Tailwind 4.
+- Stack: PHP 8.5+, Laravel 13, Filament 5, Livewire 4, Sanctum 4, Tailwind 4.
 - Laravel 10-style structure is intentional. Do not migrate.
 - Modules use `nwidart/laravel-modules`.
 - `Core` is foundation. Other modules reuse Core contracts/services.
@@ -171,11 +171,9 @@
 
 # Laravel Boost Guidelines
 
-The Laravel Boost guidelines are specifically curated by Laravel maintainers for this application. These guidelines should be followed closely to ensure the best experience when building Laravel applications.
-
 ## Foundational Context
 
-This application is a Laravel application running on PHP 8.5. You are an expert with the Laravel ecosystem. Always use the APIs that match the installed major version of each package — do not assume a version.
+This application is a Laravel application running on PHP 8.5. Always use the APIs that match the installed major version of each package — do not assume a version.
 
 Before relying on a package's API, confirm its installed version:
 - PHP packages: run `composer show --direct` to list direct dependencies with versions, or `composer show <vendor/package>` for a single package.
@@ -202,15 +200,11 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 ## Frontend Bundling
 
-- If the user doesn't see a frontend change reflected in the UI, it could mean they need to run `npm run build`, `npm run dev`, or `composer run dev`. Ask them.
+- If a frontend change doesn't show in the UI or you get a "Unable to locate file in Vite manifest" error, run `npm run build` or ask the user to run `npm run dev` or `composer run dev`.
 
 ## Documentation Files
 
 - You must only create documentation files if explicitly requested by the user.
-
-## Replies
-
-- Be concise in your explanations - focus on what's important rather than explaining obvious details.
 
 === boost rules ===
 
@@ -240,8 +234,7 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 ## Project Rules
 
-- This project contains committed, area-grouped rules in `.ai/rules` when that directory exists (settled decisions, non-obvious traps, standing constraints). Framework and package guidelines that only apply to specific paths (testing, frontend, components) also live there, under `.ai/rules/boost` — this is not just recorded decisions, it is load-bearing guidance you have not seen inline. Before you enter plan mode or create/edit any file, you MUST first: open @.ai/rules/index.md (it maps file globs to rule files), read every rule file whose globs cover the path(s) in scope, and run `grep -rin 'keyword' .ai/rules` to catch what a path match alone misses. Do not write code until you have read and are following every matching rule. If `.ai/rules` does not exist, continue without it.
-- Record a rule with `record-rule` only when the user explicitly asks for one. Instructions for the work at hand are not rules, no matter how emphatic: "remove this typo", "use X here" are work to do, not rules to record. Never record a rule on your own initiative, as a byproduct of a change, or to summarize what you just did. When the user does ask, pass a `glob` (e.g. `app/Http/Controllers/**`), a short `title`, and a few-line `note`. Use `record-rule` rather than your native memory or notes tool, because native memory is personal and session-scoped, while only `.ai/rules` is shared with the team and persists in the repo.
+- This project contains committed, area-grouped rules in `.ai/rules` when that directory exists, including path-scoped framework guidelines under `.ai/rules/boost`. Before you enter plan mode or create/edit any file, you MUST first: open @.ai/rules/index.md (it maps file globs to rule files), read every rule file whose globs cover the path(s) in scope, and run `grep -rin 'keyword' .ai/rules` to catch what a path match alone misses. Do not write code until you have read and are following every matching rule. If `.ai/rules` does not exist, continue without it.
 
 ## Artisan
 
@@ -271,17 +264,6 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 # Deployment
 
 - Laravel can be deployed using [Laravel Cloud](https://cloud.laravel.com/), which is the fastest way to deploy and scale production Laravel applications.
-- Activate the `deploying-to-cloud` skill whenever deploying to Laravel Cloud, configuring Cloud environments or resources, using the Cloud CLI, or troubleshooting Cloud deployments.
-
-=== tests rules ===
-
-# Test Enforcement
-
-- Add or update tests for behavior and logic changes when a test provides meaningful regression coverage.
-- Pure copy, styling, and layout-only changes do not require new or updated tests.
-- When test coverage applies, run the affected tests and ensure they pass.
-- Test the changed behavior and its important failure modes, but do not add tests beyond them.
-- Read the `testing-best-practices` skill before writing tests.
 
 === laravel/core rules ===
 
@@ -309,37 +291,6 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - Faker: Use methods such as `$this->faker->word()` or `fake()->randomDigit()`. Follow existing conventions whether to use `$this->faker` or `fake()`.
 - When creating tests, make use of `php artisan make:test [options] {name}` to create a feature test, and pass `--unit` to create a unit test. Most tests should be feature tests.
 
-## Vite Error
-
-- If you receive an "Illuminate\Foundation\ViteException: Unable to locate file in Vite manifest" error, you can run `npm run build` or ask the user to run `npm run dev` or `composer run dev`.
-
-=== laravel/v12 rules ===
-
-# Laravel 12
-
-- CRITICAL: ALWAYS use `search-docs` tool for version-specific Laravel documentation and updated code examples.
-- This project upgraded from Laravel 10 without migrating to the new streamlined Laravel file structure.
-- This is perfectly fine and recommended by Laravel. Follow the existing structure from Laravel 10. We do not need to migrate to the new Laravel structure unless the user explicitly requests it.
-
-## Laravel 10 Structure
-
-- Middleware typically lives in `app/Http/Middleware/` and service providers in `app/Providers/`.
-- There is no `bootstrap/app.php` application configuration in a Laravel 10 structure:
-    - Middleware registration happens in `app/Http/Kernel.php`
-    - Exception handling is in `app/Exceptions/Handler.php`
-    - Console commands and schedule register in `app/Console/Kernel.php`
-    - Rate limits likely exist in `RouteServiceProvider` or `app/Http/Kernel.php`
-
-## Database
-
-- When modifying a column, the migration must include all of the attributes that were previously defined on the column. Otherwise, they will be dropped and lost.
-
-- Laravel 12 allows limiting eagerly loaded records natively, without external packages: `$query->latest()->limit(10);`.
-
-### Models
-
-- Casts can and likely should be set in a `casts()` method on a model rather than the `$casts` property. Follow existing conventions from other models.
-
 === pint/core rules ===
 
 # Laravel Pint Code Formatter
@@ -361,6 +312,5 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - Run the narrowest set of tests that covers the change. Pass a file path or `--filter=testName` to `php artisan test --compact`.
 - Rerun a test after each change to it.
 - Run `vendor/bin/pest` to call the test runner directly. It accepts the same file path and `--filter=testName` arguments.
-- After the feature tests pass, ask the user to run the complete suite with `php artisan test --compact`.
 
 </laravel-boost-guidelines>
