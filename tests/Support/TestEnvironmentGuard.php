@@ -7,7 +7,7 @@ namespace Tests\Support;
 use RuntimeException;
 
 /**
- * Refuses to start the test suite when it could reach a real database.
+ * Refuses to start the test suite when it could reach a real database or a real Elasticsearch.
  */
 final class TestEnvironmentGuard
 {
@@ -36,6 +36,17 @@ final class TestEnvironmentGuard
                 'The test database is not safe (DB_CONNECTION="%s", DB_HOST="%s"): only sqlite or a local host (127.0.0.1, localhost, ::1) is accepted. Fix phpunit.xml/.env, or set ALLOW_REMOTE_TEST_DATABASE=1 to opt out knowingly.',
                 $connection,
                 $host,
+            );
+        }
+
+        $elastic = self::value($env, 'ELASTIC_HOST');
+        $elastic_host = $elastic === '' ? '' : (parse_url(str_contains($elastic, '://') ? $elastic : 'http://' . $elastic, PHP_URL_HOST) ?: '');
+        $elastic_allowed = in_array(mb_strtolower(self::value($env, 'ALLOW_REMOTE_TEST_ELASTICSEARCH')), self::TRUTHY, true);
+
+        if ($elastic !== '' && ! in_array(mb_trim($elastic_host, '[]'), self::LOCAL_HOSTS, true) && ! $elastic_allowed) {
+            $violations[] = sprintf(
+                'The test Elasticsearch is not safe (ELASTIC_HOST="%s"): the tests write and empty indexes, so only a local host (127.0.0.1, localhost, ::1) is accepted. Fix phpunit.xml/the shell, or set ALLOW_REMOTE_TEST_ELASTICSEARCH=1 to opt out knowingly.',
+                $elastic,
             );
         }
 
