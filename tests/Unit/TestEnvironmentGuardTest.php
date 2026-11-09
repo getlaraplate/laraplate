@@ -74,3 +74,21 @@ it('does not throw when the environment is safe', function (): void {
 
     expect(true)->toBeTrue();
 });
+
+it('flags a remote Elasticsearch', function (string $host): void {
+    $violations = TestEnvironmentGuard::violations($this->base_path, ['DB_CONNECTION' => 'sqlite', 'ELASTIC_HOST' => $host]);
+
+    expect($violations)->toHaveCount(1)
+        ->and($violations[0])->toContain('ALLOW_REMOTE_TEST_ELASTICSEARCH');
+})->with(['https://164.92.237.51:9200', 'es.example.com:9200', 'http://es.internal']);
+
+it('accepts a local Elasticsearch, or none', function (string $host): void {
+    expect(TestEnvironmentGuard::violations($this->base_path, ['DB_CONNECTION' => 'sqlite', 'ELASTIC_HOST' => $host]))->toBe([]);
+})->with(['http://127.0.0.1:9', 'localhost:9200', 'http://[::1]:9200', '']);
+
+it('accepts a remote Elasticsearch when explicitly allowed, and rejects a falsy opt-out', function (): void {
+    $env = ['DB_CONNECTION' => 'sqlite', 'ELASTIC_HOST' => 'https://es.example.com:9200'];
+
+    expect(TestEnvironmentGuard::violations($this->base_path, [...$env, 'ALLOW_REMOTE_TEST_ELASTICSEARCH' => '1']))->toBe([])
+        ->and(TestEnvironmentGuard::violations($this->base_path, [...$env, 'ALLOW_REMOTE_TEST_ELASTICSEARCH' => '0']))->toHaveCount(1);
+});
