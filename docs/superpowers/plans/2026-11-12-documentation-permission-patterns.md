@@ -1,6 +1,7 @@
 ---
 created_on: 2026-11-12
 module: ai
+status: completed
 ---
 # Permission patterns in documentation front matter. Implementation Plan
 
@@ -13,6 +14,16 @@ module: ai
 **Tech Stack:** PHP 8.5, Laravel 13, Pest. No new dependency.
 
 **Spec:** `../specs/2026-11-12-documentation-permission-patterns-design.md`.
+
+## Delivery status (2026-11-16): shipped
+
+**Documented in:** `Modules/AI/docs/rag/MODULE.md`, `Modules/AI/docs/rag/DOCUMENTATION_EVALUATION_DEVELOPER.md`, `Modules/Core/docs/rag/SETTING_ACTIONS_USER.md`, `Modules/AI/docs/rag/AI_MODEL_SELECTION_USER.md`.
+
+Every task shipped. The code and module docs are laraai#28, the front matter of the ten user documents is laracore#41, laraai#29 and larasao#13, the first indexing of `laraplate_rag_user_docs` was run by the owner (10 documents, 58 chunks, all `en`). Divergences from the steps:
+
+- **Task 7 step 2 used synthetic access contexts, not real users.** The user retrieval ran against the real index with three hand-built contexts (`core_settings.select/update`, an unrelated permission, none): the two `core_settings` pages appear only for the first. Only the `core_settings.*` requirement was exercised; `core_import_sessions.insert` and `sao_connections.*` follow the same mechanism.
+- **Task 7 step 3 got a new dataset, not the 2026-08 one.** The 2026-08 dataset grades the fixture corpus of `DocumentationBaselineGateTest` with section-level labels and stays as it is. laracore#42 adds `2026-11-documentation-user-live.json` and its report (7 cases, Core only): source hit 1.0, MRR 1.0, refusal accuracy 0.857. The failing case is the off-topic question, answered with chunks because `ai.features.faq.min_similarity` is 0.0 by default. The report does not measure the exclusion of a hidden page (`authorized_empty_accuracy` needs an empty result); the unit tests cover it.
+- **Not built:** a locale fallback (the ten documents are English-only, so they reach users whose resolved locale is `en`), and an evaluation of the AI and SAO user documents.
 
 ## Global Constraints
 
@@ -105,15 +116,15 @@ module: ai
 - [x] **Step 1: List** each user document with the permission it should require, chosen per page with the product owner before editing. Nothing is written until the list is agreed.
 - [x] **Step 2: Add** `locale`, `canonical_source`, `safe_source_label` (convention of `Modules/Core/docs/rag/evaluations/2026-08-documentation-user.json`, for example `Core · Adaptive search matching · ...`), `version`, `policy_classification: user_safe`, `policy_classification_version: in-app-docs-v1`, `required_permissions`, `tenant_scope: global`. The locale of the documents (English) against the interface language (Italian) is decided with the owner in step 1.
 - [x] **Step 3: Verify** that every document is admitted and no requirement draws the Task 4 warning. Done read-only by the agent through `sourceNames()` and `unmatchedPermissionRequirements()` on the three roots against the real `permissions` table: 5, 4 and 1 user documents admitted, no unmatched requirement. The owner's `--diff --dry-run` is part of Task 7.
-- [ ] **Step 4:** run the module suites of the three repos that changed; commit per repo: `docs(<module>): front matter for the user documentation index`.
+- [x] **Step 4:** run the module suites of the three repos that changed; commit per repo: `docs(<module>): front matter for the user documentation index`.
 
 ---
 
 ### Task 7: First indexing of the user corpus (owner-gated)
 
-- [ ] **Step 1:** the owner runs `php artisan ai:index-rag-docs --profile=user`. The store creates `laraplate_rag_user_docs` with the correct mapping.
-- [ ] **Step 2:** the owner asks one question per audience with `ai:help`-equivalent user retrieval (a user with and without the relevant permission) and confirms that a page restricted to a permission is visible only to the holders.
-- [ ] **Step 3:** if the user profile should have an evaluation report, run `test:ai:evaluate-documentation` for it; otherwise record that it has none.
+- [x] **Step 1:** the owner runs `php artisan ai:index-rag-docs --profile=user`. The store creates `laraplate_rag_user_docs` with the correct mapping.
+- [x] **Step 2:** the owner asks one question per audience with `ai:help`-equivalent user retrieval (a user with and without the relevant permission) and confirms that a page restricted to a permission is visible only to the holders.
+- [x] **Step 3:** if the user profile should have an evaluation report, run `test:ai:evaluate-documentation` for it; otherwise record that it has none.
 
 ---
 
