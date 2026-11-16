@@ -138,7 +138,7 @@ User-index chunks carry at least:
 - heading breadcrumb;
 - policy classification version.
 
-`required_permissions` uses AND semantics. A document requiring multiple permissions is retrieved only when the authenticated user has every required permission. Global product help uses a global tenant scope; tenant-authored help must match the current tenant.
+`required_permissions` uses AND semantics. A document requiring multiple permissions is retrieved only when the authenticated user has every required permission. *(Amended 2026-11-12: the semantics became OR, and entries may be short-form patterns; see `2026-11-12-documentation-permission-patterns-design.md`.)* Global product help uses a global tenant scope; tenant-authored help must match the current tenant.
 
 ## Restricted in-app topics
 
