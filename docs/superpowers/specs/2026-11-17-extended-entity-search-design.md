@@ -63,29 +63,33 @@ These shipped as pull requests before this design was agreed. They are prerequis
 | XS8 | **An extender whose content is optional keeps its own key, and the host routes speak host ids.** In the mixed list such a row carries both its own id and its host id; the client uses the host id on host routes. | The seam allows optional content (`contentIsMandatory()` false, nullable `content_id`), so XS7 cannot be the generic rule. No such extender exists yet; the rule is recorded so the first one does not invent another. |
 | XS9 | **A product is online for the public when its content is approved and currently valid and `is_published_in_shop` is true** (E18, unchanged). It is enforced as a Shop ACL on `shop_products` for the guest role, written as column conditions: `valid_from`/`valid_to` (mounted from the content) and `is_published_in_shop`, never as the `valid` scope. | Both axes are in the `contents` index (`valid_from`, `valid_to`, `extension.is_published_in_shop`), so the engine applies them and pages are not cut short. A scope never reaches a search engine, which is why the CMS guest ACL on contents also uses columns. |
 | XS10 | **A filter or ACL condition on an extender translates to the host index by a fixed rule.** A mounted attribute (content-owned) maps to the host field of the same name; an own column maps to `extension.<column>` when the extender indexes it; anything else is not filterable in search. A request filter that cannot be translated is refused with 400, as any non-indexed filter is today. An ACL condition that cannot be translated is applied when the hits are reloaded, never dropped. | One rule for request filters and ACL. Request filters keep the existing contract (search filters only on indexed fields). The ACL fails closed: a condition the engine cannot apply still holds at reload, at the cost of a possibly short page, which is the existing behaviour for database-only filters. |
+| XS11 | **Two Core contracts, one per role.** The **host** contract (implemented by CMS `Content`) exposes its type column, its registered extenders (alias to class), a query that includes extended rows, and the batched upcast. The **extender** contract (implemented by CMS `ExtendsContentTrait`, so every extender inherits it) exposes its host model, its alias and its host key. **Hiding extended rows is part of the host contract, not a default search filter:** Core derives `<type column> IS NULL` from the host, and `Content` drops its hand-written `defaultSearchFilters()` entry. `ProvidesDefaultSearchFilters` stays for fixed filters unrelated to extensions. The host implementation stays in CMS until a second host exists; then the seam's hiding scope, registry and upcast move into a Core trait. | `CrudService` lives in Core and must recognise both roles without knowing CMS. With the exclusion owned by the host contract, Core knows exactly which condition the XS3 parameter replaces; a generic default filter gives no such handle, and joining it with the alias condition would select nothing. Only one host exists today, so a generic Core trait would be built for a single consumer (the criterion the seam docs already apply to the product merge). |
+| XS12 | **The XS3 parameter applies only when the requested model implements the host contract.** On any other model, an extender route such as `shop/products` included, it is ignored without an error. | The parameter means "include everything I may see"; where nothing extends the model there is nothing to include, which is the same silent outcome as an alias the user may not read (XS4). |
 
 ## 5. Components
 
 ### Core (generic, knows neither CMS nor Shop)
 
-- A contract on the **host** model, implemented by CMS `Content`:
-  - the extenders, as alias to extender class;
-  - the type field and its value for an alias (`extended_type`);
+- The **host** contract (XS11), implemented by CMS `Content`:
+  - its type column (`extended_type`);
+  - its extenders, as alias to extender class;
   - a query that includes extended rows (`withExtended()`);
   - the batched upcast of a page of host rows to their extenders (`ContentExtensionResolver`).
-- A contract on the **extender** model, implemented by CMS `ExtendsContentTrait`:
+- The **extender** contract (XS11), implemented by CMS `ExtendsContentTrait`:
   - its host model and alias;
   - its host key (`content_id`).
+- Every search and list of a host excludes extended rows by default, from the host contract: `<type column> IS NULL`
+  at the engine (where `DefaultSearchFilters::merge()` puts the model's default filters today) and through the host's
+  hiding scope in the database.
 - `CrudService::search()` and `list()`: when the model is an extender, resolve the host and run the flows of §6. When
-  the request carries the XS3 parameter on a host, run the mixed flows.
-- The default search filter of the host (`extended_type IS NULL`) must be **replaced**, not joined: today
-  `DefaultSearchFilters::merge()` always puts it ahead of the caller's filters. The flows pass the type condition they
-  need in its place.
+  the model is a host and the request carries the XS3 parameter, replace the exclusion with the type condition of the
+  mixed flows (XS12: on any other model the parameter is ignored).
 - The filter and ACL translation of XS10.
 
 ### CMS
 
-- `Content` implements the host contract from the `ContentExtenderRegistry` and `ContentExtensionResolver`.
+- `Content` implements the host contract from the `ContentExtenderRegistry` and `ContentExtensionResolver`, and drops
+  `extended_type => null` from `defaultSearchFilters()` (XS11): the exclusion now comes from the host contract.
 - `ExtendsContentTrait` implements the extender contract, so every extender takes part with no code of its own.
 - The `extension` section of the search document: fields of different extenders share the `extension` object, and today
   the first registered extender wins a name collision (§8).
@@ -126,12 +130,14 @@ extender's ACL, for each allowed alias; the `contents` ACL on every row; then th
 
 - Core, with stub host and extender models (no CMS or Shop dependency):
   - an extender is searched through its host index and reloaded as itself;
-  - the host default is replaced, not joined;
+  - a host excludes extended rows from the host contract alone, with no default search filter declared for it;
+  - the XS3 parameter replaces that exclusion, not joins it, and is ignored on a model that is not a host (XS12);
   - a request filter on an own column that is not indexed is refused; on an indexed one it reaches the engine;
   - an ACL condition that cannot be translated still holds at reload;
   - the mixed flag includes only the extenders the user may read, and each extended row passes its own ACL;
   - columns and relations apply where the model has them, and every row carries its type.
-- CMS: `Content` and `ExtendsContentTrait` satisfy the contracts.
+- CMS: `Content` and `ExtendsContentTrait` satisfy the contracts; the generic content search still excludes extended
+  contents after `defaultSearchFilters()` loses its `extended_type` entry.
 - Shop: `/search` and `/select` of products for a guest show only online products (XS9); a user restricted to a company
   sees only that company's products, in the product routes and in the mixed list.
 - Contract: the same request through Basic, Orchestrated and Auto returns the same eligible rows, extending
