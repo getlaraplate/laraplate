@@ -50,7 +50,9 @@ These shipped as pull requests before this design was agreed. They are prerequis
 - Making an extender `Searchable` with its own index (rejected, XS1).
 - Storefront categories, per-category presets, facets and the browse price snapshot (Shop plan #3, E20, E21).
 - Facets and sort on mounted attributes of the extender (the seam's CRUD presentation already leaves them out).
-- `/detail` of a host entity returning the extended model: see §8.
+- `with_extended` on `/detail`. A client reading one record knows which entity it asks for: a content through
+  `/detail/cms/contents`, which keeps hiding extended contents, a product through `/detail/shop/products`. With the
+  shared key (XS7) the id a product carries in a mixed list opens it there.
 - Moving code out of `Content` that only `Content` uses: its relations, the per-locale document of its translated fields,
   approvals, statistics, rules and path. No class or trait is created to hold `Content`-only code (XS15).
 - Moving the extender side of the seam (`ExtendsContentTrait`, `ContentExtensionCascade`) out of CMS.
@@ -74,6 +76,8 @@ These shipped as pull requests before this design was agreed. They are prerequis
 | XS13 | **The host side of the seam moves into Core as a generic implementation of the host contract.** A Core trait gives a host: the hiding global scope on its type column (today `HidesExtendedContent`, hard-wired to `extended_type`), the `withExtended()` scope, the registry of its extenders keyed by alias (today `ContentExtenderRegistry`, keyed per host instead of global), the batched upcast (today `ContentExtensionResolver`, reading the host key and relation from the extender contract instead of `content_id` and `content`), and the extension part of the search document and mapping (today `Content::extensionSearchDocument()` and `composeExtensionMapping()`), with the bulk import including extended rows. `Content` uses the trait and declares only its type column. Shop registers `shop.product` in the Core registry for `Content`. The extender side (`ExtendsContentTrait`, `ContentExtensionCascade`: save bridge, lifecycle cascade) stays in CMS. | Every one of these pieces is generic: it depends on a type column, an alias registry and the extender contract, never on what a content is. They are the part of `Content` worth extracting; the extender side holds behaviour tied to the content's lifecycle and is out of scope. |
 | XS14 | **A Core helper declares an indexed relation once and yields both its search-document entry and its mapping field.** The declaration names the relation and its indexed properties; the common shape `id`, `name`, `slug`, `path` (filterable `id`, `slug`, `path`) is the default, and extra properties are added per relation (the address fields of `locations`). `Content` declares `contributors`, `categories`, `tags` and `locations` through it. | Today each of the four relations is written twice in `Content`, once as `only([...])` in `toSearchableArray()` and once as a `FieldDefinition` in `getSearchMapping()`, three of them with the same shape. One declaration removes the duplication and guarantees the document and the mapping agree. The indexed-relation concept already exists in Core (`FieldDefinition` `relation` option). |
 | XS15 | **The plain text of an Editor field is a Core service next to the Editor field type, and every reader of Editor content uses it.** It turns an Editor.js document (`blocks`) into the plain text the search index, the reranker and the reading statistics need. Today it lives in the CMS cast `ReadingStatistics::plainText()` and in `Content::searchableComponentValue()`, while `CmsContentEvidenceProjector` walks `blocks`, `children`, `data` and `items` with its own code. `Content` search, `ReadingStatistics` and the evidence projector converge on the Core service where their output is the same; a reader whose output must differ keeps its own step on top of it. Only shared code moves: `Content`-only code stays (§3). | `FieldType::Editor` is a Core dynamic field type that any dynamic-content model can declare (`HasDynamicContents` validates its `blocks`), so its plain text is not CMS knowledge. Three CMS readers already convert it, in two implementations. |
+| XS16 | **Extenders of the same host may share an `extension` field only with the same definition; a conflict fails loudly.** All extenders of a host write into one `extension` object of one index mapping. When the host composes the mapping, a field declared by two extenders with different definitions (type, filterable) raises an error naming both aliases and the field, instead of keeping the first registered definition as `composeExtensionMapping()` does today. Fields keep short paths (`extension.kind`), with no prefix per alias. The host module's test suite composes the mapping in the full application with every registered extender, so a conflict fails there before it ships. | An index holds one type per field: with the first definition silently kept, the second extender's values would be indexed under the wrong type or refused by the engine. Failing loudly keeps paths short and lets two extenders share a field when they mean the same thing; a prefix per alias would avoid the conflict but lengthen every filter path and the XS10 translation. |
+| XS17 | **An extender's own columns never share a name with an attribute of its host, except the native keys.** No own column of an extender may be named like a column, a translated field or a dynamic component of the host entity it extends; `id`, the timestamps and the soft-delete columns are the only shared names. Enforced twice: a test in the extender's module checks its own columns against the host's columns and translated fields, and saving a preset field of the extender's entity refuses a name that is an own column of the extender. | The seam's merge routes an own column to the extender and every other key to the host, so a shared name makes the host's field unreachable through the extender, silently. XS10 relies on the same split to translate filters. Dynamic components are configured at runtime, so a check at write time is needed besides the test: a component `featured` added to the product preset would otherwise disappear behind `Product::$featured`. |
 
 ## 5. Components
 
@@ -97,6 +101,9 @@ These shipped as pull requests before this design was agreed. They are prerequis
 - The filter and ACL translation of XS10.
 - The indexed-relation helper of XS14.
 - The Editor plain-text service of XS15, next to `FieldType::Editor`.
+- The XS16 check when the host composes its extension mapping.
+- The XS17 check on saving a preset field: the extender contract exposes its own columns and its entity, and a field
+  named like one of them is refused on that entity's presets.
 
 ### CMS
 
@@ -109,8 +116,9 @@ These shipped as pull requests before this design was agreed. They are prerequis
 - `Content` declares `contributors`, `categories`, `tags` and `locations` with the XS14 helper.
 - `Content::searchableComponentValue()`, `ReadingStatistics::plainText()` and `CmsContentEvidenceProjector` use the XS15
   service.
-- The `extension` section of the search document: fields of different extenders share the `extension` object, and today
-  the first registered extender wins a name collision (§8).
+- The `extension` section of the search document: fields of different extenders share the `extension` object; the
+  composed mapping refuses a field declared with two definitions (XS16), and a CMS test composes it with every
+  registered extender.
 
 ### Shop
 
@@ -119,6 +127,7 @@ These shipped as pull requests before this design was agreed. They are prerequis
   `is_published_in_shop`.
 - The guest ACL of XS9, seeded like the CMS guest ACL on contents.
 - `ShopServiceProvider` registers `shop.product` in the Core registry for `Content` instead of `ContentExtenderRegistry`.
+- A test that the own columns of `Product` do not collide with the columns and translated fields of `Content` (XS17).
 
 ## 6. Flows
 
@@ -160,6 +169,10 @@ extender's ACL, for each allowed alias; the `contents` ACL on every row; then th
 - Core, the XS14 helper: one declaration yields a document entry and a mapping field that agree; extra properties add to
   the default shape.
 - Core, the XS15 service: an Editor.js document yields its plain text; a plain string passes through.
+- Core, XS16: two stub extenders declaring a field with the same definition compose; with different definitions the
+  composition fails naming both aliases.
+- Core, XS17: a preset field of an extender's entity named like an own column of the extender is refused; any other name
+  is accepted, and presets of other entities are unaffected.
 - CMS: `Content` and `ExtendsContentTrait` satisfy the contracts; the generic content search still excludes extended
   contents after `defaultSearchFilters()` loses its `extended_type` entry; the search document and mapping of `Content`
   are unchanged by the XS14 helper (same keys, same mapping); reading statistics and evidence excerpts are unchanged
@@ -171,10 +184,5 @@ extender's ACL, for each allowed alias; the `contents` ACL on every row; then th
 
 ## 8. Open questions
 
-- **`extension` name collisions.** Two extenders declaring the same field share `extension.<field>`, and the first
-  registered wins the mapping. Proposal: prefix by alias (`extension.shop_product.kind`), decided before a second
-  extender ships.
 - **Approval in XS9.** Whether "approved" needs a condition of its own on public reads, or the live record of a content
   under approval is already the approved state. To verify against `HasApprovals` before seeding the guest ACL.
-- **`/detail` of a host with the flag.** Whether `/detail/cms/contents?id=X&with_extended=true` returns the upcast
-  extender. With the shared key (XS7) the same id opens it through `/detail/shop/products` already.
