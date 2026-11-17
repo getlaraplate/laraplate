@@ -51,9 +51,9 @@ All merged on 2026-11-17:
 - Create: `Modules/Core/app/Support/EditorPlainText.php`.
 - Test: `Modules/Core/tests/Unit/Support/EditorPlainTextTest.php`.
 
-- [ ] **Step 1: Test first.** An Editor.js document (array or object with `blocks`) yields the same plain text as `Modules\CMS\Casts\ReadingStatistics::plainText()` does today for the same blocks (paragraph, header, list, nested `items`, HTML tags and entities, find marks); a plain string passes through without control characters; anything else is returned as it is.
-- [ ] **Step 2: Implement** a `final readonly` class with static methods, no I/O. The block walking and HTML stripping move from `ReadingStatistics` (`normalizeBlocksList()`, `collectMetricSegments()`, `stripFindMarksFromHtmlString()`), next to `FieldType::Editor`.
-- [ ] **Step 3:** tests PASS, Pint, commit: `feat(core): plain text of an Editor field`.
+- [x] **Step 1: Test first.** An Editor.js document (array or object with `blocks`) yields the same plain text as `Modules\CMS\Casts\ReadingStatistics::plainText()` does today for the same blocks (paragraph, header, list, nested `items`, HTML tags and entities, find marks); a plain string passes through without control characters; anything else is returned as it is.
+- [x] **Step 2: Implement** a `final readonly` class with static methods, no I/O. The block walking and HTML stripping move from `ReadingStatistics` (`normalizeBlocksList()`, `collectMetricSegments()`, `stripFindMarksFromHtmlString()`), next to `FieldType::Editor`.
+- [x] **Step 3:** tests PASS, Pint, commit: `feat(core): plain text of an Editor field`. Committed on `feat/extended-entity-search` in `Modules/Core`. Pest and Pint were not run in the authoring environment (PHP 8.3, no host app): every case of the test, and parity with `ReadingStatistics::plainText()` on the same blocks, ran through a standalone script. Run both in the host app before the Core PR merges.
 
 ---
 
