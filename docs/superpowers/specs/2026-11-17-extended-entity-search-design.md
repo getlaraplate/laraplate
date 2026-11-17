@@ -1,0 +1,150 @@
+# Extended entity search and list design
+
+**Date:** 2026-11-17
+**Modules:** `Modules/Core` (generic contracts, CRUD search and list), `Modules/CMS` (implements them for `Content` and its extenders), `Modules/Shop` (first consumer: `Product`)
+**Status:** Design agreed. No implementation started beyond the groundwork listed in §2.
+**Related:** `2026-09-17-cms-content-extension-seam-design.md` (the seam; this spec settles its open item "Permissions on a mixed upcast list"); `2026-09-17-shop-module-design.md` (E16 mandatory content, E18 storefront visibility, E21 browse snapshot); `2026-10-20-shop-product-admin-design.md` (plan #2, the backoffice write surface). The storefront read endpoints of Shop plan #3 build on this spec.
+
+---
+
+## 1. Purpose
+
+An extended entity, such as the Shop `Product`, is a model in its own table that owns a CMS `Content` through the
+content-extension seam. The seam hides extended contents from every default read, and the generic CRUD surfaces have
+no way to reach them:
+
+- `/search/shop/products` answers 400, because `Product` is not `Searchable`.
+- `/search/cms/contents` filtered on `extended_type = shop.product` returns nothing: the engine may return the hits, but
+  the reload goes through `Content`, whose `HidesExtendedContent` scope drops them.
+- `/select/shop/products` works, through `Product`, but nothing lists contents and products together.
+
+This spec decides how a client searches and lists an extended entity, and how it lists the host entity together with
+the entities that extend it.
+
+## 2. Groundwork already done (2026-11-17)
+
+These shipped as pull requests before this design was agreed. They are prerequisites, not part of the work below.
+
+- getlaraplate/laracore#43:
+  - every search path applies the model's default search filters (`ProvidesDefaultSearchFilters`), so Basic,
+    Orchestrated, Auto and direct `AdvancedSearchService` callers agree on what is eligible;
+  - the basic path applies the requested locale;
+  - `ElasticsearchTranslator` translates the typed sub-fields of an `object` field, so `extension.*` of `Content` is a
+    valid, filterable mapping.
+- getlaraplate/laracms#22: the assistant retrieval provider keeps extended contents out of the engine query.
+- getlaraplate/larashop#4: a product shares the primary key of its content (XS7), and `content_id` is immutable.
+
+## 3. Scope and non-goals
+
+**In scope:**
+- `/search` and `/select` of an extended entity (`shop/products`), searched through the index of its host entity.
+- An opt-in parameter on `/search` and `/select` of a host entity (`cms/contents`) that adds the extended rows the user
+  may read, each returned as its extended model.
+- The permission model of both surfaces.
+- The generic Core contracts that let any host and extender take part, with Core knowing neither CMS nor Shop.
+
+**Non-goals:**
+- Making an extender `Searchable` with its own index (rejected, XS1).
+- Storefront categories, per-category presets, facets and the browse price snapshot (Shop plan #3, E20, E21).
+- Facets and sort on mounted attributes of the extender (the seam's CRUD presentation already leaves them out).
+- `/detail` of a host entity returning the extended model: see §8.
+
+## 4. Locked decisions
+
+| # | Decision | Rationale |
+|---|----------|-----------|
+| XS1 | **An extender is searched through the index of its host, never through an index of its own.** `Product` stays non-`Searchable`; `/search/shop/products` runs on the `contents` index, restricted to its alias. | The product's text is its content's text. A second index would embed and index the same text twice, and every editorial change on the content (translations, approvals, versions, preset changes) would need a hook to reindex the product too. The `contents` document already carries `extended_type` and the extender's `extension` section, refreshed on every extender save by `ExtendsContentTrait`. A mixed list over two indexes would also need cross-index score fusion, which is not comparable. |
+| XS2 | **An extended entity is read with its own permissions and ACL.** `/select` and `/search` of `shop/products` require `shop_products.select` and apply the ACL of `Product`, not the ACL of `contents`. The content's data is merged into the product as the seam already does (`Product::toArray()`, `IMountsRelatedAttributes`). | The client asked for products; the product's permission model governs. The merge already makes the content's fields read as the product's own. |
+| XS3 | **A host opens to its extenders through a dedicated boolean request parameter, on `/select` and `/search` alike.** Its name is open (§8; `with_extended` is the working name). `true` includes every extender alias the user may read; there is no list of aliases. | `withExtended()` cannot be a filter scope: `ScopeGuard` runs a scope on a nested query and copies only its where conditions, while `withExtended()` adds none and removes a global scope. A filter also only narrows, while this widens. The seam spec already foresaw "an ACL-gated flag". |
+| XS4 | **The extenders of a host come from the host, and only those the user may read are included.** The host declares its extenders (CMS: the `ContentExtenderRegistry`); for each one the user needs the `select` permission on the extender's table. Aliases the user may not read are left out silently. | The client should not need to know which modules extend contents. A type the user cannot read must not show up, and asking for it is not an error: the parameter means "everything I may see". |
+| XS5 | **In the mixed list, an extended row passes the ACL of the host and the ACL of its own entity.** A product row in `cms/contents?with_extended=true` must satisfy the `contents` ACL (the entity requested) and the `Product` ACL (its own rows). | The type permission alone is not enough: a user restricted to the products of their company would otherwise see every company's products through the content list. This settles the seam spec's open item. |
+| XS6 | **In the mixed list, extended rows are upcast to their extended model.** Each row carries its type. Requested columns and relations apply to the rows whose model has them, and are skipped for the others. | One list of objects the client can use as returned. Refusing a request because one included type lacks a column would make the parameter brittle; dropping columns silently per row is the lesser surprise, and the type field tells the client which shape it holds. |
+| XS7 | **An extender whose content is mandatory shares the primary key of its content.** `shop_products.id` = `content_id`, not generated, set by the model on create, guarded in the database (PostgreSQL `CHECK`, MySQL/MariaDB triggers), and `content_id` is immutable. Shipped in getlaraplate/larashop#4. | One id names a product on the content routes and on the product routes, so the mixed list holds one id space and a product found in the content list is opened by the same id. Possible only because the content is mandatory (E16). |
+| XS8 | **An extender whose content is optional keeps its own key, and the host routes speak host ids.** In the mixed list such a row carries both its own id and its host id; the client uses the host id on host routes. | The seam allows optional content (`contentIsMandatory()` false, nullable `content_id`), so XS7 cannot be the generic rule. No such extender exists yet; the rule is recorded so the first one does not invent another. |
+| XS9 | **A product is online for the public when its content is approved and currently valid and `is_published_in_shop` is true** (E18, unchanged). It is enforced as a Shop ACL on `shop_products` for the guest role, written as column conditions: `valid_from`/`valid_to` (mounted from the content) and `is_published_in_shop`, never as the `valid` scope. | Both axes are in the `contents` index (`valid_from`, `valid_to`, `extension.is_published_in_shop`), so the engine applies them and pages are not cut short. A scope never reaches a search engine, which is why the CMS guest ACL on contents also uses columns. |
+| XS10 | **A filter or ACL condition on an extender translates to the host index by a fixed rule.** A mounted attribute (content-owned) maps to the host field of the same name; an own column maps to `extension.<column>` when the extender indexes it; anything else is not filterable in search. A request filter that cannot be translated is refused with 400, as any non-indexed filter is today. An ACL condition that cannot be translated is applied when the hits are reloaded, never dropped. | One rule for request filters and ACL. Request filters keep the existing contract (search filters only on indexed fields). The ACL fails closed: a condition the engine cannot apply still holds at reload, at the cost of a possibly short page, which is the existing behaviour for database-only filters. |
+
+## 5. Components
+
+### Core (generic, knows neither CMS nor Shop)
+
+- A contract on the **host** model, implemented by CMS `Content`:
+  - the extenders, as alias to extender class;
+  - the type field and its value for an alias (`extended_type`);
+  - a query that includes extended rows (`withExtended()`);
+  - the batched upcast of a page of host rows to their extenders (`ContentExtensionResolver`).
+- A contract on the **extender** model, implemented by CMS `ExtendsContentTrait`:
+  - its host model and alias;
+  - its host key (`content_id`).
+- `CrudService::search()` and `list()`: when the model is an extender, resolve the host and run the flows of §6. When
+  the request carries the XS3 parameter on a host, run the mixed flows.
+- The default search filter of the host (`extended_type IS NULL`) must be **replaced**, not joined: today
+  `DefaultSearchFilters::merge()` always puts it ahead of the caller's filters. The flows pass the type condition they
+  need in its place.
+- The filter and ACL translation of XS10.
+
+### CMS
+
+- `Content` implements the host contract from the `ContentExtenderRegistry` and `ContentExtensionResolver`.
+- `ExtendsContentTrait` implements the extender contract, so every extender takes part with no code of its own.
+- The `extension` section of the search document: fields of different extenders share the `extension` object, and today
+  the first registered extender wins a name collision (§8).
+
+### Shop
+
+- `Product::searchableExtension()` and `searchableExtensionMapping()` gain the fields its ACL needs in the engine:
+  `company_id` (today not indexed, so a company restriction would only apply at reload) next to
+  `is_published_in_shop`.
+- The guest ACL of XS9, seeded like the CMS guest ACL on contents.
+
+## 6. Flows
+
+### `/search/shop/products`
+1. Permission `shop_products.select`; resolve the ACL of `Product`.
+2. Search the host (`Content`) index with `extended_type = shop.product` in place of the host default.
+3. Translate the request filters and the `Product` ACL (XS10) into engine filters.
+4. Reload the hits as products: `Product::whereKey($ids)` under the `Product` ACL, untranslated ACL conditions included.
+   With the shared key (XS7) the hit ids are the product ids; an XS8 extender reloads by its host key instead.
+5. Keep the engine order; serialize with the merged content.
+
+### `/select/shop/products`
+Unchanged: it already reads `Product` with its permission, its ACL and the merged content.
+
+### `/search/cms/contents?with_extended=true`
+1. Permission `contents.select`; resolve the `contents` ACL.
+2. Allowed aliases: the host's extenders whose table the user may `select` (XS4).
+3. Engine type condition: `extended_type` is null, or one of the allowed aliases; each alias branch also carries the
+   translated ACL of its extender (XS10). The `contents` ACL applies to every row.
+4. Reload: `Content::withExtended()->whereKey($ids)` under the `contents` ACL, then each extended row under its own
+   entity's ACL (XS5), then the upcast (XS6).
+
+### `/select/cms/contents?with_extended=true`
+The same in SQL: `extended_type IS NULL`, or `extended_type = <alias>` and an extender row exists that satisfies the
+extender's ACL, for each allowed alias; the `contents` ACL on every row; then the upcast.
+
+## 7. Testing
+
+- Core, with stub host and extender models (no CMS or Shop dependency):
+  - an extender is searched through its host index and reloaded as itself;
+  - the host default is replaced, not joined;
+  - a request filter on an own column that is not indexed is refused; on an indexed one it reaches the engine;
+  - an ACL condition that cannot be translated still holds at reload;
+  - the mixed flag includes only the extenders the user may read, and each extended row passes its own ACL;
+  - columns and relations apply where the model has them, and every row carries its type.
+- CMS: `Content` and `ExtendsContentTrait` satisfy the contracts.
+- Shop: `/search` and `/select` of products for a guest show only online products (XS9); a user restricted to a company
+  sees only that company's products, in the product routes and in the mixed list.
+- Contract: the same request through Basic, Orchestrated and Auto returns the same eligible rows, extending
+  `SearchPathEligibilityContractTest`.
+
+## 8. Open questions
+
+- **Names.** The request parameter (working name `with_extended`) and the field that carries the type of each row in the
+  mixed list.
+- **`extension` name collisions.** Two extenders declaring the same field share `extension.<field>`, and the first
+  registered wins the mapping. Proposal: prefix by alias (`extension.shop_product.kind`), decided before a second
+  extender ships.
+- **Approval in XS9.** Whether "approved" needs a condition of its own on public reads, or the live record of a content
+  under approval is already the approved state. To verify against `HasApprovals` before seeding the guest ACL.
+- **`/detail` of a host with the flag.** Whether `/detail/cms/contents?id=X&with_extended=true` returns the upcast
+  extender. With the shared key (XS7) the same id opens it through `/detail/shop/products` already.
