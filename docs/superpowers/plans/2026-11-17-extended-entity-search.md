@@ -75,9 +75,9 @@ All merged on 2026-11-17:
 - Create: `Modules/Core/app/Search/Schema/IndexedRelation.php`.
 - Test: `Modules/Core/tests/Unit/Search/IndexedRelationTest.php`.
 
-- [ ] **Step 1: Test first.** A declaration with a relation name and the default shape yields a `FieldDefinition` of type `Array` with `relation` set and properties `name` (text), `id` (integer, filterable), `slug` and `path` (keyword, filterable); extra properties add to the shape and can override it; the document entry of a collection of related models holds exactly the declared keys for each model, in order; field and document are built from the same declaration, so their keys match.
-- [ ] **Step 2: Implement** a `final readonly` value object: constructor (relation, field name, extra properties, index types), `field(): FieldDefinition`, `document(iterable $related): array`.
-- [ ] **Step 3:** tests PASS, Pint, commit: `feat(core): declare an indexed relation once for document and mapping`.
+- [x] **Step 1: Test first.** A declaration with a relation name and the default shape yields a `FieldDefinition` of type `Array` with `relation` set and properties `name` (text), `id` (integer, filterable), `slug` and `path` (keyword, filterable); extra properties add to the shape and can override it; the document entry of a collection of related models holds exactly the declared keys for each model, in order; field and document are built from the same declaration, so their keys match.
+- [x] **Step 2: Implement** a `final readonly` value object: constructor (relation, field name, extra properties, index types), `field(): FieldDefinition`, `document(iterable $related): array`.
+- [x] **Step 3:** tests PASS, Pint, commit: `feat(core): declare an indexed relation once for document and mapping`. Committed on `feat/extended-entity-search` in `Modules/Core`, with the stub `tests/Stubs/Search/IndexedRelationStubModel.php`. The document lists the properties in the declaration order (`name`, `id`, `slug`, `path`, then extras), so Task 4 compares document entries by key and value, not by key order. Pest and Pint not run in the authoring environment: every case ran through a standalone script. Run both in the host app.
 
 ---
 
