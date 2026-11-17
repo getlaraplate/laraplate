@@ -17,9 +17,12 @@ status: open
 
 ## Prerequisites
 
-- getlaraplate/laracore#43 merged: default search filters on every search path, locale on the basic path, typed sub-fields of an Elasticsearch `object` (needed by `extension.*` filters).
-- getlaraplate/laracms#22 merged.
-- getlaraplate/larashop#4 merged: shared primary key of `Product` (XS7). The flows of Task 9 reload products by the hit ids.
+All merged on 2026-11-17:
+
+- getlaraplate/laracore#43: default search filters on every search path, locale on the basic path, typed sub-fields of an Elasticsearch `object` (needed by `extension.*` filters).
+- getlaraplate/laracms#22.
+- getlaraplate/larashop#4: shared primary key of `Product` (XS7). The flows of Task 9 reload products by the hit ids.
+- getlaraplate/laracore#44: a pending deletion under the `Hide` strategy is hidden from an anonymous HTTP visitor. Not required by the plan; it was found while verifying XS9.
 
 ## Global Constraints
 
