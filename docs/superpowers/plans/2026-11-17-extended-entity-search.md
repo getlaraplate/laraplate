@@ -87,9 +87,9 @@ All merged on 2026-11-17:
 - Modify: `Modules/CMS/app/Models/Content.php` (`toSearchableArray()`, `getSearchMapping()`).
 - Test: `Modules/CMS/tests/Feature/ContentExtension/ContentExtensionMappingTest.php`, `ContentExtensionSearchDataTest.php`, or a new `ContentSearchDocumentTest.php`.
 
-- [ ] **Step 1:** pin the current mapping of `contributors`, `categories`, `tags`, `locations` and their document entries (tests that pass before the change).
-- [ ] **Step 2:** replace the four `only([...])` calls and the four `FieldDefinition` blocks with four `IndexedRelation` declarations (the `locations` one adds the address properties, `tags.name` is a keyword).
-- [ ] **Step 3:** the pinned tests still PASS, Pint, commit: `refactor(cms): indexed relations of Content through the Core helper`.
+- [x] **Step 1:** pin the current mapping of `contributors`, `categories`, `tags`, `locations` and their document entries (tests that pass before the change).
+- [x] **Step 2:** replace the four `only([...])` calls and the four `FieldDefinition` blocks with four `IndexedRelation` declarations (the `locations` one adds the address properties, `tags.name` is a keyword).
+- [x] **Step 3:** the pinned tests still PASS, Pint, commit: `refactor(cms): indexed relations of Content through the Core helper`. Committed on `feat/extended-entity-search` in `Modules/CMS`; pins in `tests/Feature/Search/ContentSearchableArrayTest.php` (mapping against the literal declarations before the helper, translated for Elasticsearch; document entries against `only()` on the old keys, compared by key and value). `Content::indexedRelations()` holds the four declarations. Pest and Pint not run in the authoring environment: a standalone script found the four field definitions identical (order included) and their Elasticsearch, Typesense and database translations identical. Run both in the host app.
 
 ---
 
