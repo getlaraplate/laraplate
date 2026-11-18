@@ -147,9 +147,9 @@ All merged on 2026-11-17:
 - Modify: `Modules/Core/app/Models/Pivot/Fieldable.php` (attach), `Modules/Core/app/Models/Field.php` (rename), the extender contract of Task 5 (the entity its host rows use).
 - Test: `Modules/Core/tests/Feature/Extensions/PresetFieldShadowingTest.php`.
 
-- [ ] **Step 1: Test first.** Attaching a field named like an own column of an extender to a preset of that extender's entity is refused with a validation error naming the field, the extender and XS17; renaming a field attached to such a preset to such a name is refused; other names, and presets of other entities, are accepted.
-- [ ] **Step 2: Implement** the check through the registry: which extender owns the preset's entity, and its own columns. Docblock and message per the Global Constraints.
-- [ ] **Step 3:** tests PASS, Pint, commit: `feat(core): refuse a preset field that would shadow an extender column`.
+- [x] **Step 1: Test first.** Attaching a field named like an own column of an extender to a preset of that extender's entity is refused with a validation error naming the field, the extender and XS17; renaming a field attached to such a preset to such a name is refused; other names, and presets of other entities, are accepted.
+- [x] **Step 2: Implement** the check through the registry: which extender owns the preset's entity, and its own columns. Docblock and message per the Global Constraints.
+- [x] **Step 3:** tests PASS, Pint, commit: `feat(core): refuse a preset field that would shadow an extender column`. Committed on `feat/extended-entity-search` in Core, CMS and Shop. As built: the extender contract gains `extensionEntityType(): ?string` (the type of the entity whose presets shape its host rows); `ExtenderColumnGuard` reads the preset's entity type and refuses a field named like any own column of an extender of that type, native keys included (a dynamic field named `id` would be shadowed too), with a `ValidationException` naming the field, the entity, the extender and XS17; `FieldableObserver::saving` runs it when `field_id` or `preset_id` changes, `FieldObserver::updating` when an attached field is renamed; `ExtensionRegistry::all()` lists every extender. CMS `ExtendsContentTrait` returns null by default, Shop `Product` returns `products`, and `ProductColumnNamesTest` tries a `featured` field on the product preset. Tests: `Modules/Core/tests/Feature/Extensions/PresetFieldShadowingTest.php`. Pest and Pint not run in the authoring environment (lint only): run both in the host app.
 
 ---
 
