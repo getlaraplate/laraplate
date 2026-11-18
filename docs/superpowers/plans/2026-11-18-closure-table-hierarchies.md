@@ -51,19 +51,29 @@ Written and run on today's code, before anything changes. Everything here passes
 - Consumes: `Modules\Core\Performance\BenchmarkRunner::run(callable $operation, int $iterations = 30, int $warmup = 3): BenchmarkReport` (duration and query stats).
 - Produces: the baseline table in this plan, read by Task 9; the characterization tests, which must pass unchanged after Task 5 except where Task 5 says otherwise.
 
-- [ ] **Step 1: Write the benchmark.** Skipped unless `HIERARCHY_BENCHMARK=1`. Seeds: 5,000 categories six levels deep with `order_column` deliberately not following depth; 20,000 comments in threads up to five levels; a role chain of five with permissions at each level and a user holding the leaf role. Cases, each through `BenchmarkRunner::run()`: ACL resolution for that user (`AclResolverService`); a page of 50 contents with their category URLs; `CrudService::tree()` on a category with parents, children and both; creating a leaf comment; moving a category subtree of 200 nodes; deleting a middle category. Prints one line per case: case name, p50 and p95 duration, queries.
-- [ ] **Step 2: Run it on SQLite and on one server database (dedicated throwaway database).** Run: `HIERARCHY_BENCHMARK=1 php artisan test --compact Modules/CMS/tests/Integration/Performance/HierarchyBenchmarkTest.php` (second run with `DB_CONNECTION`/`DB_DATABASE` pointing at the throwaway database). Copy the numbers into the Baseline table below.
-- [ ] **Step 3: Write the characterization tests.**
+- [x] **Step 1: Write the benchmark.** Skipped unless `HIERARCHY_BENCHMARK=1`. Seeds: 5,000 categories six levels deep with `order_column` deliberately not following depth; 20,000 comments in threads up to five levels; a role chain of five with permissions at each level and a user holding the leaf role. Cases, each through `BenchmarkRunner::run()`: ACL resolution for that user (`AclResolverService`); a page of 50 contents with their category URLs; `CrudService::tree()` on a category with parents, children and both; creating a leaf comment; moving a category subtree of 200 nodes; deleting a middle category. Prints one line per case: case name, p50 and p95 duration, queries.
+- [x] **Step 2: Run it on SQLite and on one server database (dedicated throwaway database).** Run: `HIERARCHY_BENCHMARK=1 php artisan test --compact Modules/CMS/tests/Integration/Performance/HierarchyBenchmarkTest.php` (second run with `DB_CONNECTION`/`DB_DATABASE` pointing at the throwaway database). Copy the numbers into the Baseline table below. (SQLite; server database deferred, see line under the table)
+- [x] **Step 3: Write the characterization tests.**
   - `RoleTest`: `it('inherits permissions through a trashed middle role')`: roles A ← B ← C, B soft-deleted, permission only on A; `C->hasPermission(...)` and `getAllPermissions()` give the same results as without B trashed (record what today returns and assert it).
   - `HierarchyCharacterizationTest` on comments (a thread root, two children, a grandchild): `CrudService::tree()` with parents, children and both returns the same node ids, in the same order, each with today's `depth` (signed) and `path` values, asserted literally; with an ACL hiding one node, that node is absent and the others are unchanged.
   - Same file: a comment thread loaded with `with('descendants')` on two roots returns each root's own replies.
-- [ ] **Step 4: Run them; all pass on today's code.** Run: `php artisan test --compact Modules/Core/tests/Feature/Models/RoleTest.php Modules/CMS/tests/Feature/Hierarchy`
-- [ ] **Step 5: Commit** (Core: `test(core): characterize role inheritance through a trashed role`; CMS: `test(cms): baseline benchmark and characterization of hierarchies`; root: the plan with the baseline).
+- [x] **Step 4: Run them; all pass on today's code.** Run: `php artisan test --compact Modules/Core/tests/Feature/Models/RoleTest.php Modules/CMS/tests/Feature/Hierarchy`
+- [x] **Step 5: Commit** (Core: `test(core): characterize role inheritance through a trashed role`; CMS: `test(cms): baseline benchmark and characterization of hierarchies`; root: the plan with the baseline).
 
 **Baseline (filled by Step 2):**
 
 | Case | Driver | p50 ms | p95 ms | Queries |
 |---|---|---|---|---|
+| acl resolution (5 roles) | sqlite | 6.77 | 6.96 | 3 |
+| page of 50 contents + category urls | sqlite | 380.24 | 471.57 | 17 |
+| crud tree: parents | sqlite | 1468.34 | 1744.19 | 14 |
+| crud tree: children | sqlite | 1305.07 | 1666.05 | 14 |
+| crud tree: parents + children | sqlite | 1717.87 | 1978.58 | 14 |
+| create a leaf comment | sqlite | 11.48 | 12.15 | 11 |
+| move a 200-node category subtree | sqlite | 17.75 | 18.59 | 10 |
+| delete a middle category | sqlite | 11.58 | 14.59 | 6 |
+
+Server database: pending, measured later from this commit.
 
 ### Task 2: `ClosureTableMaintainer` and the migration helper
 
