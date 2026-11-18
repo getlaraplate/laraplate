@@ -1,7 +1,7 @@
 ---
 created_on: 2026-11-17
 module: core, cms, shop
-status: open
+status: completed
 ---
 # Extended entity search and list. Implementation Plan
 
@@ -137,7 +137,7 @@ All merged on 2026-11-17:
 - [x] **Step 2:** `extension` gains `company_id` (integer, filterable) next to `is_published_in_shop`.
 - [x] **Step 3: XS17 test.** The own columns of `Product`, less `id`, timestamps and soft-delete columns, share no name with the columns of `cms_contents` nor the fields of `ContentTranslation`. The failure message names the colliding names and XS17.
 - [x] **Step 4:** tests PASS, Pint, commit: `feat(shop): products in the Core extension registry, with company and publication indexed`. Committed on `feat/extended-entity-search` in `Modules/Shop`. `Product::extensionOwnColumns()` returns `OWN_COLUMNS`; `ProductColumnNamesTest` checks them against the columns of `cms_contents` and `Content::getTranslatableFields()`, and that every column of `shop_products` is in the list. `ProductExtensionTest` gains the registration and the `company_id` cases, and its upcast case uses `Content::upcastExtensions()`, so Shop no longer touches the deprecated CMS delegates. The `contents` mapping gains `extension.company_id`: the owner rebuilds the index after the merge. Pest and Pint not run in the authoring environment (lint only): run both in the host app.
-- [ ] **Step 5:** once the Shop PR is merged, remove the deprecated CMS delegates `Modules/CMS/app/Services/ContentExtenderRegistry.php` and `Modules/CMS/app/Services/ContentExtensionResolver.php` in a CMS follow-up: move `ContentExtenderRegistryTest` and `ContentExtensionResolverTest` onto the Core registry and resolver, and the CMS tests that register through the CMS registry onto the Core one; deleting the old test files needs the owner's approval in that PR.
+- [-] **Step 5 (moved to a follow-up, it can only run after the Shop PR is merged and its test deletions need the owner's approval):** once the Shop PR is merged, remove the deprecated CMS delegates `Modules/CMS/app/Services/ContentExtenderRegistry.php` and `Modules/CMS/app/Services/ContentExtensionResolver.php` in a CMS follow-up: move `ContentExtenderRegistryTest` and `ContentExtensionResolverTest` onto the Core registry and resolver, and the CMS tests that register through the CMS registry onto the Core one; deleting the old test files needs the owner's approval in that PR.
 
 ---
 
@@ -196,7 +196,36 @@ All merged on 2026-11-17:
 **Files:**
 - Modify: `Modules/CMS/docs/CONTENT_EXTENSION.md` ("Becoming a consumer", "Search", "Generic search excludes extended contents"), `Modules/Shop/docs/rag/MODULE.md` (search and list of products, `with_extended`, the XS17 test, the guest ACL), `Modules/Core/docs/rag/MODULE.md` (host and extender contracts, preset field refusal), `Modules/Core/docs/rag/SEARCH_RETRIEVAL_PIPELINE.md` (constraints table: the host exclusion and `with_extended`), `Modules/Core/docs/CRUD_SYSTEM.md` or its RAG counterpart (the `with_extended` parameter).
 
-- [ ] **Step 1:** document XS16 and XS17 with their reasons where they are enforced, per spec §8.
-- [ ] **Step 2:** document the request parameter, the mixed list (`extended_type` per row, columns applied where present) and the extender search.
-- [ ] **Step 3:** commit per repo: `docs(<module>): extended entity search and list`.
-- [ ] **Step 4: Close.** A `## Delivery status (date)` section with its `**Documented in:**` line naming the module docs of Steps 1 and 2, every box resolved (`- [x]`, or `- [-]` with its reason), `status: completed` in the front matter.
+- [x] **Step 1:** document XS16 and XS17 with their reasons where they are enforced, per spec §8.
+- [x] **Step 2:** document the request parameter, the mixed list (`extended_type` per row, columns applied where present) and the extender search.
+- [x] **Step 3:** commit per repo: `docs(<module>): extended entity search and list`. Committed on `feat/extended-entity-search` in Core, CMS and Shop.
+- [x] **Step 4: Close.** A `## Delivery status (date)` section with its `**Documented in:**` line naming the module docs of Steps 1 and 2, every box resolved (`- [x]`, or `- [-]` with its reason), `status: completed` in the front matter.
+
+## Delivery status (2026-11-18): built, pending review and merge
+
+Built on `feat/extended-entity-search` in `Modules/Core`, `Modules/CMS` and `Modules/Shop`, to be merged in the order
+Core, CMS, Shop. Pest and Pint were not run in the authoring environment (PHP 8.3, no host app): every file was
+linted, and the suites run in the host app before the PRs merge. After the Shop merge the owner rebuilds the
+`contents` index (new `extension.company_id`) and every Typesense collection (null placeholder).
+
+**Documented in:** `Modules/CMS/docs/CONTENT_EXTENSION.md` (host and extender split, the two naming rules XS16 and
+XS17 with their reasons, searching and listing extenders), `Modules/Shop/docs/rag/MODULE.md` (search and list of
+products, the public ACL, the column-name test), `Modules/Core/docs/rag/MODULE.md` (host and extender contracts,
+the preset field refusal, null and `extension.*` filters on every engine),
+`Modules/Core/docs/rag/SEARCH_RETRIEVAL_PIPELINE.md` (the constraints table with the host exclusion, the extender
+search and `with_extended`), `Modules/Core/docs/CRUD_SYSTEM.md` (the `with_extended` parameter).
+
+Divergences from the plan, each recorded in its task:
+
+- Task 6: the CMS `ContentExtenderRegistry` and `ContentExtensionResolver` stay as deprecated delegates over Core, so
+  Shop keeps working between merges; their removal is Task 7 Step 5, moved to a CMS follow-up after the Shop merge.
+- Task 8: the extender contract gained `extensionEntityType()`; native keys are refused as preset field names too.
+- Task 9: the reload of a model that mounts related attributes applies its ACL through the CRUD query builder.
+  Same-day follow-ups: `extension.*` filters on every engine (EXISTS on the extender tables for the database and
+  collection engines), the hiding scope removed from the engine queries and hydration of a search that asks for an
+  alias (without it an extender search on `Content` came back empty), Core's own collection engine,
+  `ExtensionDocumentCheck`, `company_id` cast to integer.
+- Before Task 10: equality on null fixed on Elasticsearch (`must_not exists`) and Typesense (an indexed placeholder
+  for null top-level strings).
+- Known limit: on Typesense a null date has no placeholder, so `valid_to IS NULL` in the public ACLs of contents and
+  products finds nothing there.
