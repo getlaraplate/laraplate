@@ -92,11 +92,11 @@ Server database: pending, measured later from this commit.
   - `rebuild(): void`: truncates and refills level by level, set-based (roots, then each depth from the previous one), no query per node.
   - Every method works on the tables through the query builder, ignoring model scopes: trashed, inactive and expired rows stay in the closure.
 
-- [ ] **Step 1: Write the failing tests** on a temporary table pair created with the helper: `it('creates the closure table with its keys')` (columns, primary key, index via `Schema::getIndexes`/`getForeignKeys`); `it('inserts a node under its parent ancestors')`; `it('moves a subtree with all its descendants')` (rows of every descendant point at the new ancestors, depths correct); `it('refuses to move a node under its own descendant')` (exception, closure unchanged); `it('detaches the subtrees of nested doomed nodes without touching surviving links')` (tree `r → d1 → a → x`, `a → d2`, doomed `d1` and `d2`: `(a, x)` survives, `(r, x)` and `(r, a)` are gone); `it('rebuilds to the same rows as incremental maintenance')` (build a random tree of 300 nodes with inserts and moves, snapshot, rebuild, compare).
-- [ ] **Step 2: Run them; they fail.** Run: `php artisan test --compact Modules/Core/tests/Integration/Support/Hierarchy/ClosureTableMaintainerTest.php`
-- [ ] **Step 3: Implement the helper, the exception (sibling of the other Core exceptions) and the maintainer.** For the deletes in `moveSubtree` and `detachSubtreesOf`, select the pairs first, then delete in chunks (Global Constraints, MySQL 1093).
-- [ ] **Step 4: Run them; they pass.** Same command. Also run once on the throwaway server database from Task 1.
-- [ ] **Step 5: Pint and commit** (`feat(core): closure table maintainer and migration helper`).
+- [x] **Step 1: Write the failing tests** on a temporary table pair created with the helper: `it('creates the closure table with its keys')` (columns, primary key, index via `Schema::getIndexes`/`getForeignKeys`); `it('inserts a node under its parent ancestors')`; `it('moves a subtree with all its descendants')` (rows of every descendant point at the new ancestors, depths correct); `it('refuses to move a node under its own descendant')` (exception, closure unchanged); `it('detaches the subtrees of nested doomed nodes without touching surviving links')` (tree `r → d1 → a → x`, `a → d2`, doomed `d1` and `d2`: `(a, x)` survives, `(r, x)` and `(r, a)` are gone); `it('rebuilds to the same rows as incremental maintenance')` (build a random tree of 300 nodes with inserts and moves, snapshot, rebuild, compare).
+- [x] **Step 2: Run them; they fail.** Run: `php artisan test --compact Modules/Core/tests/Integration/Support/Hierarchy/ClosureTableMaintainerTest.php`
+- [x] **Step 3: Implement the helper, the exception (sibling of the other Core exceptions) and the maintainer.** For the deletes in `moveSubtree` and `detachSubtreesOf`, select the pairs first, then delete in chunks (Global Constraints, MySQL 1093).
+- [x] **Step 4: Run them; they pass.** Same command. Also run once on the throwaway server database from Task 1.
+- [x] **Step 5: Pint and commit** (`feat(core): closure table maintainer and migration helper`).
 
 ### Task 3: The facet path refuses black-listed relations
 
