@@ -136,11 +136,11 @@ Server database: pending, measured later from this commit.
   - `isRoot()`, `isLeaf()`, `isDescendantOf()`, `isAncestorOf()`, `isSiblingOf()`, `getDepth()` (no cache), `moveTo()` kept.
 - Removed: `newCollection()` override, the depth cache, `bloodlineAndSelf()`, the `closure()` relation and its scopes if nothing uses them (grep; a `- [-]` with the reason if one stays).
 
-- [ ] **Step 1: Write the failing tests** in `HasClosureTableTest`: ancestors closest first under a global scope ordering by another column; a trashed middle node hides only itself; `with()` of each of the twelve relations on three parents returns each parent's own nodes; `depth` signed and no `pivot` in `toArray()`; saving with a new `parent_id` (plain `save()`, not `moveTo()`) moves the whole subtree; saving a parent inside the own subtree throws `HierarchyCycleException` and saves nothing; hard-deleting a middle node leaves its children as roots with their subtrees intact; the whole sequence ends equal to `rebuildClosure()`; the existing connection-affinity tests keep passing.
-- [ ] **Step 2: Run them; they fail.** Run: `php artisan test --compact Modules/Core/tests/Integration/Helpers/HasClosureTableTest.php`
-- [ ] **Step 3: Implement.** Events: `created` → `insertNode`; `updating` with a dirty parent → cycle check before saving; `updated` with a changed parent → `moveSubtree`; `deleting` (or `forceDeleting` on a soft-deletable model) → `detachSubtreesOf` the node itself. Each event body runs in a transaction the trait opens on the model connection. Soft delete and restore touch nothing.
-- [ ] **Step 4: Run them; they pass.** Same command, plus `Modules/Core/tests/Integration/Helpers/TreeCollectionTest.php`.
-- [ ] **Step 5: Pint and commit** (`refactor(core): closure table trait with the full hierarchy relations`).
+- [x] **Step 1: Write the failing tests** in `HasClosureTableTest`: ancestors closest first under a global scope ordering by another column; a trashed middle node hides only itself; `with()` of each of the twelve relations on three parents returns each parent's own nodes; `depth` signed and no `pivot` in `toArray()`; saving with a new `parent_id` (plain `save()`, not `moveTo()`) moves the whole subtree; saving a parent inside the own subtree throws `HierarchyCycleException` and saves nothing; hard-deleting a middle node leaves its children as roots with their subtrees intact; the whole sequence ends equal to `rebuildClosure()`; the existing connection-affinity tests keep passing.
+- [x] **Step 2: Run them; they fail.** Run: `php artisan test --compact Modules/Core/tests/Integration/Helpers/HasClosureTableTest.php`
+- [x] **Step 3: Implement.** Events: `created` → `insertNode`; `updating` with a dirty parent → cycle check before saving; `updated` with a changed parent → `moveSubtree`; `deleting` (or `forceDeleting` on a soft-deletable model) → `detachSubtreesOf` the node itself. Each event body runs in a transaction the trait opens on the model connection. Soft delete and restore touch nothing.
+- [x] **Step 4: Run them; they pass.** Same command, plus `Modules/Core/tests/Integration/Helpers/TreeCollectionTest.php`.
+- [x] **Step 5: Pint and commit** (`refactor(core): closure table trait with the full hierarchy relations`).
 
 ### Task 5: Switch the three hierarchies
 
