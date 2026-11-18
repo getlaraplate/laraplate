@@ -158,15 +158,15 @@ One task: the models, their tables and `CrudService::tree()` change together, or
 - Consumes: Task 4 relations; Task 1 characterization values.
 - Produces: `/tree` payload identical to Task 1 for every mode.
 
-- [ ] **Step 1: Write the failing chain tests.** Categories root → child → grandchild with `order_column` values 3, 1, 2 (not following depth), loaded from the database (no `setRelation`): `full_name` is `root > child > grandchild`, `ids` is `root.child.grandchild` by key, and the content URL built from the grandchild has the segments in that order.
-- [ ] **Step 2: Run them; they fail on today's code.** Run: `php artisan test --compact Modules/CMS/tests/Feature/Models/CategoryTest.php Modules/CMS/tests/Integration/Models/ContentTest.php`
-- [ ] **Step 3: Add the closure tables to the three create migrations with `MigrateUtils::closureTable()`, and the enum cases.**
-- [ ] **Step 4: Switch the three models to `HasClosureTable`.**
-- [ ] **Step 5: Rewrite `CrudService::tree()` for the closure relations.** Same `$tree_relation_type` names; the visible-keys `whereIn` qualifies the related key; `path` computed to the values pinned in Task 1; comments mentioning the recursive expression rewritten. `useRecursiveRelationships()` detects `HasClosureTable`.
-- [ ] **Step 6: Adapt the existing tests listed under Files.**
-- [ ] **Step 7: Run the suites; all pass, Task 1 characterization included.** Run: `php artisan test --compact Modules/Core/tests Modules/CMS/tests`, then `php artisan test --compact Modules/CRM/tests Modules/ERP/tests` (taxonomy subclasses).
-- [ ] **Step 8: Check a fresh install.** Run: `php artisan migrate:fresh --seed` on the throwaway database; it completes, and `SELECT COUNT(*)` on each closure table is at least the row count of its model table.
-- [ ] **Step 9: Pint and commit** (Core: `refactor(core): roles and taxonomies on the closure table`; CMS: `refactor(cms): comments on the closure table`).
+- [x] **Step 1: Write the failing chain tests.** Categories root → child → grandchild with `order_column` values 3, 1, 2 (not following depth), loaded from the database (no `setRelation`): `full_name` is `root > child > grandchild`, `ids` is `root.child.grandchild` by key, and the content URL built from the grandchild has the segments in that order. (3, 1, 2 sorts the grandchild's ancestors closest first under the scope order, so it passes before the switch too; a second data row, 1, 3, 2, sorts them root first and is the one that fails before it)
+- [x] **Step 2: Run them; they fail on today's code.** Run: `php artisan test --compact Modules/CMS/tests/Feature/Models/CategoryTest.php Modules/CMS/tests/Integration/Models/ContentTest.php`
+- [x] **Step 3: Add the closure tables to the three create migrations with `MigrateUtils::closureTable()`, and the enum cases.**
+- [x] **Step 4: Switch the three models to `HasClosureTable`.**
+- [x] **Step 5: Rewrite `CrudService::tree()` for the closure relations.** Same `$tree_relation_type` names; the visible-keys `whereIn` qualifies the related key; `path` computed to the values pinned in Task 1; comments mentioning the recursive expression rewritten. `useRecursiveRelationships()` detects `HasClosureTable`.
+- [x] **Step 6: Adapt the existing tests listed under Files.**
+- [x] **Step 7: Run the suites; all pass, Task 1 characterization included.** Run: `php artisan test --compact Modules/Core/tests Modules/CMS/tests`, then `php artisan test --compact Modules/CRM/tests Modules/ERP/tests` (taxonomy subclasses). (`AclResolverServiceTest` set role parents with `saveQuietly()`, which bypasses the closure: saved with `save()` instead)
+- [x] **Step 8: Check a fresh install.** Run: `php artisan migrate:fresh --seed` on the throwaway database; it completes, and `SELECT COUNT(*)` on each closure table is at least the row count of its model table. (run on a throwaway SQLite file: no local server database; roles 7 rows / 7 closure rows, taxonomies and comments seed none)
+- [x] **Step 9: Pint and commit** (Core: `refactor(core): roles and taxonomies on the closure table`; CMS: `refactor(cms): comments on the closure table`).
 
 ### Task 6: `model:soft-deletes-remove` rebuilds the closure
 
