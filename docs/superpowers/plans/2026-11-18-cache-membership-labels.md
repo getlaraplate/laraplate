@@ -180,16 +180,16 @@ status: open
 - Consumes: Tasks 3, 5, 6.
 - Produces: `CrudResponseCache::remember(CrudRequestData $request_data, Closure $compute, Closure $render, Closure $authorize): Response`, where `$compute(): CrudResult`, `$render(CrudResult): Response`, `$authorize(): void`; `CrudResponseCache::keyFor(Request $request): string` (path, sorted query, user, roles, token, `App::getLocale()`); `CrudService::authorizeCachedRead(CrudRequestData $requestData): void` (the `ensurePermission(..., 'select', ...)` and `authorizeRequestedRelations()` each read method runs first).
 
-- [ ] **Step 1: Write the failing feature tests** on a `HasCache` entity through its `/app/crud` routes:
+- [x] **Step 1: Write the failing feature tests** on a `HasCache` entity through its `/app/crud` routes:
   - second identical request runs no query on its table (`DB::listen` count through the model's connection)
   - permission removed straight in the pivot table (no event) → the cached URL answers 403
   - two guests with `Accept-Language: it` and `en` get their own responses; a guest and a user on one URL get their own
   - a 403/422 response is not stored; `no_cache=1` bypasses
   - a model without `HasCache` is never stored; with `complete: false` on a counter index it is not stored
-- [ ] **Step 2: Run** `vendor/bin/pest --compact Modules/Core/tests/Feature/Crud/CrudResponseCacheTest.php`. Expected: FAIL.
-- [ ] **Step 3: Implement.** Search is not routed through `CrudResponseCache` (author's call on the point the spec left open: its rows come from an index reindexed asynchronously, so a flush on write would let the cache refill from the old index); add a test that a second identical search still calls the service. Hit: `$authorize()`, return value. Miss: `$compute()`, `$render()`, store only status 200 with `rowLabels()` and the TTL of today. Failover degraded or `NullLabelIndex`: compute and render only.
-- [ ] **Step 4: Run** it and `vendor/bin/pest --compact Modules/Core/tests/Feature/Crud Modules/Core/tests/Integration/Cache`. Expected: PASS.
-- [ ] **Step 5: Commit** `feat(crud): look up the response cache before computing a read`.
+- [x] **Step 2: Run** `vendor/bin/pest --compact Modules/Core/tests/Feature/Crud/CrudResponseCacheTest.php`. Expected: FAIL.
+- [x] **Step 3: Implement.** Search is not routed through `CrudResponseCache` (author's call on the point the spec left open: its rows come from an index reindexed asynchronously, so a flush on write would let the cache refill from the old index); add a test that a second identical search still calls the service. Hit: `$authorize()`, return value. Miss: `$compute()`, `$render()`, store only status 200 with `rowLabels()` and the TTL of today. Failover degraded or `NullLabelIndex`: compute and render only.
+- [x] **Step 4: Run** it and `vendor/bin/pest --compact Modules/Core/tests/Feature/Crud Modules/Core/tests/Integration/Cache`. Expected: PASS.
+- [x] **Step 5: Commit** `feat(crud): look up the response cache before computing a read`.
 
 ### Task 8: Invalidation by entity, end to end
 
