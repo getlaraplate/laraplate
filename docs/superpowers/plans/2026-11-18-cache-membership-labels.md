@@ -122,11 +122,11 @@ status: open
 **Interfaces:**
 - Produces: `QueryBuilder::requestedRelationPathsByUse(Model $model, SelectRequestData $request_data, bool $lenient_filters = false, bool $include_columns = true): array{display: list<string>, membership: list<string>}`. `display`: `relations` and the relation part of plain dotted columns. `membership`: aggregates, computed columns, group by, sorts, filters. `requestedRelationPaths()` returns the deduplicated merge, unchanged for its callers.
 
-- [ ] **Step 1: Write the failing test** on `ACL` and `Role` requests: `relations=role` → `display: ['role']`; `filters` on `role.name` → `membership: ['role']`; both → `role` in both; the merge equals today's `requestedRelationPaths()` for the same requests.
-- [ ] **Step 2: Run** it. Expected: FAIL.
-- [ ] **Step 3: Implement** by splitting the existing collection in `requestedRelationPaths()`; guards and black-list handling unchanged.
-- [ ] **Step 4: Run** it and `vendor/bin/pest --compact Modules/Core/tests --filter=QueryBuilder`. Expected: PASS.
-- [ ] **Step 5: Commit** `refactor(crud): split requested relation paths into display and membership`.
+- [x] **Step 1: Write the failing test** on `ACL` and `Role` requests: `relations=role` → `display: ['role']`; `filters` on `role.name` → `membership: ['role']`; both → `role` in both; the merge equals today's `requestedRelationPaths()` for the same requests.
+- [x] **Step 2: Run** it. Expected: FAIL.
+- [x] **Step 3: Implement** by splitting the existing collection in `requestedRelationPaths()`; guards and black-list handling unchanged.
+- [x] **Step 4: Run** it and `vendor/bin/pest --compact Modules/Core/tests --filter=QueryBuilder`. Expected: PASS.
+- [x] **Step 5: Commit** `refactor(crud): split requested relation paths into display and membership`.
 
 ### Task 5: Dependency resolver
 
@@ -139,7 +139,7 @@ status: open
 - Consumes: `requestedRelationPathsByUse()` (Task 4), `CacheLabel`, `CacheDependencies` (Task 1).
 - Produces: `forRequest(Model $model, SelectRequestData $request_data, ?User $user, bool $single_record): CacheDependencies`; `rowLabels(Model $model, CacheDependencies $dependencies, mixed $data): list<string>`; `interface IDeclaresCacheDependencies { public function cacheDependencyTables(): array; }` (list of tables).
 
-- [ ] **Step 1: Write the failing tests.**
+- [x] **Step 1: Write the failing tests.**
   - list of `ACL` with `relations=role`: labels contain `table:core_acls`, `crud`, `user:{id}`, `role:{id}` of the caller; `row_tables` = `['core_roles']`; `complete` true.
   - list of `Role` with `relations=permissions`: labels contain `table:core_permissions` and `table:` of the pivot (`$role->permissions()->getTable()`).
   - filter on `role.name`: `table:core_roles` in labels, not in `row_tables`.
@@ -147,10 +147,10 @@ status: open
   - a translated stub adds its translations table; a stub implementing `IDeclaresCacheDependencies` adds its tables; a path through `morphTo` gives `complete: false`.
   - `hasOne` and `hasMany` segments give set labels, `belongsTo` gives a row table; a segment after a to-many segment keeps its own kind.
   - `AssertsCacheDependencies::assertCacheDependenciesCover(Closure $call, CacheDependencies $dependencies)` records the tables the call queries (`listen()` on the model's connection, table names parsed from `from`/`join` of the SQL) and fails naming each table with no `table:` label and no row table; its own test feeds it a call that reads an undeclared table and expects the failure. Every model opted into the cache by this plan's tests is checked with it once.
-- [ ] **Step 2: Run** it. Expected: FAIL.
-- [ ] **Step 3: Implement.** Walk each path with the relation instance of each segment (`$model->{$name}()`, names already guarded): `BelongsTo` → row table (display) or set label (membership); `MorphTo` → stop, `complete: false`, row labels after the query; `BelongsToMany`/`MorphToMany` → set labels of related and pivot table; `HasOneOrMany`, `HasOneOrManyThrough` → set labels of related (and through parent). Translations through `HasTranslations::translations()`. Scope labels from the user and its roles as `Repository::getKeyPartsFromUser()` collects them (guests are the anonymous user). `rowLabels()` walks the Eloquent models in `$data` (model, collection, paginator) and their loaded `BelongsTo`/`MorphTo` relations recursively; `CrudResult::$data` for list, detail, tree and history holds models: confirm, and if a method returns arrays, collect the models in `CrudService` before serialization.
-- [ ] **Step 4: Run** it. Expected: PASS.
-- [ ] **Step 5: Commit** `feat(crud): resolve cache labels of a CRUD read`.
+- [x] **Step 2: Run** it. Expected: FAIL.
+- [x] **Step 3: Implement.** Walk each path with the relation instance of each segment (`$model->{$name}()`, names already guarded): `BelongsTo` → row table (display) or set label (membership); `MorphTo` → stop, `complete: false`, row labels after the query; `BelongsToMany`/`MorphToMany` → set labels of related and pivot table; `HasOneOrMany`, `HasOneOrManyThrough` → set labels of related (and through parent). Translations through `HasTranslations::translations()`. Scope labels from the user and its roles as `Repository::getKeyPartsFromUser()` collects them (guests are the anonymous user). `rowLabels()` walks the Eloquent models in `$data` (model, collection, paginator) and their loaded `BelongsTo`/`MorphTo` relations recursively; `CrudResult::$data` for list, detail, tree and history holds models: confirm, and if a method returns arrays, collect the models in `CrudService` before serialization.
+- [x] **Step 4: Run** it. Expected: PASS.
+- [x] **Step 5: Commit** `feat(crud): resolve cache labels of a CRUD read`.
 
 ### Task 6: Invalidator, model-event listener and pivot flushes
 
