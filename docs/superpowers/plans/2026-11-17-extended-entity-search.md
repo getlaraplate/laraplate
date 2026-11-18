@@ -133,10 +133,10 @@ All merged on 2026-11-17:
 - Modify: `Modules/Shop/app/Providers/ShopServiceProvider.php`, `Modules/Shop/app/Models/Product.php` (`searchableExtension()`, `searchableExtensionMapping()`).
 - Test: `Modules/Shop/tests/Feature/ProductExtensionTest.php`, a new `Modules/Shop/tests/Feature/ProductColumnNamesTest.php`.
 
-- [ ] **Step 1:** `shop.product` is registered in the Core registry for `Content` (both the resolving and the already-resolved paths of today's provider).
-- [ ] **Step 2:** `extension` gains `company_id` (integer, filterable) next to `is_published_in_shop`.
-- [ ] **Step 3: XS17 test.** The own columns of `Product`, less `id`, timestamps and soft-delete columns, share no name with the columns of `cms_contents` nor the fields of `ContentTranslation`. The failure message names the colliding names and XS17.
-- [ ] **Step 4:** tests PASS, Pint, commit: `feat(shop): products in the Core extension registry, with company and publication indexed`.
+- [x] **Step 1:** `shop.product` is registered in the Core registry for `Content` (both the resolving and the already-resolved paths of today's provider).
+- [x] **Step 2:** `extension` gains `company_id` (integer, filterable) next to `is_published_in_shop`.
+- [x] **Step 3: XS17 test.** The own columns of `Product`, less `id`, timestamps and soft-delete columns, share no name with the columns of `cms_contents` nor the fields of `ContentTranslation`. The failure message names the colliding names and XS17.
+- [x] **Step 4:** tests PASS, Pint, commit: `feat(shop): products in the Core extension registry, with company and publication indexed`. Committed on `feat/extended-entity-search` in `Modules/Shop`. `Product::extensionOwnColumns()` returns `OWN_COLUMNS`; `ProductColumnNamesTest` checks them against the columns of `cms_contents` and `Content::getTranslatableFields()`, and that every column of `shop_products` is in the list. `ProductExtensionTest` gains the registration and the `company_id` cases, and its upcast case uses `Content::upcastExtensions()`, so Shop no longer touches the deprecated CMS delegates. The `contents` mapping gains `extension.company_id`: the owner rebuilds the index after the merge. Pest and Pint not run in the authoring environment (lint only): run both in the host app.
 - [ ] **Step 5:** once the Shop PR is merged, remove the deprecated CMS delegates `Modules/CMS/app/Services/ContentExtenderRegistry.php` and `Modules/CMS/app/Services/ContentExtensionResolver.php` in a CMS follow-up: move `ContentExtenderRegistryTest` and `ContentExtensionResolverTest` onto the Core registry and resolver, and the CMS tests that register through the CMS registry onto the Core one; deleting the old test files needs the owner's approval in that PR.
 
 ---
