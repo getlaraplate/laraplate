@@ -174,11 +174,11 @@ One task: the models, their tables and `CrudService::tree()` change together, or
 - Modify: `Modules/Core/app/SoftDeletes/Console/ModelSoftDeletesRemoveCommand.php` (after the purge around line 65)
 - Test: the command's existing test file (find it with `rg -l ModelSoftDeletesRemoveCommand Modules/Core/tests`)
 
-- [ ] **Step 1: Write the failing test** `it('rebuilds the closure after purging a hierarchical model')`: a stub model with `HasClosureTable` and soft deletes, a trashed middle node with a live child; after the command, closure equals `rebuildClosure()` on the remaining rows and the child has no link to the purged node's ancestors.
-- [ ] **Step 2: Run it; it fails.**
-- [ ] **Step 3: Call `rebuildClosure()` when the purged model uses `HasClosureTable`.**
-- [ ] **Step 4: Run it; it passes.**
-- [ ] **Step 5: Pint and commit** (`fix(core): purging soft deletes keeps the closure in step`).
+- [x] **Step 1: Write the failing test** `it('rebuilds the closure after purging a hierarchical model')`: a stub model with `HasClosureTable` and soft deletes, a trashed middle node with a live child; after the command, closure equals `rebuildClosure()` on the remaining rows and the child has no link to the purged node's ancestors.
+- [x] **Step 2: Run it; it fails.**
+- [x] **Step 3: Call `rebuildClosure()` when the purged model uses `HasClosureTable`.**
+- [x] **Step 4: Run it; it passes.**
+- [x] **Step 5: Pint and commit** (`fix(core): purging soft deletes keeps the closure in step`).
 
 ### Task 7: Owners that cascade into a hierarchy
 
