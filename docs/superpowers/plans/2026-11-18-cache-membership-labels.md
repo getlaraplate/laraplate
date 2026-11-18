@@ -196,9 +196,9 @@ status: open
 **Files:**
 - Test: `Modules/Core/tests/Feature/Crud/CrudResponseCacheInvalidationTest.php`
 
-- [ ] **Step 1: Write the tests**, each on `array` and on a `file` store (counters): creating a row → every cached page of the list misses (Review Focus 1); updating a row → its list and detail miss; writing another entity's table → still a hit; a committed transaction flushes once, a rolled-back one leaves the hit (Review Focus 5); attaching a permission to a role → the roles list with `relations=permissions` misses.
-- [ ] **Step 2: Run** them. Expected: PASS (they pin Tasks 6-7); fix the owning task's code if not.
-- [ ] **Step 3: Commit** `test(crud): response cache invalidation by entity on both index kinds`.
+- [x] **Step 1: Write the tests**, each on `array` and on a `file` store (counters): creating a row → every cached page of the list misses (Review Focus 1); updating a row → its list and detail miss; writing another entity's table → still a hit; a committed transaction flushes once, a rolled-back one leaves the hit (Review Focus 5); attaching a permission to a role → the roles list with `relations=permissions` misses.
+- [x] **Step 2: Run** them. Expected: PASS (they pin Tasks 6-7); fix the owning task's code if not.
+- [x] **Step 3: Commit** `test(crud): response cache invalidation by entity on both index kinds`.
 
 ### Task 9: Permission and ACL triggers
 
