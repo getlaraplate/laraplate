@@ -108,11 +108,11 @@ Server database: pending, measured later from this commit.
 **Interfaces:**
 - Produces: `resolveManyRelation()` returns `null` when `QueryBuilder::isBlackListedPath($relation)` is true, so all three facet callers refuse it with their existing errors.
 
-- [ ] **Step 1: Write the failing test.** The stub declares `descendants(): BelongsToMany`. `it('refuses a facet on a black-listed relation')`: a facet with `relation = 'descendants'` is refused with the existing "is not a BelongsToMany/MorphToMany relation" `InvalidArgumentException`; a facet on a non-black-listed `BelongsToMany` of the same stub still works.
-- [ ] **Step 2: Run it; it fails.** Run: `php artisan test --compact Modules/Core/tests/Integration/Services/Crud/FacetBlackListTest.php`
-- [ ] **Step 3: Add the check in `resolveManyRelation()`.**
-- [ ] **Step 4: Run it and the existing facet tests; they pass.** Run: `php artisan test --compact --filter=facet Modules/Core/tests`
-- [ ] **Step 5: Pint and commit** (`fix(core): facets refuse black-listed relations`).
+- [x] **Step 1: Write the failing test.** The stub declares `descendants(): BelongsToMany`. `it('refuses a facet on a black-listed relation')`: a facet with `relation = 'descendants'` is refused with the existing "is not a BelongsToMany/MorphToMany relation" `InvalidArgumentException`; a facet on a non-black-listed `BelongsToMany` of the same stub still works.
+- [x] **Step 2: Run it; it fails.** Run: `php artisan test --compact Modules/Core/tests/Integration/Services/Crud/FacetBlackListTest.php`
+- [x] **Step 3: Add the check in `resolveManyRelation()`.**
+- [x] **Step 4: Run it and the existing facet tests; they pass.** Run: `php artisan test --compact --filter=facet Modules/Core/tests`
+- [x] **Step 5: Pint and commit** (`fix(core): facets refuse black-listed relations`).
 
 ### Task 4: `HasClosureTable` rewritten
 
