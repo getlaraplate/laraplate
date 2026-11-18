@@ -240,11 +240,11 @@ status: open
 - Modify: `Modules/Core/app/Http/Controllers/DocsController.php`, `SettingController.php`, `Modules/Core/app/Inspector/Inspect.php`, `Modules/Core/app/Console/{WarmCacheCommand,TranslationsCheckCommand,SwaggerGenerateCommand}.php`, `Modules/Core/app/Providers/{CoreServiceProvider,CommandListenerProvider}.php`, `Modules/Core/app/Services/Geocoding/AbstractGeocodingService.php`, `Modules/Core/app/Cache/Repository.php` (remove `getCacheTags()` once unused)
 - Test: one case per caller in its existing test file
 
-- [ ] **Step 1: Write the failing tests:** each value is served on its second read and gone after its invalidation: docs after `SwaggerGenerateCommand`, translations after `TranslationsCheckCommand`, inspector after a migration, the cron list after saving a `CronJob` (label `table:core_cron_jobs`), site configs after saving a `Setting` (label `table:core_settings`).
-- [ ] **Step 2: Run** them. Expected: FAIL.
-- [ ] **Step 3: Implement** with `lookup`/`store`/`flush` and labels (`table:` of the source table, or a named label `docs`, `translations`, `inspector`); TTL `config('cache.duration.long')` instead of `forever`.
-- [ ] **Step 4: Run** them and the files of Step 1. Expected: PASS.
-- [ ] **Step 5: Commit** `refactor(cache): move remaining tag users to labels`.
+- [x] **Step 1: Write the failing tests:** each value is served on its second read and gone after its invalidation: docs after `SwaggerGenerateCommand`, translations after `TranslationsCheckCommand`, inspector after a migration, the cron list after saving a `CronJob` (label `table:core_cron_jobs`), site configs after saving a `Setting` (label `table:core_settings`).
+- [x] **Step 2: Run** them. Expected: FAIL.
+- [x] **Step 3: Implement** with `lookup`/`store`/`flush` and labels (`table:` of the source table, or a named label `docs`, `translations`, `inspector`); TTL `config('cache.duration.long')` instead of `forever`.
+- [x] **Step 4: Run** them and the files of Step 1. Expected: PASS.
+- [x] **Step 5: Commit** `refactor(cache): move remaining tag users to labels`.
 
 ### Task 13: Documentation and closing
 
