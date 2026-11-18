@@ -182,6 +182,8 @@ One task: the models, their tables and `CrudService::tree()` change together, or
 
 ### Task 7: Owners that cascade into a hierarchy
 
+> **Scope change (2026-11-18, controller ruling):** the investigation found cascade chains the text below misses. Entity, Preset, Presettable and Template reach comments through the contents they take along, and Template reaches taxonomies through presets. Shop's product contents sit on Shop's own entity, which CMS cannot observe. `model:soft-deletes-remove` purges owner tables with no events. Writing in `deleting` is the pattern Task 4's review rejected. As built: `deleting` only reads the surviving children (`ClosureTableMaintainer::childrenLeftBy()`). `deleted` roots them (`rootParentless()`, via `moveSubtree($id, null)`). The cascades live in a Core `OwnerCascadeRegistry`, reached by `HierarchyOwnerObserver`, which is attached with `#[ObservedBy]` to User, Entity, Preset, Presettable and Template. Core registers taxonomies, CMS registers comments and attaches the observer to Content. The purge command rebuilds the registered closures. The guards derive the transitive chains from the schema.
+
 **Files:**
 - Modify: `Modules/CMS/app/Providers/CMSServiceProvider.php` (listeners on `User` and `Content` delete events)
 - Modify: `Modules/Core/app/Models/Entity.php`, `Modules/Core/app/Models/Preset.php`, `Modules/Core/app/Models/Pivot/Presettable.php` (or the services that delete them: find every delete path with `rg -n "delete\(|detach\(" ` on them)
@@ -191,13 +193,13 @@ One task: the models, their tables and `CrudService::tree()` change together, or
 - Consumes: `ClosureTableMaintainer::forModel()` and `detachSubtreesOf()` (Task 2).
 - Produces: every owner delete path detaches the doomed hierarchy rows before the row goes: `User` (`forceDeleting`, it is soft-deletable) and `Content` (`deleting`) for comments by `user_id` / `content_id`; `Entity`, `Preset` and `Presettable` delete paths for taxonomies by `entity_id` / `presettable_id`. A path with no Eloquent event (a pivot `detach`) calls the maintainer explicitly where it deletes.
 
-- [ ] **Step 1: Write the failing tests.**
+- [x] **Step 1: Write the failing tests.**
   - Guard, one per module for its own tables: for each hierarchy table, `Schema::getForeignKeys()` lists the keys with `on_delete = cascade` pointing at another table; the set must equal the handled set declared in the test (`core_taxonomies.entity_id`, `core_taxonomies.presettable_id`; `cms_comments.user_id`, `cms_comments.content_id`), so a new cascade fails the test until it is handled.
   - Behaviour, one per handled key: a thread whose root belongs to the owner and whose replies belong to others; force-delete the owner through its normal path (for a user, `HardDeleteCoordinator::purge()`); the replies are roots and the closure equals `rebuildClosure()`.
-- [ ] **Step 2: Run them; behaviour tests fail.** Run: `php artisan test --compact Modules/Core/tests/Integration/Hierarchy Modules/CMS/tests/Integration/Hierarchy`
-- [ ] **Step 3: Add the handlers.**
-- [ ] **Step 4: Run them; they pass.**
-- [ ] **Step 5: Pint and commit** (Core: `fix(core): taxonomy owners keep the closure in step`; CMS: `fix(cms): comment owners keep the closure in step`).
+- [x] **Step 2: Run them; behaviour tests fail.** Run: `php artisan test --compact Modules/Core/tests/Integration/Hierarchy Modules/CMS/tests/Integration/Hierarchy`
+- [x] **Step 3: Add the handlers.**
+- [x] **Step 4: Run them; they pass.**
+- [x] **Step 5: Pint and commit** (Core: `fix(core): taxonomy owners keep the closure in step`; CMS: `fix(cms): comment owners keep the closure in step`).
 
 ### Task 8: Remove the packages
 
