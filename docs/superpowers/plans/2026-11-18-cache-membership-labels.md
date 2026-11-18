@@ -55,7 +55,7 @@ status: open
   - `final readonly class CacheLookup(string $key, bool $hit, mixed $value, int $started_at, CacheDependencies $dependencies)`; `$started_at` in microseconds.
   - `interface ICacheLabelIndex`: `lookup(string $key, CacheDependencies $dependencies): CacheLookup`; `store(CacheLookup $lookup, mixed $value, int $ttl, array $row_labels = []): bool`; `forget(CacheLookup $lookup): void`; `flush(string ...$labels): void`; `pruneStale(): int`; `supportsRowLabels(): bool`.
 
-- [ ] **Step 1: Write the failing tests.** `CacheLabelTest` pins the five string forms and `tableOfRow('row:core_users:5') === 'table:core_users'`. `LabelIndexContractTest` runs every case on `dataset('label indexes')` = `array` (`new ArrayLabelIndex()`) and `counters` (`new VersionCounterLabelIndex(new Repository(new ArrayStore()))`):
+- [x] **Step 1: Write the failing tests.** `CacheLabelTest` pins the five string forms and `tableOfRow('row:core_users:5') === 'table:core_users'`. `LabelIndexContractTest` runs every case on `dataset('label indexes')` = `array` (`new ArrayLabelIndex()`) and `counters` (`new VersionCounterLabelIndex(new Repository(new ArrayStore()))`):
   - `it('misses, stores, then hits')`
   - `it('misses after one of its labels is flushed')`
   - `it('keeps the entry when an unrelated label is flushed')`
@@ -64,12 +64,12 @@ status: open
   - `it('misses once the ttl passed')` with `$this->travel(61)->seconds()` on a 60 s entry
   - membership only (`->skip(fn () => ! $index->supportsRowLabels())`): `it('keeps the entry when an unrelated row is flushed')` (`row:core_users:7`) and `it('prunes expired memberships')` (`pruneStale()` returns 1)
   - `NullLabelIndex`: `it('never hits')`
-- [ ] **Step 2: Run** `vendor/bin/pest --compact Modules/Core/tests/Integration/Cache/Labels`. Expected: FAIL, classes missing.
-- [ ] **Step 3: Implement the vocabulary and the contract.**
-- [ ] **Step 4: Implement `ArrayLabelIndex`.** Values, memberships (`label => [key => expires_at]`) and last-flush times (`label => microseconds`) in arrays; time from `Carbon::now()`. `store()` returns false when any label of the lookup or any row label was flushed after `started_at`. Row labels are memberships like any other.
-- [ ] **Step 5: Implement `VersionCounterLabelIndex(Repository $cache)`.** `lookup()` reads `labelv:*` of `labels` plus `table:{t}` of every `row_tables` entry in one `many()`, sorts them, appends `|label=version` pairs to the key, reads it; `store()` puts under that resolved key with the TTL and ignores `$row_labels`; `flush()` increments each label's counter, a row label's table counter instead of its own; `supportsRowLabels()` false; `pruneStale()` returns 0. Store the resolved key in `CacheLookup::$key`.
-- [ ] **Step 6: Run** the same command. Expected: PASS.
-- [ ] **Step 7: Commit** `feat(cache): label index contract with in-memory and version-counter indexes`.
+- [x] **Step 2: Run** `vendor/bin/pest --compact Modules/Core/tests/Integration/Cache/Labels`. Expected: FAIL, classes missing.
+- [x] **Step 3: Implement the vocabulary and the contract.**
+- [x] **Step 4: Implement `ArrayLabelIndex`.** Values, memberships (`label => [key => expires_at]`) and last-flush times (`label => microseconds`) in arrays; time from `Carbon::now()`. `store()` returns false when any label of the lookup or any row label was flushed after `started_at`. Row labels are memberships like any other.
+- [x] **Step 5: Implement `VersionCounterLabelIndex(Repository $cache)`.** `lookup()` reads `labelv:*` of `labels` plus `table:{t}` of every `row_tables` entry in one `many()`, sorts them, appends `|label=version` pairs to the key, reads it; `store()` puts under that resolved key with the TTL and ignores `$row_labels`; `flush()` increments each label's counter, a row label's table counter instead of its own; `supportsRowLabels()` false; `pruneStale()` returns 0. Store the resolved key in `CacheLookup::$key`.
+- [x] **Step 6: Run** the same command. Expected: PASS.
+- [x] **Step 7: Commit** `feat(cache): label index contract with in-memory and version-counter indexes`.
 
 ### Task 2: Redis membership index
 
@@ -81,16 +81,16 @@ status: open
 - Consumes: `ICacheLabelIndex`, `CacheLookup`, `CacheDependencies`, `CacheLabel` (Task 1).
 - Produces: `final class RedisLabelIndex(RedisStore $store) implements ICacheLabelIndex`.
 
-- [ ] **Step 1: Write the failing tests.** Contract cases on the `redis` dataset entry (a store on the `cache` connection with a per-test prefix, flushed in `afterEach`), plus `it('flushes a label with more members than one chunk')` with 2500 members and `->group('redis')`.
-- [ ] **Step 2: Run** `vendor/bin/pest --compact Modules/Core/tests/Integration/Cache/Labels --group=redis`. Expected: FAIL (or SKIPPED without Redis: run it where Redis is up before ticking).
-- [ ] **Step 3: Implement.** Four Lua scripts, all keys under the store prefix:
+- [x] **Step 1: Write the failing tests.** Contract cases on the `redis` dataset entry (a store on the `cache` connection with a per-test prefix, flushed in `afterEach`), plus `it('flushes a label with more members than one chunk')` with 2500 members and `->group('redis')`.
+- [x] **Step 2: Run** `vendor/bin/pest --compact Modules/Core/tests/Integration/Cache/Labels --group=redis`. Expected: FAIL (or SKIPPED without Redis: run it where Redis is up before ticking).
+- [x] **Step 3: Implement.** Four Lua scripts, all keys under the store prefix:
   - lookup: `GET key` plus `TIME`, returns value and microseconds;
   - store: `HMGET labelflush <labels>`; if any is greater than `started_at`, return 0; else `SET key value EX ttl` and `ZADD label:{l} expires_at key` for each label;
   - flush: per label, `HSET labelflush l <TIME>`, `ZRANGE label:{l}` in chunks of 1000, `DEL` the members, `DEL label:{l}`;
   - prune: `SCAN` `label:*`, `ZREMRANGEBYSCORE -inf <TIME>`, and `HDEL labelflush` fields older than the longest TTL in use (`config('cache.duration')` max).
   Values are serialized as `RedisStore` does (`serialize`, numeric left raw).
-- [ ] **Step 4: Run** the command with Redis up. Expected: PASS.
-- [ ] **Step 5: Commit** `feat(cache): Redis membership label index`.
+- [x] **Step 4: Run** the command with Redis up. Expected: PASS.
+- [x] **Step 5: Commit** `feat(cache): Redis membership label index`.
 
 ### Task 3: Index selection, failover degradation, measurement, commands
 
@@ -104,14 +104,14 @@ status: open
 - Consumes: Tasks 1-2.
 - Produces: `CacheLabelIndexFactory::forStore(Repository $cache): ICacheLabelIndex`; `FailoverLabelIndex(ICacheLabelIndex $primary)`; `MeasuredLabelIndex(ICacheLabelIndex $inner, Repository $stats)`; `app(ICacheLabelIndex::class)` is the measured index of the default store; commands `cache:prune-labels`, `cache:label-stats`.
 
-- [ ] **Step 1: Write the failing tests.**
+- [x] **Step 1: Write the failing tests.**
   - factory: `array` store → `ArrayLabelIndex`; `redis` → `RedisLabelIndex`; `file`, `database` → `VersionCounterLabelIndex`; `null` → `NullLabelIndex`; `failover` → `FailoverLabelIndex` around the index of its first store (`config('cache.stores.failover.stores')[0]`).
   - failover, with a primary that throws on demand: `it('misses and stores nothing while the primary throws')`; `it('flushes crud on the primary before the first call after recovery')` (assert the primary received `flush('crud')` before `lookup`).
   - commands: `cache:prune-labels` prints the pruned count; `cache:label-stats` lists, per label, flushes, and per first `table:` label, hits and misses, after a scripted sequence.
-- [ ] **Step 2: Run** `vendor/bin/pest --compact Modules/Core/tests/Integration/Cache/Labels Modules/Core/tests/Feature/Console/CacheLabelCommandsTest.php`. Expected: FAIL.
-- [ ] **Step 3: Implement.** `FailoverLabelIndex` catches `Throwable` from the primary, sets a degraded flag, returns a miss / `false` / no-op; the next call that succeeds runs `flush(CacheLabel::all())` first and clears the flag. `MeasuredLabelIndex` increments `labelstats:{metric}:{label}` on the stats repository (any driver) and keeps the label list under `labelstats:labels`. Schedule `cache:prune-labels` `->hourly()->onOneServer()`.
-- [ ] **Step 4: Run** the command. Expected: PASS.
-- [ ] **Step 5: Commit** `feat(cache): label index selection, failover degradation, prune and stats commands`.
+- [x] **Step 2: Run** `vendor/bin/pest --compact Modules/Core/tests/Integration/Cache/Labels Modules/Core/tests/Feature/Console/CacheLabelCommandsTest.php`. Expected: FAIL.
+- [x] **Step 3: Implement.** `FailoverLabelIndex` catches `Throwable` from the primary, sets a degraded flag, returns a miss / `false` / no-op; the next call that succeeds runs `flush(CacheLabel::all())` first and clears the flag. `MeasuredLabelIndex` increments `labelstats:{metric}:{label}` on the stats repository (any driver) and keeps the label list under `labelstats:labels`. Schedule `cache:prune-labels` `->hourly()->onOneServer()`.
+- [x] **Step 4: Run** the command. Expected: PASS.
+- [x] **Step 5: Commit** `feat(cache): label index selection, failover degradation, prune and stats commands`.
 
 ### Task 4: Relation paths by use
 
