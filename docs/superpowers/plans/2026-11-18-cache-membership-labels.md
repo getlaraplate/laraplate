@@ -207,11 +207,11 @@ status: open
 - Modify: `Modules/Core/app/Providers/CoreServiceProvider.php` (set `permission.events_enabled` true in `register()`), `Modules/Core/app/Providers/EventServiceProvider.php`, `Modules/Core/app/Observers/AclObserver.php`, `Modules/Core/app/Services/AclResolverService.php` (resolutions stored through the index with label `acl`; `flushCache()` = `flush('acl')`; the `Cache::flush()` fallbacks removed)
 - Test: `Modules/Core/tests/Feature/Crud/CrudResponseCachePermissionTest.php`
 
-- [ ] **Step 1: Write the failing tests:** `givePermissionTo`/`revokePermissionTo`/`syncPermissions` on a role → `role:{id}` flushed; on a user → `user:{id}`; `assignRole`/`removeRole` → `user:{id}`; an ACL with `role_id` → `role:{role_id}` and `acl`; with `role_id` null → `table:` of its permission's entity and `acl`; no test path calls `Cache::flush()` (spy).
-- [ ] **Step 2: Run** it. Expected: FAIL.
-- [ ] **Step 3: Implement**, listening to `Spatie\Permission\Events\{RoleAttachedEvent, RoleDetachedEvent, PermissionAttachedEvent, PermissionDetachedEvent}`; read their payload from the installed package.
-- [ ] **Step 4: Run** it and `vendor/bin/pest --compact Modules/Core/tests --filter=Acl`. Expected: PASS.
-- [ ] **Step 5: Commit** `feat(cache): flush user, role and ACL labels on permission changes`.
+- [x] **Step 1: Write the failing tests:** `givePermissionTo`/`revokePermissionTo`/`syncPermissions` on a role → `role:{id}` flushed; on a user → `user:{id}`; `assignRole`/`removeRole` → `user:{id}`; an ACL with `role_id` → `role:{role_id}` and `acl`; with `role_id` null → `table:` of its permission's entity and `acl`; no test path calls `Cache::flush()` (spy).
+- [x] **Step 2: Run** it. Expected: FAIL.
+- [x] **Step 3: Implement**, listening to `Spatie\Permission\Events\{RoleAttachedEvent, RoleDetachedEvent, PermissionAttachedEvent, PermissionDetachedEvent}`; read their payload from the installed package.
+- [x] **Step 4: Run** it and `vendor/bin/pest --compact Modules/Core/tests --filter=Acl`. Expected: PASS.
+- [x] **Step 5: Commit** `feat(cache): flush user, role and ACL labels on permission changes`.
 
 ### Task 10: Row labels end to end
 
