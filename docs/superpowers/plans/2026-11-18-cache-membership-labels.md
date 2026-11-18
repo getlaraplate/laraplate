@@ -228,11 +228,11 @@ status: open
 - Modify: `Modules/CMS/app/Import/Pipeline/ImportPipeline.php`
 - Test: `Modules/CMS/tests/Integration/Import/ImportPipelineCacheFlushTest.php`
 
-- [ ] **Step 1: Write the failing test:** one import run calls `CacheLabelInvalidator::flushTable()` once per table it wrote (contents, categories, contributors, tags, locations and their pivots), after the run.
-- [ ] **Step 2: Run** it. Expected: FAIL.
-- [ ] **Step 3: Implement**, collecting the tables during the run and flushing at its end.
-- [ ] **Step 4: Run** it. Expected: PASS.
-- [ ] **Step 5: Commit** in laracms `feat(import): flush cache labels of the tables an import wrote`.
+- [x] **Step 1: Write the failing test:** one import run calls `CacheLabelInvalidator::flushTable()` once per table it wrote (contents, categories, contributors, tags, locations and their pivots), after the run.
+- [x] **Step 2: Run** it. Expected: FAIL.
+- [x] **Step 3: Implement**, collecting the tables during the run and flushing at its end.
+- [x] **Step 4: Run** it. Expected: PASS.
+- [x] **Step 5: Commit** in laracms `feat(import): flush cache labels of the tables an import wrote`.
 
 ### Task 12: Existing tag users on labels
 
