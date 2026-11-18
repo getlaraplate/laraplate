@@ -163,11 +163,11 @@ status: open
 - Consumes: `ICacheLabelIndex`, `CacheLabel`.
 - Produces: `CacheLabelInvalidator`: `flushTable(string $table, ?Model $owner = null): void`, `flushRecord(Model $model, bool $with_table = true): void`, `flushPivot(BelongsToMany $relation): void`, `flushUser(int|string $id, ?Model $owner = null): void`, `flushRole(int|string $id, ?Model $owner = null): void`, `flushLabels(?Model $owner, string ...$labels): void`. Every method defers to `$owner->getConnection()->afterCommit()` when an owner is given.
 
-- [ ] **Step 1: Write the failing tests** on a recording index: created → `table:`; updated, deleted, restored, forceDeleted → `table:` and `row:`; inside `$model->getConnection()->transaction()` nothing before commit, one flush after; rollback → none; `attach`, `detach`, `sync`, `toggle`, `updateExistingPivot` on `Role::permissions()` → `table:` of pivot, `core_roles`, `core_permissions`.
-- [ ] **Step 2: Run** it. Expected: FAIL.
-- [ ] **Step 3: Implement.** Listener on `eloquent.created: *`, `eloquent.updated: *`, `eloquent.deleted: *`, `eloquent.restored: *`, `eloquent.forceDeleted: *` (wildcard handler `handle(string $event, array $payload)`). In the relation classes alias the revision trait's mutators (`use OpensRevisionOnMutation { attach as attachWithinRevision; ... }`) and flush after each. `Cache::clearByEntity()` delegates to `flushTable`.
-- [ ] **Step 4: Run** it and `vendor/bin/pest --compact Modules/Core/tests --filter=Versioned`. Expected: PASS.
-- [ ] **Step 5: Commit** `feat(cache): flush labels on model events and pivot writes after commit`.
+- [x] **Step 1: Write the failing tests** on a recording index: created → `table:`; updated, deleted, restored, forceDeleted → `table:` and `row:`; inside `$model->getConnection()->transaction()` nothing before commit, one flush after; rollback → none; `attach`, `detach`, `sync`, `toggle`, `updateExistingPivot` on `Role::permissions()` → `table:` of pivot, `core_roles`, `core_permissions`.
+- [x] **Step 2: Run** it. Expected: FAIL.
+- [x] **Step 3: Implement.** Listener on `eloquent.created: *`, `eloquent.updated: *`, `eloquent.deleted: *`, `eloquent.restored: *`, `eloquent.forceDeleted: *` (wildcard handler `handle(string $event, array $payload)`). In the relation classes alias the revision trait's mutators (`use OpensRevisionOnMutation { attach as attachWithinRevision; ... }`) and flush after each. `Cache::clearByEntity()` delegates to `flushTable`.
+- [x] **Step 4: Run** it and `vendor/bin/pest --compact Modules/Core/tests --filter=Versioned`. Expected: PASS.
+- [x] **Step 5: Commit** `feat(cache): flush labels on model events and pivot writes after commit`.
 
 ### Task 7: CRUD read path
 
