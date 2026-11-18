@@ -218,9 +218,9 @@ status: open
 **Files:**
 - Test: `Modules/Core/tests/Feature/Crud/CrudResponseCacheRowLabelTest.php`
 
-- [ ] **Step 1: Write the tests** on a cached list of `ACL` with `relations=role`: on `array`, updating a role not embedded → hit, updating the embedded role → miss; deleting, soft-deleting, restoring the embedded role → miss (Review Focus 4); on a `file` store, updating the role not embedded → miss (documented over-invalidation).
-- [ ] **Step 2: Run** them. Expected: PASS; fix Task 5 or 6 if not.
-- [ ] **Step 3: Commit** `test(crud): row-level invalidation of embedded records`.
+- [x] **Step 1: Write the tests** on a cached list of `ACL` with `relations=role`: on `array`, updating a role not embedded → hit, updating the embedded role → miss; deleting, soft-deleting, restoring the embedded role → miss (Review Focus 4); on a `file` store, updating the role not embedded → miss (documented over-invalidation).
+- [x] **Step 2: Run** them. Expected: PASS; fix Task 5 or 6 if not.
+- [x] **Step 3: Commit** `test(crud): row-level invalidation of embedded records`.
 
 ### Task 11: Mass writes in CMS imports (laracms)
 
