@@ -163,22 +163,22 @@
 - Produces: `PurgeVersionHistoryJob(string $table, string $settingName)`, queued; `handle()` reads the setting again and does nothing unless it is still `false`.
 - Produces: `VersioningSettingConfirmation implements ISettingChangeConfirmation`: `supports()` for names starting with `versioning.strategy.`; `warn()` only when the new value is `false` and the old one is not, naming the sets and rows lost (`countFor()`) and saying that hard-delete snapshots are kept; `confirmed()` nothing (the observer dispatches, so an approved modification or the API purge too); `lockedReason()` null.
 
-- [ ] **Step 1: Failing tests:** setting a table's strategy to `false` dispatches the job (`Bus::fake()`); the job removes every set of the table's roots and keeps a hard-delete snapshot set; the job does nothing when the setting is a strategy again by the time it runs; the purge is by table, so two models on one table both lose their history; the settings page asks for confirmation naming the counts and saves after it.
-- [ ] **Step 2–4:** run and fail, implement, run.
-- [ ] **Step 5:** Commit.
+- [x] **Step 1: Failing tests:** setting a table's strategy to `false` dispatches the job (`Bus::fake()`); the job removes every set of the table's roots and keeps a hard-delete snapshot set; the job does nothing when the setting is a strategy again by the time it runs; the purge is by table, so two models on one table both lose their history; the settings page asks for confirmation naming the counts and saves after it.
+- [x] **Step 2–4:** run and fail, implement, run.
+- [x] **Step 5:** Commit. Committed on Core branch `feat/versioning-switch-off-purge`. As built: `VersionHistoryPurger` (`countFor()`, `purge()` by `root_table_ref`, chunks of 500, keeps a set holding a `deleted` row with no relation path), `PurgeVersionHistoryJob` (queued after the commit, one try, reads the setting again), `VersioningSettingConfirmation` (also `tableOf()` and `isOff()`, registered in `CoreServiceProvider::boot()`); `SettingObserver::saved()` dispatches the job when the value changes to `false`. Divergence: the settings form keyed a boolean choice of a JSON setting by its string cast, the empty string, which the required select refused, so `false` could not be saved from the page; `SettingForm` now keys booleans `true`/`false` and saves them as booleans. Tests: `Modules/Core/tests/Integration/Versioning/VersioningSwitchTest.php`, `Modules/Core/tests/Feature/Filament/VersioningSettingConfirmationTest.php`. Pest and Pint not run in the authoring environment (PHP 8.3, no host app; lint only): run both in the host app.
 
 ### Task C2: Turning it back on anchors each record at its first write
 
 **Files:**
 - Test: `Modules/Core/tests/Integration/Versioning/VersioningSwitchTest.php`
 
-- [ ] **Step 1: Write the tests (D22, D45):** off (job run), on, then a save gives one `baseline` set holding the save's own row, the root, every locale and every tag (the image after the save); a record not saved since has no version and `currentRevision()` is `null`; a revert to the baseline set leaves tags and translations in place.
-- [ ] **Step 2:** Run: expected to pass on Part A and C1 with no new code; any failure is fixed in the task that owns the code.
-- [ ] **Step 3:** Commit.
+- [x] **Step 1: Write the tests (D22, D45):** off (job run), on, then a save gives one `baseline` set holding the save's own row, the root, every locale and every tag (the image after the save); a record not saved since has no version and `currentRevision()` is `null`; a revert to the baseline set leaves tags and translations in place.
+- [x] **Step 2:** Run: expected to pass on Part A and C1 with no new code; any failure is fixed in the task that owns the code. No new code was needed: `BaselinePolicy::isDue()` finds no baseline after the purge. Not run in the authoring environment (lint only): run in the host app.
+- [x] **Step 3:** Commit. Committed on Core branch `feat/versioning-switch-off-purge`, in `Modules/Core/tests/Integration/Versioning/VersioningSwitchTest.php`: the locales case and the links case are separate, since no stub has both; the revert of the locales case uses `revertToVersion()` on the baseline's root snapshot row, the links case `restoreToRevision()`. Also on that branch, outside the plan: `VersionStrategy::fromSetting()` reads an empty setting value (`null`, `''`) as off, where `HasVersions` used to fail on every write of the model (`Modules/Core/tests/Unit/Versioning/VersionStrategyFromSettingTest.php`).
 
 ### Part C closing and slice closing
 
-- [ ] **Documentation:** `MODULE.md` of Core (switching versioning off and on, what is kept); `docs/rag` operator note if the settings documentation lists the versioning settings; the spec and review status lines; the parent plan (tick Slice 5).
+- [x] **Documentation:** `MODULE.md` of Core (switching versioning off and on, what is kept); `docs/rag` operator note if the settings documentation lists the versioning settings; the spec and review status lines; the parent plan (tick Slice 5). Done 2026-11-19, Core `9e66f81c`: *Switching versioning off and on* in `MODULE.md` (also the empty value read as off and the boolean choices of a `json` setting), *Turn versioning off for a table* in `VERSIONING_DEVELOPER.md`, the operator note in `SETTING_ACTIONS_USER.md` and the registered confirmation in `SETTING_ACTIONS_DEVELOPER.md`; spec and review status lines updated. The parent plan is ticked with the delivery status, once the regression is green.
 - [ ] **Regression** per suite, recorded in the delivery status.
 - [ ] **Commit** in Core and in `laraplate/`; PRs.
 
