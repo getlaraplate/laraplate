@@ -208,11 +208,11 @@ One task: the models, their tables and `CrudService::tree()` change together, or
 - Delete: `Modules/Core/app/Models/Concerns/HasTypedRecursiveRelationships.php`
 - Modify: `composer.lock`, `phpstan-baseline.neon` (entry naming `Staudenmeir\LaravelAdjacencyList\Eloquent\Collection`, around line 7174)
 
-- [ ] **Step 1: Remove the requirement and the trait; update the lock.** Run from the laraplate root: `composer update staudenmeir/laravel-adjacency-list staudenmeir/laravel-cte staudenmeir/eloquent-has-many-deep-contracts`
-- [ ] **Step 2: Check nothing is left.** Run: `/usr/bin/rg -n -i staudenmeir --glob '!vendor/**' --glob '!docs/superpowers/**' .` Expected: only the README line Task 9 replaces. `composer show | grep staudenmeir` prints nothing.
-- [ ] **Step 3: Remove the stale baseline entry and run static analysis.** Run: `vendor/bin/phpstan analyse --memory-limit=2G`. Expected: no new error; fix code, never add ignores.
-- [ ] **Step 4: Run the full Core and CMS suites.** Run: `php artisan test --compact Modules/Core/tests Modules/CMS/tests`
-- [ ] **Step 5: Commit** (Core: `chore(core): drop staudenmeir/laravel-adjacency-list`; root: `chore: lock without the staudenmeir packages`).
+- [x] **Step 1: Remove the requirement and the trait; update the lock.** Run from the laraplate root: `composer update staudenmeir/laravel-adjacency-list staudenmeir/laravel-cte staudenmeir/eloquent-has-many-deep-contracts`
+- [x] **Step 2: Check nothing is left.** Run: `/usr/bin/rg -n -i staudenmeir --glob '!vendor/**' --glob '!docs/superpowers/**' .` Expected: only the README line Task 9 replaces. `composer show | grep staudenmeir` prints nothing.
+- [x] **Step 3: Remove the stale baseline entry and run static analysis.** Run: `vendor/bin/phpstan analyse --memory-limit=2G`. Expected: no new error; fix code, never add ignores.
+- [x] **Step 4: Run the full Core and CMS suites.** Run: `php artisan test --compact Modules/Core/tests Modules/CMS/tests`
+- [x] **Step 5: Commit** (Core: `chore(core): drop staudenmeir/laravel-adjacency-list`; root: `chore: lock without the staudenmeir packages`).
 
 ### Task 9: Performance gate, documentation, close
 
