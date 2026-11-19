@@ -234,3 +234,10 @@ Divergences from the plan, each recorded in its task:
   (`ElasticClientBuilder`), unrelated to this plan's code but found while rebuilding its indexes.
 - Known limit: on Typesense a null date has no placeholder, so `valid_to IS NULL` in the public ACLs of contents and
   products finds nothing there.
+- Note (2026-11-19): the known limit above was misread. Dates were Typesense strings, so a null date already got the
+  string placeholder; the real defect was wider: Typesense filters ranges on numbers only, so every date range
+  (`valid_from <= now` in the public ACLs) was refused, `@now` was written empty, and a null in the wheres of a
+  keyword search threw in Scout's filter. Fixed in getlaraplate/laracore#57 (top-level dates indexed as `int64`
+  timestamps, a null date as `TypesenseEngine::NULL_TIMESTAMP` kept out of every range, the wheres written by Core);
+  the module docs dropped the limit in getlaraplate/laracms#26 and getlaraplate/larashop#7. Not yet verified on a live
+  Typesense cluster. The Task 11 note on the same limit is superseded by this one.
