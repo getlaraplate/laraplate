@@ -75,9 +75,11 @@
             The same holds for the database server and Redis of .env. The default connection is
             sqlite, but a test that switches connection or makes redis its cache, queue or session
             store connects to whatever DB_HOST and REDIS_HOST say, and the bootstrap guard runs
-            before .env is loaded. A run on 2026-11-19 held open sockets to the shared MySQL and
-            Redis this way. An unreachable local port makes such a test fail at once instead. To
-            test against a real database server, change these lines knowingly.
+            before .env is loaded. An unreachable local port makes such a test fail at once
+            instead. To test against a real database server, change these lines knowingly.
+            These lines bind the test process only: `php artisan test` boots the application with
+            .env in its own parent process before it starts Pest, and that process connects to the
+            hosts of .env like any other artisan command. `vendor/bin/pest` has no such parent.
         -->
         <env name="DB_HOST" value="127.0.0.1" force="true"/>
         <env name="DB_PORT" value="9" force="true"/>
