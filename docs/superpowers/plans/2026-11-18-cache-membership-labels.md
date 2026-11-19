@@ -1,7 +1,7 @@
 ---
 created_on: 2026-11-18
 module: core, cms
-status: open
+status: completed
 ---
 # Cache membership labels. Implementation Plan
 
@@ -14,6 +14,20 @@ status: open
 **Tech Stack:** PHP 8.5, Laravel 13, Pest, Redis (phpredis or predis through Laravel). No new dependency.
 
 **Spec:** `../specs/2026-11-18-cache-membership-labels-design.md`
+
+## Delivery status (2026-11-19): shipped
+
+**Documented in:** `Modules/Core/docs/rag/CACHE_LABELS_DEVELOPER.md`, `Modules/Core/docs/CRUD_SYSTEM.md`, `Modules/Core/docs/rag/MODULE.md`, `Modules/Core/docs/ACL_SYSTEM.md`, `Modules/CMS/docs/IMPORTS.md`.
+
+Every task shipped, on the laracore and laracms branches `feature/cache-membership-labels`, rebased on their current masters before the pull requests. Divergences from the steps:
+
+- **ACL caches its responses.** Task 10 tests row labels on a cached ACL list, but `ACL` had no `HasCache`, so nothing was stored. `Modules/Core/app/Models/ACL.php` gained `HasCache`.
+- **No Spatie event listener.** Task 9 planned a listener on Spatie's role and permission events. Every Spatie grant writes through Core's relation overrides, so the pivot flush covers Spatie calls, Filament `sync()`, seeders and commands; the listener and `permission.events_enabled` were removed. ACL writes flush the role and every role below it.
+- **A `rows:{table}` label.** Not in the spec. Every entry that carries row labels of a table also carries `rows:{table}`, and `flushTable()` flushes it with `table:`, so a mass write without model events reaches cached details. Writes that fire model events still flush only `table:` and the row written: `CrudController` no longer calls `clearByEntity()` after them, lock and unlock (query-builder writes) flush their row, and any write on a `Modification` flushes the record it modifies.
+- **Mass writes in Core flush too.** The settings, lock and soft-delete commands, the settings cleaner and approval writes call `flushTable()`; only CMS imports were planned.
+- **CMS test path and one flush per run.** The Task 11 test lives in `Modules/CMS/tests/Feature/Import/ImportPipelineCacheFlushTest.php`, and the run flushes every written table in one `flushTables()` call instead of one call per table.
+- **Task 13 step 3 ran per directory.** Paratest crashes in the worktree and one process for the whole suite runs out of memory, so the Core suite ran one directory at a time. Everything passed except `Feature/Search/ElasticClientBuilderTest`, which fails on laracore master too: it casts a Guzzle `HandlerStack` to string, and Guzzle 8.4 removed that.
+- **Left for later:** the write-path cost on Redis (per-transaction label collection, one script for the flush mark, a shorter retention of flush times) and `CrudService::history()` ignoring the requested key, which predates this plan.
 
 ## Prerequisites
 
@@ -253,7 +267,7 @@ status: open
 - Create: `Modules/Core/docs/rag/CACHE_LABELS_DEVELOPER.md`: labels, drivers table, what a module writing outside Eloquent must flush, the commands
 - Modify: this plan (ticks, `status: completed`, `## Delivery status (date): ...`, `**Documented in:**`), `docs/superpowers/plans/INDEX.md`
 
-- [ ] **Step 1: Write the docs** from the code as merged.
-- [ ] **Step 2: Run** `vendor/bin/pest --compact tests/Unit/ClosedPlansPointToDocumentationTest.php`. Expected: PASS.
-- [ ] **Step 3: Run** the full Core suite `vendor/bin/pest --compact --parallel Modules/Core/tests` and the CMS import tests. Expected: PASS.
-- [ ] **Step 4: Commit** `docs(cache): membership labels and the response cache`.
+- [x] **Step 1: Write the docs** from the code as merged.
+- [x] **Step 2: Run** `vendor/bin/pest --compact tests/Unit/ClosedPlansPointToDocumentationTest.php`. Expected: PASS.
+- [x] **Step 3: Run** the full Core suite `vendor/bin/pest --compact --parallel Modules/Core/tests` and the CMS import tests. Expected: PASS.
+- [x] **Step 4: Commit** `docs(cache): membership labels and the response cache`.
