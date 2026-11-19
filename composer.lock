@@ -19272,5 +19272,8 @@
         "ext-sockets": "*"
     },
     "platform-dev": {},
+    "platform-overrides": {
+        "ext-oci8": "3.0.1"
+    },
     "plugin-api-version": "2.11.0"
 }
