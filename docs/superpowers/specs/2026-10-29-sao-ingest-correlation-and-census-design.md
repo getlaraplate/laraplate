@@ -1,7 +1,7 @@
 # SAO ingest correlation rules, reprocessing, recurrence and deploy containment
 
 **Date:** 2026-10-29
-**Status:** Design proposed.
+**Status:** implemented (2026-10-29), see `docs/superpowers/plans/2026-10-29-sao-ingest-correlation-and-census.md`
 **Module:** `Modules/SAO`
 **Parent spec:** `2026-07-31-sao-module-design.md` (§4 census, §6 ingest; D12, D13, D14, D15, D18)
 **Builds on:** phase 4 (`2026-08-16-sao-phase-4-ingest-source-profiles-design.md`), phase 5b (`2026-08-16-sao-phase-5b-code-to-work-releases-design.md`), phase 6 (`2026-08-16-sao-phase-6-fix-propagation-closure-design.md`).
