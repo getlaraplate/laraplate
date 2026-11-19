@@ -178,7 +178,7 @@
 
 ### Part C closing and slice closing
 
-- [ ] **Documentation:** `MODULE.md` of Core (switching versioning off and on, what is kept); `docs/rag` operator note if the settings documentation lists the versioning settings; the spec and review status lines; the parent plan (tick Slice 5).
+- [x] **Documentation:** `MODULE.md` of Core (switching versioning off and on, what is kept); `docs/rag` operator note if the settings documentation lists the versioning settings; the spec and review status lines; the parent plan (tick Slice 5). Done 2026-11-19, Core `9e66f81c`: *Switching versioning off and on* in `MODULE.md` (also the empty value read as off and the boolean choices of a `json` setting), *Turn versioning off for a table* in `VERSIONING_DEVELOPER.md`, the operator note in `SETTING_ACTIONS_USER.md` and the registered confirmation in `SETTING_ACTIONS_DEVELOPER.md`; spec and review status lines updated. The parent plan is ticked with the delivery status, once the regression is green.
 - [ ] **Regression** per suite, recorded in the delivery status.
 - [ ] **Commit** in Core and in `laraplate/`; PRs.
 
