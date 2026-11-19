@@ -172,9 +172,9 @@
 **Files:**
 - Test: `Modules/Core/tests/Integration/Versioning/VersioningSwitchTest.php`
 
-- [ ] **Step 1: Write the tests (D22, D45):** off (job run), on, then a save gives one `baseline` set holding the save's own row, the root, every locale and every tag (the image after the save); a record not saved since has no version and `currentRevision()` is `null`; a revert to the baseline set leaves tags and translations in place.
-- [ ] **Step 2:** Run: expected to pass on Part A and C1 with no new code; any failure is fixed in the task that owns the code.
-- [ ] **Step 3:** Commit.
+- [x] **Step 1: Write the tests (D22, D45):** off (job run), on, then a save gives one `baseline` set holding the save's own row, the root, every locale and every tag (the image after the save); a record not saved since has no version and `currentRevision()` is `null`; a revert to the baseline set leaves tags and translations in place.
+- [x] **Step 2:** Run: expected to pass on Part A and C1 with no new code; any failure is fixed in the task that owns the code. No new code was needed: `BaselinePolicy::isDue()` finds no baseline after the purge. Not run in the authoring environment (lint only): run in the host app.
+- [x] **Step 3:** Commit. Committed on Core branch `feat/versioning-switch-off-purge`, in `Modules/Core/tests/Integration/Versioning/VersioningSwitchTest.php`: the locales case and the links case are separate, since no stub has both; the revert of the locales case uses `revertToVersion()` on the baseline's root snapshot row, the links case `restoreToRevision()`. Also on that branch, outside the plan: `VersionStrategy::fromSetting()` reads an empty setting value (`null`, `''`) as off, where `HasVersions` used to fail on every write of the model (`Modules/Core/tests/Unit/Versioning/VersionStrategyFromSettingTest.php`).
 
 ### Part C closing and slice closing
 
