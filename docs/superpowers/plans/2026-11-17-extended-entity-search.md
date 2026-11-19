@@ -137,7 +137,7 @@ All merged on 2026-11-17:
 - [x] **Step 2:** `extension` gains `company_id` (integer, filterable) next to `is_published_in_shop`.
 - [x] **Step 3: XS17 test.** The own columns of `Product`, less `id`, timestamps and soft-delete columns, share no name with the columns of `cms_contents` nor the fields of `ContentTranslation`. The failure message names the colliding names and XS17.
 - [x] **Step 4:** tests PASS, Pint, commit: `feat(shop): products in the Core extension registry, with company and publication indexed`. Committed on `feat/extended-entity-search` in `Modules/Shop`. `Product::extensionOwnColumns()` returns `OWN_COLUMNS`; `ProductColumnNamesTest` checks them against the columns of `cms_contents` and `Content::getTranslatableFields()`, and that every column of `shop_products` is in the list. `ProductExtensionTest` gains the registration and the `company_id` cases, and its upcast case uses `Content::upcastExtensions()`, so Shop no longer touches the deprecated CMS delegates. The `contents` mapping gains `extension.company_id`: the owner rebuilds the index after the merge. Pest and Pint not run in the authoring environment (lint only): run both in the host app.
-- [-] **Step 5 (moved to a follow-up, it can only run after the Shop PR is merged and its test deletions need the owner's approval):** once the Shop PR is merged, remove the deprecated CMS delegates `Modules/CMS/app/Services/ContentExtenderRegistry.php` and `Modules/CMS/app/Services/ContentExtensionResolver.php` in a CMS follow-up: move `ContentExtenderRegistryTest` and `ContentExtensionResolverTest` onto the Core registry and resolver, and the CMS tests that register through the CMS registry onto the Core one; deleting the old test files needs the owner's approval in that PR.
+- [x] **Step 5 (done in a follow-up, after the Shop PR merged; the test deletions approved by the owner, getlaraplate/laracms#24 and getlaraplate/laracore#47):** once the Shop PR is merged, remove the deprecated CMS delegates `Modules/CMS/app/Services/ContentExtenderRegistry.php` and `Modules/CMS/app/Services/ContentExtensionResolver.php` in a CMS follow-up: move `ContentExtenderRegistryTest` and `ContentExtensionResolverTest` onto the Core registry and resolver, and the CMS tests that register through the CMS registry onto the Core one; deleting the old test files needs the owner's approval in that PR.
 
 ---
 
@@ -217,8 +217,10 @@ search and `with_extended`), `Modules/Core/docs/CRUD_SYSTEM.md` (the `with_exten
 
 Divergences from the plan, each recorded in its task:
 
-- Task 6: the CMS `ContentExtenderRegistry` and `ContentExtensionResolver` stay as deprecated delegates over Core, so
-  Shop keeps working between merges; their removal is Task 7 Step 5, moved to a CMS follow-up after the Shop merge.
+- Task 6: the CMS `ContentExtenderRegistry` and `ContentExtensionResolver` stayed as deprecated delegates over Core,
+  so Shop kept working between merges; Task 7 Step 5 removed them after the Shop merge (getlaraplate/laracms#24): the
+  resolver tests moved to `ContentExtensionUpcastTest`, the registry cases to Core (getlaraplate/laracore#47),
+  `ContentExtenderRegistryTest` and `FakeContentExtender` were deleted with the owner's approval.
 - Task 8: the extender contract gained `extensionEntityType()`; native keys are refused as preset field names too.
 - Task 9: the reload of a model that mounts related attributes applies its ACL through the CRUD query builder.
   Same-day follow-ups: `extension.*` filters on every engine (EXISTS on the extender tables for the database and
@@ -227,5 +229,8 @@ Divergences from the plan, each recorded in its task:
   `ExtensionDocumentCheck`, `company_id` cast to integer.
 - Before Task 10: equality on null fixed on Elasticsearch (`must_not exists`) and Typesense (an indexed placeholder
   for null top-level strings).
+- After the merge, `scout:rebuild` against an Elasticsearch 8 cluster with `ELASTIC_COMPATIBLE_WITH=8` failed: the
+  Scout driver built its own clients without the compatibility header. Fixed in getlaraplate/laracore#48
+  (`ElasticClientBuilder`), unrelated to this plan's code but found while rebuilding its indexes.
 - Known limit: on Typesense a null date has no placeholder, so `valid_to IS NULL` in the public ACLs of contents and
   products finds nothing there.
