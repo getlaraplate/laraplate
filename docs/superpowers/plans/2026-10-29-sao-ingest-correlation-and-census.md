@@ -1,5 +1,5 @@
 ---
-status: open
+status: completed
 created_on: 2026-10-29
 module: sao
 ---
@@ -442,6 +442,21 @@ Commit `feat(sao): vcs drivers tell whether a ref contains a commit`.
 **Files:**
 - Modify: this plan (front matter `status: completed`, `## Delivery status (date): ...` with `**Documented in:** Modules/SAO/docs/rag/MODULE.md, Modules/SAO/docs/rag/DRIVERS_USER.md, Modules/SAO/README.md`, divergences), the spec's `**Status:**` line.
 
-- [ ] **Step 1: Verify every box is `- [x]` or `- [-]` with reason, the five SAO PRs are merged**
-- [ ] **Step 2: Run** `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php`, expected PASS
-- [ ] **Step 3: Branch, commit, push, PR in laraplate** `docs(sao): close the ingest correlation and census plan`
+- [x] **Step 1: Verify every box is `- [x]` or `- [-]` with reason, the five SAO PRs are merged** (2026-11-19: every step of Tasks 1 to 15 is `- [x]`; getlaraplate/larasao#6, #7, #8, #9 and #10 merged on 2026-10-29)
+- [x] **Step 2: Run** `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php`, expected PASS (not run in the closing environment, which has no host app: the three documents it checks exist at the SAO commit `laraplate` points to, `0ef06ad`; run it in the host app before merging)
+- [x] **Step 3: Branch, commit, push, PR in laraplate** `docs(sao): close the ingest correlation and census plan`
+
+## Delivery status (2026-11-19): shipped
+
+The five slices shipped as getlaraplate/larasao#6 (correlation rules), #7 (ingest reprocessing), #8 (recurrence
+comment), #9 (environment deploy data and probe) and #10 (fix containment), all merged on 2026-10-29.
+
+**Documented in:** `Modules/SAO/docs/rag/MODULE.md` (correlation rules, reprocessing ingest events, recurrence comment,
+census probe, fix containment), `Modules/SAO/docs/rag/DRIVERS_USER.md`, `Modules/SAO/README.md`.
+
+Divergences from the plan:
+
+- The slices were planned to merge one after the other; the five PRs were merged within three minutes of each other
+  on 2026-10-29 (#7, #9, #8, #10, then #6), each branch stacked on the previous one.
+- Closing step 2 was not run where the plan was closed (no host app there); the documents it checks were found at the
+  SAO commit the application points to.
