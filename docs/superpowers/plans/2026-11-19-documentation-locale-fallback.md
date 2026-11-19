@@ -1,6 +1,7 @@
 ---
 created_on: 2026-11-19
 module: ai
+status: completed
 ---
 # English fallback for the user documentation. Implementation Plan
 
@@ -13,6 +14,17 @@ module: ai
 **Tech Stack:** PHP 8.5, Laravel 13, Pest. No new dependency, no new setting, no new environment variable.
 
 **Spec:** `../specs/2026-11-19-documentation-locale-fallback-design.md`.
+
+## Delivery status (2026-11-19): shipped
+
+**Documented in:** `Modules/AI/docs/rag/MODULE.md` (*Language of a user document*), `Modules/AI/docs/SEARCH_AND_TRANSLATION.md`.
+
+Every task shipped in getlaraplate/laraai#31. Divergences from the steps:
+
+- **The preference is its own class,** `DocumentationLocalePreference`, called from `InAppDocumentationRetrieval::retrieve()`, instead of a private step of `retrieve()`: a document without a canonical source cannot reach `retrieve()` (the audience policy refuses it), so only a pure class could test that rule.
+- **Task 3 added one test, not a change:** the read filter shares `elasticsearchFilter()`, so the English document key opens for an Italian caller with no code of its own; the test pins it through `chunksOfDocument()`.
+- **The full AI suite had 17 failures from `vendor/laravel/...` files missing** while another process touched the dependencies; the three Assistance folders they sit in pass on a rerun (275 passed). The whole suite was not run a second time.
+- **Not built, as the spec says:** on-the-fly or stored translations, a visible "shown in English" marker, a translation of the ten guides.
 
 ## Global Constraints
 
