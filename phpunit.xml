@@ -71,6 +71,23 @@
         <env name="ELASTIC_API_KEY" value="" force="true"/>
         <env name="ELASTIC_RETRIES" value="0" force="true"/>
         <env name="ELASTIC_TIMEOUT" value="2" force="true"/>
+        <!--
+            The same holds for the database server and Redis of .env. The default connection is
+            sqlite, but a test that switches connection or makes redis its cache, queue or session
+            store connects to whatever DB_HOST and REDIS_HOST say, and the bootstrap guard runs
+            before .env is loaded. An unreachable local port makes such a test fail at once
+            instead. To test against a real database server, change these lines knowingly.
+            These lines bind the test process only: `php artisan test` boots the application with
+            .env in its own parent process before it starts Pest, and that process connects to the
+            hosts of .env like any other artisan command. `vendor/bin/pest` has no such parent.
+        -->
+        <env name="DB_HOST" value="127.0.0.1" force="true"/>
+        <env name="DB_PORT" value="9" force="true"/>
+        <env name="DB_URL" value="" force="true"/>
+        <env name="DB_READ_HOSTS" value="" force="true"/>
+        <env name="REDIS_HOST" value="127.0.0.1" force="true"/>
+        <env name="REDIS_PORT" value="9" force="true"/>
+        <env name="REDIS_URL" value="" force="true"/>
         <env name="AI_EMBEDDINGS_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="LOG_CHANNEL" value="null"/>
