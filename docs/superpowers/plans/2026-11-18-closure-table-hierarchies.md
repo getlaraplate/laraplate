@@ -222,9 +222,9 @@ One task: the models, their tables and `CrudService::tree()` change together, or
 - Modify: `Modules/Core/README.md` (dependency list line 727), `Modules/Core/docs/CRUD_SYSTEM.md` (example around line 785), `Modules/Core/docs/rag/PERFORMANCE_TOOLKIT.md` (`depth_cache` row), `Modules/Core/docs/rag/MODULE.md` and `Modules/CMS/docs/rag/MODULE.md` where they describe role inheritance, category paths or comment threads
 - Modify: `docs/superpowers/specs/2026-11-18-closure-table-hierarchies-design.md` (status), `docs/superpowers/plans/INDEX.md`
 
-- [ ] **Step 1: Rerun the Task 1 benchmark on both databases and fill the After table.**
+- [x] **Step 1: Rerun the Task 1 benchmark on both databases and fill the After table.** (SQLite; server database pending the user's decision, see line under the table)
 - [ ] **Step 2: Apply the gate.** Every read case: p50 and p95 no higher than baseline beyond noise (5 %), queries no more; ACL resolution, content URLs and tree with parents faster. Writes recorded, no gate. If a read case fails, stop and report to the user with both tables; do not merge.
-- [ ] **Step 3: Write the documentation.** `HIERARCHIES_DEVELOPER.md`: giving a model a hierarchy (trait, `MigrateUtils::closureTable()`, overridable column names), the twelve relations and their order, what the trait maintains, what a bulk writer must do (`rebuildClosure()` or `ClosureTableMaintainer::detachSubtreesOf()`), the cascade guard. The other files as listed.
+- [x] **Step 3: Write the documentation.** `HIERARCHIES_DEVELOPER.md`: giving a model a hierarchy (trait, `MigrateUtils::closureTable()`, overridable column names), the twelve relations and their order, what the trait maintains, what a bulk writer must do (`rebuildClosure()` or `ClosureTableMaintainer::detachSubtreesOf()`), the cascade guard. The other files as listed.
 - [ ] **Step 4: Close the plan.** All boxes resolved; `status: completed`; `## Delivery status (date): ...` with divergences and `**Documented in:**` naming the docs above. Spec status `Implemented`. Run: `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php`
 - [ ] **Step 5: Commit and open the three PRs** (Core, CMS, root), bodies listing the gate numbers.
 
@@ -232,3 +232,13 @@ One task: the models, their tables and `CrudService::tree()` change together, or
 
 | Case | Driver | p50 ms | p95 ms | Queries |
 |---|---|---|---|---|
+| acl resolution (5 roles) | sqlite | 4.83 | 4.97 | 3 |
+| page of 50 contents + category urls | sqlite | 397.43 | 401.81 | 17 |
+| crud tree: parents | sqlite | 1231.27 | 1268.72 | 15 |
+| crud tree: children | sqlite | 1222.47 | 1239.11 | 15 |
+| crud tree: parents + children | sqlite | 1438.06 | 1449.69 | 15 |
+| create a leaf comment | sqlite | 9.18 | 9.64 | 12 |
+| move a 200-node category subtree | sqlite | 17.76 | 18.00 | 17 |
+| delete a middle category | sqlite | 7.70 | 8.25 | 6 |
+
+The three tree cases issue one query more than the baseline: the `ClosurePaths` read of the closure rows that gives each node its `path`, by design (the baseline computed the path from the loaded ancestors). The page of 50 contents is 4.5 % above the baseline p50 (inside the 5 % noise), p95 below it. Whether these meet the gate is the user's call. Server database: pending the user's decision.
