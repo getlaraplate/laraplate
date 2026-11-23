@@ -83,7 +83,8 @@
 
 - Every PHP file: `declare(strict_types=1);`.
 - Always braces for control structures.
-- Explicit param types and return types.
+- Explicit param types and return types, closure parameters and class constants included.
+- `composer test:type-coverage` is a gate at `--min=100`, not a report: it must stay green. Type a closure with what the call site passes, not with what reads well (`->toBase()` turns an Eloquent builder into a query builder, an eager-load constraint receives a `Relation`), and run that module's tests, because the wrong choice passes analysis and fails at runtime. Never widen to `mixed` to satisfy the gate. Details and the `@pest-ignore-type` exception: `.cursor/rules/01-php-laravel-standards.mdc`.
 - Prefer constructor property promotion.
 - Use `#[Override]` when overriding.
 - Use `final`, `readonly`, `static` where existing rules require.
@@ -109,6 +110,7 @@
 ## Testing
 
 - Every code change needs automated test proof.
+- Coverage stays as near 100% as the code honestly allows, and never falls because of a change: `composer test:type-coverage` (`--min=100`) and `composer test:coverage` (`--exactly=100`). Close a gap by typing or testing the code, never by deleting a test, widening a type to `mixed`, lowering a threshold or excluding a path. When something genuinely cannot be covered, say so on the line with the reason (`@pest-ignore-type`) and state the judgment when finishing.
 - Prefer Pest and feature tests unless unit test fits better.
 - Keep tests inside module `tests/` for module work.
 - Use factories/states for setup.

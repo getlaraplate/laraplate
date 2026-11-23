@@ -121,16 +121,16 @@
       "rector --dry-run"
     ],
     "test:coverage": "pest --parallel --coverage --exactly=100",
-    "test:unit": "php artisan test --compact --testsuite=Unit",
-    "test:integration": "php artisan test --compact --testsuite=Integration",
-    "test:feature": "php artisan test --compact --testsuite=Feature",
+    "test:unit": "php artisan test --parallel --compact --testsuite=Unit",
+    "test:integration": "php artisan test --parallel --compact --testsuite=Integration",
+    "test:feature": "php artisan test --parallel --compact --testsuite=Feature",
     "test:modules": [
       "@test:unit",
       "@test:integration",
       "@test:feature"
     ],
-    "test:pest": "vendor/bin/pest --compact",
-    "test:pest:parallel": "vendor/bin/pest --parallel --compact",
+    "test:pest": "vendor/bin/pest --parallel --compact",
+    "test:pest:serial": "vendor/bin/pest --compact",
     "test:types": "phpstan",
     "test:refactor": "rector",
     "test:licenses": "vendor/bin/check-licenses",
