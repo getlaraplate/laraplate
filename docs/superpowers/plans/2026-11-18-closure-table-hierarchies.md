@@ -62,6 +62,21 @@ Written and run on today's code, before anything changes. Everything here passes
 
 **Baseline (filled by Step 2):**
 
+Re-measured 2026-11-23 with Xdebug off from 0623a60 (`XDEBUG_MODE=off`, 20 iterations, three runs alternating with the branch; median of the run p50s and p95s, spread of the run p50s in brackets):
+
+| Case | Driver | p50 ms | p95 ms | Queries |
+|---|---|---|---|---|
+| acl resolution (5 roles) | sqlite | 1.46 [1.42-1.54] | 1.51 | 3 |
+| page of 50 contents + category urls | sqlite | 81.33 [81.01-81.84] | 85.71 | 17 |
+| crud tree: parents | sqlite | 155.00 [154.12-158.73] | 163.71 | 14 |
+| crud tree: children | sqlite | 158.16 [157.03-164.26] | 172.69 | 14 |
+| crud tree: parents + children | sqlite | 193.47 [193.18-195.02] | 212.99 | 14 |
+| create a leaf comment | sqlite | 3.04 [3.02-3.06] | 3.24 | 11 |
+| move a 200-node category subtree | sqlite | 3.51 [3.45-3.64] | 3.83 | 10 |
+| delete a middle category | sqlite | 2.33 [2.31-2.33] | 2.44 | 6 |
+
+First measurement, Xdebug on (`develop,debug,coverage`, `start_with_request=yes`), not comparable:
+
 | Case | Driver | p50 ms | p95 ms | Queries |
 |---|---|---|---|---|
 | acl resolution (5 roles) | sqlite | 6.77 | 6.96 | 3 |
@@ -230,15 +245,17 @@ One task: the models, their tables and `CrudService::tree()` change together, or
 
 **After (filled by Step 1):**
 
+Branch with Core 675d661d, 43cb65e8, 3a9c6b60, 8899251d, measured in the same alternating runs as the re-measured baseline above (Xdebug off; median of the run p50s and p95s, spread of the run p50s in brackets):
+
 | Case | Driver | p50 ms | p95 ms | Queries |
 |---|---|---|---|---|
-| acl resolution (5 roles) | sqlite | 4.83 | 4.97 | 3 |
-| page of 50 contents + category urls | sqlite | 397.43 | 401.81 | 17 |
-| crud tree: parents | sqlite | 1231.27 | 1268.72 | 15 |
-| crud tree: children | sqlite | 1222.47 | 1239.11 | 15 |
-| crud tree: parents + children | sqlite | 1438.06 | 1449.69 | 15 |
-| create a leaf comment | sqlite | 9.18 | 9.64 | 12 |
-| move a 200-node category subtree | sqlite | 17.76 | 18.00 | 17 |
-| delete a middle category | sqlite | 7.70 | 8.25 | 6 |
+| acl resolution (5 roles) | sqlite | 1.38 [1.36-1.41] | 1.52 | 3 |
+| page of 50 contents + category urls | sqlite | 89.14 [88.82-89.47] | 99.46 | 17 |
+| crud tree: parents | sqlite | 155.36 [152.14-169.38] | 173.04 | 15 |
+| crud tree: children | sqlite | 158.01 [150.51-159.14] | 170.92 | 15 |
+| crud tree: parents + children | sqlite | 186.71 [184.64-190.50] | 200.76 | 15 |
+| create a leaf comment | sqlite | 3.36 [3.36-3.52] | 3.70 | 12 |
+| move a 200-node category subtree | sqlite | 6.34 [6.33-6.81] | 6.98 | 17 |
+| delete a middle category | sqlite | 2.11 [2.09-2.84] | 2.18 | 6 |
 
-The three tree cases issue one query more than the baseline: the `ClosurePaths` read of the closure rows that gives each node its `path`, by design (the baseline computed the path from the loaded ancestors). The page of 50 contents is 4.5 % above the baseline p50 (inside the 5 % noise), p95 below it. Whether these meet the gate is the user's call. Server database: pending the user's decision.
+The three tree cases issue one query more than the baseline: the `ClosurePaths` read of the closure rows that gives each node its `path`, by design. The trees and ACL resolution are at par or faster. The page of 50 contents is 9.6 % above the baseline p50, outside both spreads: the closure join hydrates one ancestor model per (category, ancestor) pair (305 categories against 253), where the recursive CTE shared the ancestors among sibling categories; its SQL is at par since Core 675d661d. Writes: the subtree move rewrites 200 x 3 closure rows (inherent), the leaf comment inserts its closure rows (+1 query). The first After measurement, taken with Xdebug on, is replaced by this one. Server database: pending the user's decision.
