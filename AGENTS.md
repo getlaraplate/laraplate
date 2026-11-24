@@ -110,7 +110,7 @@
 ## Testing
 
 - Every code change needs automated test proof.
-- Coverage stays as near 100% as the code honestly allows, and never falls because of a change: `composer test:type-coverage` (`--min=100`) and `composer test:coverage` (`--exactly=100`). Close a gap by typing or testing the code, never by deleting a test, widening a type to `mixed`, lowering a threshold or excluding a path. When something genuinely cannot be covered, say so on the line with the reason (`@pest-ignore-type`) and state the judgment when finishing.
+- Type coverage stays at 100% and never falls because of a change: `composer test:type-coverage` (`--min=100`). Close a gap by typing the code, never by widening a type to `mixed`, lowering the threshold or excluding a path. When a type genuinely cannot be expressed, say so on the line with the reason (`@pest-ignore-type`) and state the judgment when finishing.
 - Prefer Pest and feature tests unless unit test fits better.
 - Keep tests inside module `tests/` for module work.
 - Use factories/states for setup.
