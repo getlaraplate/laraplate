@@ -979,12 +979,6 @@ parameters:
 			path: Modules/CMS/app/Models/Category.php
 
 		-
-			rawMessage: 'Trait Modules\Core\Models\Concerns\HasTranslations requires using class to implement Modules\Core\Contracts\ITranslatableModel, but Modules\CMS\Models\Category does not.'
-			identifier: class.missingImplements
-			count: 1
-			path: Modules/CMS/app/Models/Category.php
-
-		-
 			rawMessage: 'Class Modules\CMS\Models\Comment uses generic trait Modules\Core\Models\Concerns\HasTranslations but does not specify its types: TModel, TTranslationModel'
 			identifier: missingType.generics
 			count: 1
@@ -1046,12 +1040,6 @@ parameters:
 
 		-
 			rawMessage: 'Trait Modules\Core\Models\Concerns\HasApprovals requires using class to implement Modules\Core\Contracts\IModeratableModel, but Modules\CMS\Models\Comment does not.'
-			identifier: class.missingImplements
-			count: 1
-			path: Modules/CMS/app/Models/Comment.php
-
-		-
-			rawMessage: 'Trait Modules\Core\Models\Concerns\HasTranslations requires using class to implement Modules\Core\Contracts\ITranslatableModel, but Modules\CMS\Models\Comment does not.'
 			identifier: class.missingImplements
 			count: 1
 			path: Modules/CMS/app/Models/Comment.php
@@ -1351,12 +1339,6 @@ parameters:
 			path: Modules/CMS/app/Models/Content.php
 
 		-
-			rawMessage: 'Trait Modules\Core\Models\Concerns\HasTranslations requires using class to implement Modules\Core\Contracts\ITranslatableModel, but Modules\CMS\Models\Content does not.'
-			identifier: class.missingImplements
-			count: 1
-			path: Modules/CMS/app/Models/Content.php
-
-		-
 			rawMessage: 'Trait Modules\Core\Search\Traits\Searchable requires using class to implement Modules\Core\Contracts\IEmbeddableModel, but Modules\CMS\Models\Content does not.'
 			identifier: class.missingImplements
 			count: 1
@@ -1603,12 +1585,6 @@ parameters:
 			path: Modules/CMS/app/Models/Contributor.php
 
 		-
-			rawMessage: 'Trait Modules\Core\Models\Concerns\HasTranslations requires using class to implement Modules\Core\Contracts\ITranslatableModel, but Modules\CMS\Models\Contributor does not.'
-			identifier: class.missingImplements
-			count: 1
-			path: Modules/CMS/app/Models/Contributor.php
-
-		-
 			rawMessage: Anonymous function should return string|null but returns mixed.
 			identifier: return.type
 			count: 1
@@ -1755,12 +1731,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\CMS\Models\Tag::translations() should return Illuminate\Database\Eloquent\Relations\HasMany<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated> but returns Illuminate\Database\Eloquent\Relations\HasMany<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated, $this(Modules\CMS\Models\Tag)>.'
 			identifier: return.type
-			count: 1
-			path: Modules/CMS/app/Models/Tag.php
-
-		-
-			rawMessage: 'Trait Modules\Core\Models\Concerns\HasTranslations requires using class to implement Modules\Core\Contracts\ITranslatableModel, but Modules\CMS\Models\Tag does not.'
-			identifier: class.missingImplements
 			count: 1
 			path: Modules/CMS/app/Models/Tag.php
 
@@ -6415,12 +6385,6 @@ parameters:
 			path: Modules/Core/app/Models/Taxonomy.php
 
 		-
-			rawMessage: 'Trait Modules\Core\Models\Concerns\HasTranslations requires using class to implement Modules\Core\Contracts\ITranslatableModel, but Modules\Core\Models\Taxonomy does not.'
-			identifier: class.missingImplements
-			count: 1
-			path: Modules/Core/app/Models/Taxonomy.php
-
-		-
 			rawMessage: 'Unable to resolve the template type TRelatedModel in call to method Illuminate\Database\Eloquent\Model::hasMany()'
 			identifier: argument.templateType
 			count: 1
@@ -10957,12 +10921,6 @@ parameters:
 			path: Modules/ERP/app/Models/Activity.php
 
 		-
-			rawMessage: 'Trait Modules\Core\Models\Concerns\HasTranslations requires using class to implement Modules\Core\Contracts\ITranslatableModel, but Modules\ERP\Models\Activity does not.'
-			identifier: class.missingImplements
-			count: 1
-			path: Modules/ERP/app/Models/Activity.php
-
-		-
 			rawMessage: 'Method Modules\ERP\Models\AnalyticDimension::values() return type with generic class Illuminate\Database\Eloquent\Relations\HasMany does not specify its types: TRelatedModel, TDeclaringModel'
 			identifier: missingType.generics
 			count: 1
@@ -11078,12 +11036,6 @@ parameters:
 
 		-
 			rawMessage: 'Trait Modules\Core\Models\Concerns\HasApprovals requires using class to implement Modules\Core\Contracts\IModeratableModel, but Modules\ERP\Models\OpportunityStage does not.'
-			identifier: class.missingImplements
-			count: 1
-			path: Modules/ERP/app/Models/OpportunityStage.php
-
-		-
-			rawMessage: 'Trait Modules\Core\Models\Concerns\HasTranslations requires using class to implement Modules\Core\Contracts\ITranslatableModel, but Modules\ERP\Models\OpportunityStage does not.'
 			identifier: class.missingImplements
 			count: 1
 			path: Modules/ERP/app/Models/OpportunityStage.php
