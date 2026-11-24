@@ -72,11 +72,11 @@ Already done in this cleanup, not part of the tasks: laraplate#81 (`checkModelPr
 **Interfaces:**
 - Produces: `php artisan models:declare-columns {--module=* : Module names; app models when absent} {--dry-run : Print the docblocks, write nothing}`. It runs `ide-helper:models --nowrite`, reads the `@property` lines of each class in `_ide_helper_models.php`, keeps those whose name is a column of the model's table (`Schema::getColumnListing()`), skips a model whose parent model has the same table (D1, Review Focus 1), and writes them into the model file.
 
-- [ ] **Step 1: Write the failing tests** against stub models: `it writes a property tag for each column and none for relations`, `it keeps the existing docblock lines` (a stub with a description and `@phpstan-use`), `it writes the docblock above the class attributes` (a stub with `#[ObservedBy]`), `it creates a docblock when the class has none`, `it skips a model whose parent owns the same table`, `it replaces nothing when run twice` (idempotent: second run leaves the file byte-identical), `it writes nothing with --dry-run`.
-- [ ] **Step 2: Run them.** Expected: FAIL, command not found.
-- [ ] **Step 3: Implement the command.** The column block goes at the end of the class docblock, after one ` *` separator line, sorted in table column order; existing `@property` lines for the same names are replaced, all other lines kept.
-- [ ] **Step 4: Run the tests.** Expected: PASS. Pint, type coverage.
-- [ ] **Step 5: Commit and open the app PR.**
+- [x] **Step 1: Write the failing tests** against stub models: `it writes a property tag for each column and none for relations`, `it keeps the existing docblock lines` (a stub with a description and `@phpstan-use`), `it writes the docblock above the class attributes` (a stub with `#[ObservedBy]`), `it creates a docblock when the class has none`, `it skips a model whose parent owns the same table`, `it replaces nothing when run twice` (idempotent: second run leaves the file byte-identical), `it writes nothing with --dry-run`.
+- [x] **Step 2: Run them.** Expected: FAIL, command not found.
+- [x] **Step 3: Implement the command.** The column block goes at the end of the class docblock, after one ` *` separator line, sorted in table column order; existing `@property` lines for the same names are replaced, all other lines kept.
+- [x] **Step 4: Run the tests.** Expected: PASS. Pint, type coverage.
+- [x] **Step 5: Commit and open the app PR.**
 
 ### Task 3: Declare the columns, module by module
 
