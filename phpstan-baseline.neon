@@ -9,7 +9,7 @@ parameters:
 		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
-			count: 6
+			count: 3
 			path: Modules/AI/app/Ai/Embeddings/EmbeddingModelRegistry.php
 
 		-
@@ -79,30 +79,6 @@ parameters:
 			path: Modules/AI/app/Jobs/GenerateEmbeddingsJob.php
 
 		-
-			rawMessage: Access to constant class on an unknown class Modules\AI\Jobs\ITranslatableModel.
-			identifier: class.notFound
-			count: 2
-			path: Modules/AI/app/Jobs/TranslateModelJob.php
-
-		-
-			rawMessage: 'Call to method getKey() on an unknown class Modules\AI\Jobs\ITranslatableModel.'
-			identifier: class.notFound
-			count: 2
-			path: Modules/AI/app/Jobs/TranslateModelJob.php
-
-		-
-			rawMessage: 'Call to method hasTranslation() on an unknown class Modules\AI\Jobs\ITranslatableModel.'
-			identifier: class.notFound
-			count: 1
-			path: Modules/AI/app/Jobs/TranslateModelJob.php
-
-		-
-			rawMessage: PHPDoc tag @phpstan-assert-if-true for $model contains unknown class Modules\AI\Jobs\ITranslatableModel.
-			identifier: class.notFound
-			count: 1
-			path: Modules/AI/app/Jobs/TranslateModelJob.php
-
-		-
 			rawMessage: 'Static call to instance method stdClass::getTranslatableFields().'
 			identifier: method.staticCall
 			count: 1
@@ -169,44 +145,14 @@ parameters:
 			path: Modules/AI/app/Services/ApplicationContent/Evaluation/ApplicationContentEvaluationDataset.php
 
 		-
-			rawMessage: 'Parameter #1 $data of static method Modules\AI\Services\ApplicationContent\Evaluation\ApplicationContentEvaluationDataset::assertExactKeys() expects array<string, mixed>, array<mixed, mixed> given.'
-			identifier: argument.type
-			count: 2
-			path: Modules/AI/app/Services/ApplicationContent/Evaluation/ApplicationContentEvaluationDataset.php
-
-		-
 			rawMessage: 'Parameter #1 $data of static method Modules\AI\Services\ApplicationContent\Evaluation\ApplicationContentEvaluationDataset::caseFromArray() expects array<string, mixed>, array<mixed, mixed> given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/AI/app/Services/ApplicationContent/Evaluation/ApplicationContentEvaluationDataset.php
 
 		-
-			rawMessage: 'Parameter #1 $data of static method Modules\AI\Services\ApplicationContent\Evaluation\ApplicationContentEvaluationDataset::fromArray() expects array<string, mixed>, array<mixed, mixed> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Services/ApplicationContent/Evaluation/ApplicationContentEvaluationDataset.php
-
-		-
-			rawMessage: 'Parameter #1 $data of static method Modules\AI\Services\ApplicationContent\Evaluation\ApplicationContentEvaluationDataset::string() expects array<string, mixed>, array<mixed, mixed> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Services/ApplicationContent/Evaluation/ApplicationContentEvaluationDataset.php
-
-		-
-			rawMessage: Anonymous function should return float but returns mixed.
-			identifier: return.type
-			count: 1
-			path: Modules/AI/app/Services/ApplicationContent/Evaluation/ApplicationContentEvaluationService.php
-
-		-
 			rawMessage: 'Argument of an invalid type mixed supplied for foreach, only iterables are supported.'
 			identifier: foreach.nonIterable
-			count: 2
-			path: Modules/AI/app/Services/ApplicationContent/Evaluation/ApplicationContentEvaluationService.php
-
-		-
-			rawMessage: Binary operation "+" between mixed and 1 results in an error.
-			identifier: binaryOp.invalid
 			count: 1
 			path: Modules/AI/app/Services/ApplicationContent/Evaluation/ApplicationContentEvaluationService.php
 
@@ -229,34 +175,10 @@ parameters:
 			path: Modules/AI/app/Services/ApplicationContent/Evaluation/ApplicationContentEvaluationService.php
 
 		-
-			rawMessage: 'Parameter #1 ...$arg1 of function max expects non-empty-array, list<float> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Services/ApplicationContent/Evaluation/ApplicationContentEvaluationService.php
-
-		-
 			rawMessage: Using nullsafe property access "?->hits" on left side of ?? is unnecessary. Use -> instead.
 			identifier: nullsafe.neverNull
 			count: 1
 			path: Modules/AI/app/Services/ApplicationContent/Evaluation/ApplicationContentEvaluationService.php
-
-		-
-			rawMessage: Anonymous function should return float but returns mixed.
-			identifier: return.type
-			count: 1
-			path: Modules/AI/app/Services/ApplicationContent/Evaluation/ApplicationContentRetrievalStrategyEvaluationService.php
-
-		-
-			rawMessage: 'Argument of an invalid type mixed supplied for foreach, only iterables are supported.'
-			identifier: foreach.nonIterable
-			count: 1
-			path: Modules/AI/app/Services/ApplicationContent/Evaluation/ApplicationContentRetrievalStrategyEvaluationService.php
-
-		-
-			rawMessage: Binary operation "+" between mixed and 1 results in an error.
-			identifier: binaryOp.invalid
-			count: 1
-			path: Modules/AI/app/Services/ApplicationContent/Evaluation/ApplicationContentRetrievalStrategyEvaluationService.php
 
 		-
 			rawMessage: Cannot access offset 'hybrid'|'keyword'|'vector' on mixed.
@@ -301,22 +223,10 @@ parameters:
 			path: Modules/AI/app/Services/Assistance/AssistantAccessContextFactory.php
 
 		-
-			rawMessage: Cannot cast mixed to string.
-			identifier: cast.string
-			count: 2
-			path: Modules/AI/app/Services/Assistance/AssistantAccessContextFactory.php
-
-		-
 			rawMessage: 'Call to function is_string() with string will always evaluate to true.'
 			identifier: function.alreadyNarrowedType
 			count: 1
 			path: Modules/AI/app/Services/Assistance/AssistantPromptContext.php
-
-		-
-			rawMessage: 'Parameter #2 $subject of function preg_match expects string, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Services/Assistance/Evaluation/AssistantEvaluationCase.php
 
 		-
 			rawMessage: Negated boolean expression is always false.
@@ -329,18 +239,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: Modules/AI/app/Services/Assistance/Evaluation/AssistantEvaluationDataset.php
-
-		-
-			rawMessage: 'Parameter #1 $data of static method Modules\AI\Services\Assistance\Evaluation\AssistantEvaluationDataset::fromArray() expects array<string, mixed>, array<mixed, mixed> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Services/Assistance/Evaluation/AssistantEvaluationDataset.php
-
-		-
-			rawMessage: Anonymous function should return float but returns mixed.
-			identifier: return.type
-			count: 1
-			path: Modules/AI/app/Services/Assistance/Evaluation/AssistantEvaluationService.php
 
 		-
 			rawMessage: Cannot cast mixed to int.
@@ -356,12 +254,6 @@ parameters:
 
 		-
 			rawMessage: 'Parameter #1 $string of function mb_trim expects string, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Services/Assistance/Evaluation/AssistantEvaluationService.php
-
-		-
-			rawMessage: 'Parameter #1 ...$arg1 of function max expects non-empty-array, list<float> given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/AI/app/Services/Assistance/Evaluation/AssistantEvaluationService.php
@@ -385,12 +277,6 @@ parameters:
 			path: Modules/AI/app/Services/Assistance/InAppAssistanceService.php
 
 		-
-			rawMessage: 'Parameter #2 $allowedToolNames of method Modules\AI\Services\Tools\ToolRegistry::getNeuronToolsForDefinitions() expects list<string>|null, array given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Services/Assistance/InAppAssistanceService.php
-
-		-
 			rawMessage: 'Call to function is_string() with string will always evaluate to true.'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -409,24 +295,6 @@ parameters:
 			path: Modules/AI/app/Services/Assistance/Policies/CompiledAssistantPolicy.php
 
 		-
-			rawMessage: 'Method Modules\AI\Services\Assistance\Policies\CompiledAssistantPolicy::__construct() has parameter $allowedTools with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/AI/app/Services/Assistance/Policies/CompiledAssistantPolicy.php
-
-		-
-			rawMessage: 'Call to function is_array() with array will always evaluate to true.'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: Modules/AI/app/Services/Documentation/DocumentAudiencePolicy.php
-
-		-
-			rawMessage: 'Parameter #2 $subject of function preg_match expects string, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Services/Documentation/Evaluation/DocumentationEvaluationCase.php
-
-		-
 			rawMessage: Negated boolean expression is always false.
 			identifier: booleanNot.alwaysFalse
 			count: 1
@@ -439,32 +307,8 @@ parameters:
 			path: Modules/AI/app/Services/Documentation/Evaluation/DocumentationEvaluationDataset.php
 
 		-
-			rawMessage: 'Parameter #1 $data of static method Modules\AI\Services\Documentation\Evaluation\DocumentationEvaluationDataset::fromArray() expects array<string, mixed>, array<mixed, mixed> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Services/Documentation/Evaluation/DocumentationEvaluationDataset.php
-
-		-
-			rawMessage: Anonymous function should return float but returns mixed.
-			identifier: return.type
-			count: 1
-			path: Modules/AI/app/Services/Documentation/Evaluation/DocumentationEvaluationService.php
-
-		-
 			rawMessage: 'Argument of an invalid type mixed supplied for foreach, only iterables are supported.'
 			identifier: foreach.nonIterable
-			count: 2
-			path: Modules/AI/app/Services/Documentation/Evaluation/DocumentationEvaluationService.php
-
-		-
-			rawMessage: Binary operation "+" between mixed and 1 results in an error.
-			identifier: binaryOp.invalid
-			count: 1
-			path: Modules/AI/app/Services/Documentation/Evaluation/DocumentationEvaluationService.php
-
-		-
-			rawMessage: 'Call to function is_string() with string will always evaluate to true.'
-			identifier: function.alreadyNarrowedType
 			count: 1
 			path: Modules/AI/app/Services/Documentation/Evaluation/DocumentationEvaluationService.php
 
@@ -477,18 +321,6 @@ parameters:
 		-
 			rawMessage: Instanceof between NeuronAI\RAG\Document and NeuronAI\RAG\Document will always evaluate to true.
 			identifier: instanceof.alwaysTrue
-			count: 1
-			path: Modules/AI/app/Services/Documentation/Evaluation/DocumentationEvaluationService.php
-
-		-
-			rawMessage: 'Parameter #1 ...$arg1 of function max expects non-empty-array, list<float> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Services/Documentation/Evaluation/DocumentationEvaluationService.php
-
-		-
-			rawMessage: Result of || is always false.
-			identifier: booleanOr.alwaysFalse
 			count: 1
 			path: Modules/AI/app/Services/Documentation/Evaluation/DocumentationEvaluationService.php
 
@@ -595,12 +427,6 @@ parameters:
 			path: Modules/AI/app/Services/Tools/CrudToolProvider.php
 
 		-
-			rawMessage: 'Parameter #1 $rows of method Modules\AI\Services\Tools\CrudToolProvider::aggregateRows() expects list<mixed>, array<mixed> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Services/Tools/CrudToolProvider.php
-
-		-
 			rawMessage: 'Parameter #1 $rows of method Modules\AI\Services\Tools\CrudToolProvider::exportColumns() expects list<array<string, mixed>>, array<array> given.'
 			identifier: argument.type
 			count: 1
@@ -615,7 +441,7 @@ parameters:
 		-
 			rawMessage: Using nullsafe property access "?->totalRecords" on left side of ?? is unnecessary. Use -> instead.
 			identifier: nullsafe.neverNull
-			count: 2
+			count: 1
 			path: Modules/AI/app/Services/Tools/CrudToolProvider.php
 
 		-
@@ -655,18 +481,6 @@ parameters:
 			path: Modules/AI/database/seeders/AIDatabaseSeeder.php
 
 		-
-			rawMessage: 'Parameter #1 $rows of method Modules\Core\Seeding\SeedDefinition::rows() expects list<array<string, mixed>>, array<int, array{name: string, value: mixed, encrypted: bool, choices: array<int, mixed>|null, type: Modules\Core\Casts\SettingTypeEnum, group_name: string, description: string}> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/database/seeders/AIDatabaseSeeder.php
-
-		-
-			rawMessage: Using nullsafe method call on non-nullable type Illuminate\Console\Command. Use -> instead.
-			identifier: nullsafe.neverNull
-			count: 1
-			path: Modules/AI/database/seeders/AIDatabaseSeeder.php
-
-		-
 			rawMessage: 'Method Modules\CMS\Analytics\AbstractAnalytics::elasticsearchAggregationBuckets() should return list<array<string, mixed>> but returns list<array<mixed, mixed>>.'
 			identifier: return.type
 			count: 1
@@ -693,7 +507,7 @@ parameters:
 		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
-			count: 4
+			count: 2
 			path: Modules/CMS/app/ApplicationContent/CmsApplicationContentRetrievalProvider.php
 
 		-
@@ -727,12 +541,6 @@ parameters:
 			path: Modules/CMS/app/ApplicationContent/CmsContentEvidenceProjector.php
 
 		-
-			rawMessage: Cannot cast mixed to string.
-			identifier: cast.string
-			count: 1
-			path: Modules/CMS/app/ApplicationContent/CmsContentEvidenceProjector.php
-
-		-
 			rawMessage: 'Parameter #4 $fixedActions of static method Modules\CMS\Filament\Resources\Categories\Tables\CategoriesTable::coreConfigureTable() expects list<string>, list<Filament\Actions\Action|Filament\Actions\ActionGroup> given.'
 			identifier: argument.type
 			count: 1
@@ -753,12 +561,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $modelFqn of static method Modules\Core\Filament\FilamentTraitResolver::computedAttributesNeverInForms() expects class-string, string given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Contents/Pages/EditContent.php
-
-		-
-			rawMessage: 'Trait Modules\Core\Filament\Utils\HasFilamentFormDataSanitizer requires using class to extend Filament\Resources\Pages\CreateRecord|Filament\Resources\Pages\EditRecord, but Modules\CMS\Filament\Resources\Contents\Pages\EditContent does not.'
-			identifier: class.missingExtends
 			count: 1
 			path: Modules/CMS/app/Filament/Resources/Contents/Pages/EditContent.php
 
@@ -847,12 +649,6 @@ parameters:
 			path: Modules/CMS/app/Import/ContributorImporter.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Import\Pipeline\ImportPipeline::import() should return int but returns mixed.'
-			identifier: return.type
-			count: 1
-			path: Modules/CMS/app/Import/Pipeline/ImportPipeline.php
-
-		-
 			rawMessage: Cannot cast mixed to int.
 			identifier: cast.int
 			count: 4
@@ -931,12 +727,6 @@ parameters:
 			path: Modules/CMS/app/Import/Support/ImportPresetProvisioner.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Import\Support\ImportPresetProvisioner::ensurePreset() should return Modules\CMS\Models\Pivot\Presettable but returns Modules\Core\Models\Pivot\Presettable.'
-			identifier: return.type
-			count: 1
-			path: Modules/CMS/app/Import/Support/ImportPresetProvisioner.php
-
-		-
 			rawMessage: 'Method Modules\CMS\Import\Support\ImportPresetProvisioner::fieldDefinitions() should return array<string, array{type: Modules\Core\Casts\FieldType, translatable?: bool, required?: bool}> but returns array{}|array{type: string, translatable?: bool, required?: bool}.'
 			identifier: return.type
 			count: 1
@@ -973,12 +763,6 @@ parameters:
 			path: Modules/CMS/app/Import/TagImporter.php
 
 		-
-			rawMessage: 'Trait Modules\Core\Models\Concerns\HasApprovals requires using class to implement Modules\Core\Contracts\IModeratableModel, but Modules\CMS\Models\Category does not.'
-			identifier: class.missingImplements
-			count: 1
-			path: Modules/CMS/app/Models/Category.php
-
-		-
 			rawMessage: 'Class Modules\CMS\Models\Comment uses generic trait Modules\Core\Models\Concerns\HasTranslations but does not specify its types: TModel, TTranslationModel'
 			identifier: missingType.generics
 			count: 1
@@ -1003,12 +787,6 @@ parameters:
 			path: Modules/CMS/app/Models/Comment.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Models\Comment::getAllTranslations() should return Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model> but returns Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Collection<int, Modules\Core\Services\Translation\Definitions\ITranslated>.'
-			identifier: return.type
-			count: 1
-			path: Modules/CMS/app/Models/Comment.php
-
-		-
 			rawMessage: 'Method Modules\CMS\Models\Comment::getDefaultTranslation() should return (Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated)|null but returns Illuminate\Database\Eloquent\Model|null.'
 			identifier: return.type
 			count: 1
@@ -1029,18 +807,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\CMS\Models\Comment::translations() should return Illuminate\Database\Eloquent\Relations\HasMany<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated> but returns Illuminate\Database\Eloquent\Relations\HasMany<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated, $this(Modules\CMS\Models\Comment)>.'
 			identifier: return.type
-			count: 1
-			path: Modules/CMS/app/Models/Comment.php
-
-		-
-			rawMessage: 'Parameter #1 $modification of method Modules\CMS\Models\Comment::applyModificationChanges() expects Modules\Core\Models\Modification, Approval\Models\Modification given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/CMS/app/Models/Comment.php
-
-		-
-			rawMessage: 'Trait Modules\Core\Models\Concerns\HasApprovals requires using class to implement Modules\Core\Contracts\IModeratableModel, but Modules\CMS\Models\Comment does not.'
-			identifier: class.missingImplements
 			count: 1
 			path: Modules/CMS/app/Models/Comment.php
 
@@ -1083,7 +849,7 @@ parameters:
 		-
 			rawMessage: Cannot cast mixed to int.
 			identifier: cast.int
-			count: 2
+			count: 1
 			path: Modules/CMS/app/Models/Content.php
 
 		-
@@ -1107,12 +873,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\CMS\Models\Content::_internalDynamicContentsGetComponentsAttribute() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/CMS/app/Models/Content.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Models\Content::_internalDynamicContentsGetRules() should return array<string, array<string, mixed>> but returns array<string>.'
-			identifier: return.type
 			count: 1
 			path: Modules/CMS/app/Models/Content.php
 
@@ -1161,12 +921,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\CMS\Models\Content::entity() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
 			identifier: missingType.generics
-			count: 1
-			path: Modules/CMS/app/Models/Content.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Models\Content::getAllTranslations() should return Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model> but returns Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Collection<int, Modules\Core\Services\Translation\Definitions\ITranslated>.'
-			identifier: return.type
 			count: 1
 			path: Modules/CMS/app/Models/Content.php
 
@@ -1279,12 +1033,6 @@ parameters:
 			path: Modules/CMS/app/Models/Content.php
 
 		-
-			rawMessage: 'Parameter #1 $name of class Modules\Core\Search\Schema\FieldDefinition constructor expects string, int|string given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/CMS/app/Models/Content.php
-
-		-
 			rawMessage: 'Parameter #1 ...$arrays of function array_merge expects array, mixed given.'
 			identifier: argument.type
 			count: 1
@@ -1335,12 +1083,6 @@ parameters:
 		-
 			rawMessage: 'Trait Modules\Core\Models\Concerns\HasTranslatedDynamicContents uses generic trait Modules\Core\Models\Concerns\HasTranslations but does not specify its types: TModel, TTranslationModel'
 			identifier: missingType.generics
-			count: 1
-			path: Modules/CMS/app/Models/Content.php
-
-		-
-			rawMessage: 'Trait Modules\Core\Search\Traits\Searchable requires using class to implement Modules\Core\Contracts\IEmbeddableModel, but Modules\CMS\Models\Content does not.'
-			identifier: class.missingImplements
 			count: 1
 			path: Modules/CMS/app/Models/Content.php
 
@@ -1399,12 +1141,6 @@ parameters:
 			path: Modules/CMS/app/Models/Contributor.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Models\Contributor::_internalDynamicContentsGetRules() should return array<string, array<string, mixed>> but returns array<string>.'
-			identifier: return.type
-			count: 1
-			path: Modules/CMS/app/Models/Contributor.php
-
-		-
 			rawMessage: 'Method Modules\CMS\Models\Contributor::_internalDynamicContentsSetAttribute() should return $this(Modules\CMS\Models\Contributor) but returns mixed.'
 			identifier: return.type
 			count: 1
@@ -1443,12 +1179,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\CMS\Models\Contributor::entity() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
 			identifier: missingType.generics
-			count: 1
-			path: Modules/CMS/app/Models/Contributor.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Models\Contributor::getAllTranslations() should return Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model> but returns Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Collection<int, Modules\Core\Services\Translation\Definitions\ITranslated>.'
-			identifier: return.type
 			count: 1
 			path: Modules/CMS/app/Models/Contributor.php
 
@@ -1651,12 +1381,6 @@ parameters:
 			path: Modules/CMS/app/Models/Pivot/Taggable.php
 
 		-
-			rawMessage: 'Trait Modules\Core\Models\Concerns\HasApprovals requires using class to implement Modules\Core\Contracts\IModeratableModel, but Modules\CMS\Models\Preset does not.'
-			identifier: class.missingImplements
-			count: 1
-			path: Modules/CMS/app/Models/Preset.php
-
-		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
 			count: 1
@@ -1677,18 +1401,6 @@ parameters:
 		-
 			rawMessage: 'Generic type Illuminate\Database\Eloquent\Relations\HasOne<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated> in PHPDoc tag @return does not specify all template types of class Illuminate\Database\Eloquent\Relations\HasOne: TRelatedModel, TDeclaringModel'
 			identifier: generics.lessTypes
-			count: 1
-			path: Modules/CMS/app/Models/Tag.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Models\Tag::contents() should return Illuminate\Database\Eloquent\Relations\MorphToMany<Modules\CMS\Models\Content, $this(Modules\CMS\Models\Tag), Illuminate\Database\Eloquent\Relations\MorphPivot, ''pivot''> but returns Illuminate\Database\Eloquent\Relations\MorphToMany<Modules\CMS\Models\Content, $this(Modules\CMS\Models\Tag), Modules\CMS\Models\Pivot\Taggable, ''pivot''>.'
-			identifier: return.type
-			count: 1
-			path: Modules/CMS/app/Models/Tag.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Models\Tag::getAllTranslations() should return Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model> but returns Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Collection<int, Modules\Core\Services\Translation\Definitions\ITranslated>.'
-			identifier: return.type
 			count: 1
 			path: Modules/CMS/app/Models/Tag.php
 
@@ -1933,18 +1645,6 @@ parameters:
 			path: Modules/CMS/database/factories/ContentFactory.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Database\Factories\ContentFactory::existingRelationSets() should return array{contributors: array<int, true>, categories: array<int, true>, tags: array<int, true>, related: array<int, true>} but returns array{contributors: array<mixed, true>, categories: array<mixed, true>, tags: array<mixed, true>, related: array<mixed, true>}.'
-			identifier: return.type
-			count: 1
-			path: Modules/CMS/database/factories/ContentFactory.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Database\Factories\ContentFactory::pickRandomIds() should return list<int> but returns array<int, int>.'
-			identifier: return.type
-			count: 1
-			path: Modules/CMS/database/factories/ContentFactory.php
-
-		-
 			rawMessage: PHPDoc tag @extends contains generic type Modules\Core\Overrides\Factory<Modules\CMS\Models\Content> but class Modules\Core\Overrides\Factory is not generic.
 			identifier: generics.notGeneric
 			count: 1
@@ -2001,12 +1701,6 @@ parameters:
 		-
 			rawMessage: 'Call to protected static method getEntityType() of class Modules\CMS\Models\Contributor.'
 			identifier: staticMethod.protected
-			count: 1
-			path: Modules/CMS/database/factories/ContributorFactory.php
-
-		-
-			rawMessage: Cannot access offset mixed on mixed.
-			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
 			path: Modules/CMS/database/factories/ContributorFactory.php
 
@@ -2185,27 +1879,9 @@ parameters:
 			path: Modules/CMS/database/seeders/CMSDatabaseSeeder.php
 
 		-
-			rawMessage: 'Parameter #1 $rows of method Modules\Core\Seeding\SeedDefinition::rows() expects list<array<string, mixed>>, array<int, array{name: string, value: mixed, encrypted: bool, choices: array<int, mixed>|null, type: Modules\Core\Casts\SettingTypeEnum, group_name: string, description: string}> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/CMS/database/seeders/CMSDatabaseSeeder.php
-
-		-
 			rawMessage: 'Parameter #2 $haystack of function in_array expects array, mixed given.'
 			identifier: argument.type
 			count: 2
-			path: Modules/CMS/database/seeders/CMSDatabaseSeeder.php
-
-		-
-			rawMessage: 'Part $entity[''name''] (mixed) of encapsed string cannot be cast to string.'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: Modules/CMS/database/seeders/CMSDatabaseSeeder.php
-
-		-
-			rawMessage: Using nullsafe method call on non-nullable type Illuminate\Console\Command. Use -> instead.
-			identifier: nullsafe.neverNull
-			count: 23
 			path: Modules/CMS/database/seeders/CMSDatabaseSeeder.php
 
 		-
@@ -2431,12 +2107,6 @@ parameters:
 			path: Modules/Core/app/Casts/ExpandGraphRequestData.php
 
 		-
-			rawMessage: 'Parameter #1 $array of function array_values expects array<T>, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Casts/ExpandGraphRequestData.php
-
-		-
 			rawMessage: 'Parameter #1 $relations of method Modules\Core\Casts\ExpandGraphRequestData::deriveDepth() expects list<string>, list<mixed> given.'
 			identifier: argument.type
 			count: 1
@@ -2461,56 +2131,8 @@ parameters:
 			path: Modules/Core/app/Casts/ExpandGraphRequestData.php
 
 		-
-			rawMessage: Instanceof between Modules\Core\Casts\Filter and Modules\Core\Casts\Filter will always evaluate to true.
-			identifier: instanceof.alwaysTrue
-			count: 1
-			path: Modules/Core/app/Casts/FiltersGroup.php
-
-		-
-			rawMessage: Result of || is always true.
-			identifier: booleanOr.alwaysTrue
-			count: 1
-			path: Modules/Core/app/Casts/FiltersGroup.php
-
-		-
-			rawMessage: 'Argument of an invalid type mixed supplied for foreach, only iterables are supported.'
-			identifier: foreach.nonIterable
-			count: 1
-			path: Modules/Core/app/Casts/FiltersGroupCast.php
-
-		-
-			rawMessage: 'Call to function array_is_list() with array<string, mixed> will always evaluate to false.'
-			identifier: function.impossibleType
-			count: 2
-			path: Modules/Core/app/Casts/FiltersGroupCast.php
-
-		-
-			rawMessage: 'Call to function is_array() with *NEVER* will always evaluate to true.'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: Modules/Core/app/Casts/FiltersGroupCast.php
-
-		-
-			rawMessage: Cannot cast mixed to string.
-			identifier: cast.string
-			count: 3
-			path: Modules/Core/app/Casts/FiltersGroupCast.php
-
-		-
 			rawMessage: 'Class Modules\Core\Casts\FiltersGroupCast implements generic interface Illuminate\Contracts\Database\Eloquent\CastsAttributes but does not specify its types: TGet, TSet'
 			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Casts/FiltersGroupCast.php
-
-		-
-			rawMessage: 'Parameter #1 $data of method Modules\Core\Casts\FiltersGroupCast::hydrateGroup() expects array<string, mixed>, array<mixed, mixed> given.'
-			identifier: argument.type
-			count: 2
-			path: Modules/Core/app/Casts/FiltersGroupCast.php
-
-		-
-			rawMessage: 'Parameter #1 $item of method Modules\Core\Casts\FiltersGroupCast::hydrateNode() expects array<string, mixed>, array<mixed, mixed> given.'
-			identifier: argument.type
 			count: 1
 			path: Modules/Core/app/Casts/FiltersGroupCast.php
 
@@ -2587,12 +2209,6 @@ parameters:
 			path: Modules/Core/app/Casts/SearchGraphRequestData.php
 
 		-
-			rawMessage: 'Parameter #1 $array of function array_values expects array<T>, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Casts/SearchGraphRequestData.php
-
-		-
 			rawMessage: 'Parameter #1 $relations of method Modules\Core\Casts\SearchGraphRequestData::deriveDepth() expects list<string>, list<mixed> given.'
 			identifier: argument.type
 			count: 1
@@ -2603,18 +2219,6 @@ parameters:
 			identifier: assign.propertyType
 			count: 1
 			path: Modules/Core/app/Casts/SearchGraphRequestData.php
-
-		-
-			rawMessage: 'Parameter #1 $value of static method Modules\Core\Casts\SearchMode::from() expects int|string, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Casts/SearchRequestData.php
-
-		-
-			rawMessage: 'Parameter #1 $value of static method Modules\Core\Search\Enums\TextMatchPreference::from() expects int|string, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Casts/SearchRequestData.php
 
 		-
 			rawMessage: 'Property Modules\Core\Casts\SearchRequestData::$qs (string) does not accept mixed.'
@@ -2707,12 +2311,6 @@ parameters:
 			path: Modules/Core/app/Console/CheckPendingApprovalsCommand.php
 
 		-
-			rawMessage: 'Unable to resolve the template type TReturnType in call to method Illuminate\Support\Collection<int,array<string, int|string>>::sum()'
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Console/CheckPendingApprovalsCommand.php
-
-		-
 			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::onlyTrashed().'
 			identifier: staticMethod.notFound
 			count: 1
@@ -2723,54 +2321,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: Modules/Core/app/Console/ClearExpiredModels.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::createSnapshotVersion().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Console/CompactVersions.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getVersionStrategy().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Console/CompactVersions.php
-
-		-
-			rawMessage: 'Call to an undefined method object::getConnectionName().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Console/CompactVersions.php
-
-		-
-			rawMessage: 'Call to an undefined method object::getMorphClass().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Console/CompactVersions.php
-
-		-
-			rawMessage: 'Generator expects value type object{versionable_type: string, versionable_id: mixed, connection_ref: string|null, table_ref: string|null}, stdClass given.'
-			identifier: generator.valueType
-			count: 1
-			path: Modules/Core/app/Console/CompactVersions.php
-
-		-
-			rawMessage: 'Method Modules\Core\Console\CompactVersions::resolveTargetModel() should return Illuminate\Database\Eloquent\Model|null but returns Illuminate\Database\Eloquent\Collection<(int|string), Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Model|null.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/app/Console/CompactVersions.php
-
-		-
-			rawMessage: 'Part $versionableId (mixed) of encapsed string cannot be cast to string.'
-			identifier: encapsedStringPart.nonString
-			count: 2
-			path: Modules/Core/app/Console/CompactVersions.php
-
-		-
-			rawMessage: Right side of && is always true.
-			identifier: booleanAnd.rightAlwaysTrue
-			count: 1
-			path: Modules/Core/app/Console/Concerns/HasBenchmark.php
 
 		-
 			rawMessage: Right side of && is always true.
@@ -2923,12 +2473,6 @@ parameters:
 			path: Modules/Core/app/Console/HandleLicensesCommand.php
 
 		-
-			rawMessage: 'Parameter #2 $rows of function Laravel\Prompts\table expects array<int, array<int, string>>|Illuminate\Support\Collection<int, array<int, string>>|null, list<array{int, mixed, mixed}> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Console/HandleLicensesCommand.php
-
-		-
 			rawMessage: 'Return type of call to method Illuminate\Support\LazyCollection<int,Modules\Core\Models\License>::map() contains unresolvable type.'
 			identifier: method.unresolvableReturnType
 			count: 1
@@ -2975,18 +2519,6 @@ parameters:
 			identifier: identical.alwaysFalse
 			count: 1
 			path: Modules/Core/app/Console/MakeFilamentResourcesCommand.php
-
-		-
-			rawMessage: 'Parameter #2 $callback of function array_filter expects (callable(array{name: string, type: string, type_name: string, nullable: bool, default: mixed, auto_increment: bool, comment: string|null, generation: array{type: string, expression: string|null}|null}): bool)|null, Closure(array{name: string, type_name: string, type: string, nullable: bool, auto_increment: bool}): bool given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Console/MakeModelTranslatableCommand.php
-
-		-
-			rawMessage: 'Parameter #8 $selected_columns of method Modules\Core\Console\MakeModelTranslatableCommand::createTranslationModel() expects array<int, array{name: string, type_name: string, type: string, nullable: bool, auto_increment: bool}>, list<array{name: string, type: string, type_name: string, nullable: bool, default: mixed, auto_increment: bool, comment: string|null, generation: array{type: string, expression: string|null}|null}> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Console/MakeModelTranslatableCommand.php
 
 		-
 			rawMessage: Cannot cast mixed to string.
@@ -3105,18 +2637,6 @@ parameters:
 		-
 			rawMessage: 'Argument of an invalid type mixed supplied for foreach, only iterables are supported.'
 			identifier: foreach.nonIterable
-			count: 1
-			path: Modules/Core/app/Console/TranslationsCheckCommand.php
-
-		-
-			rawMessage: 'Cannot call method getCacheTags() on class-string|object.'
-			identifier: method.nonObject
-			count: 1
-			path: Modules/Core/app/Console/TranslationsCheckCommand.php
-
-		-
-			rawMessage: 'Cannot call method store() on mixed.'
-			identifier: method.nonObject
 			count: 1
 			path: Modules/Core/app/Console/TranslationsCheckCommand.php
 
@@ -3307,48 +2827,6 @@ parameters:
 			path: Modules/Core/app/Filament/Generators/LaraplateResourceListRecordsPageClassGenerator.php
 
 		-
-			rawMessage: 'Method Modules\Core\Filament\Pages\CacheHealth::getVisibleWidgets() has invalid return type Modules\Core\Filament\Pages\Widget.'
-			identifier: class.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Pages/CacheHealth.php
-
-		-
-			rawMessage: 'Method Modules\Core\Filament\Pages\CacheHealth::getVisibleWidgets() has invalid return type Modules\Core\Filament\Pages\WidgetConfiguration.'
-			identifier: class.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Pages/CacheHealth.php
-
-		-
-			rawMessage: 'Method Modules\Core\Filament\Pages\CacheHealth::getVisibleWidgets() should return array<class-string<Modules\Core\Filament\Pages\Widget>|Modules\Core\Filament\Pages\WidgetConfiguration> but returns array<class-string<Filament\Widgets\Widget>|Filament\Widgets\WidgetConfiguration>.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/app/Filament/Pages/CacheHealth.php
-
-		-
-			rawMessage: 'Method Modules\Core\Filament\Pages\CacheHealth::getWidgets() has invalid return type Modules\Core\Filament\Pages\Widget.'
-			identifier: class.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Pages/CacheHealth.php
-
-		-
-			rawMessage: 'Method Modules\Core\Filament\Pages\CacheHealth::getWidgets() has invalid return type Modules\Core\Filament\Pages\WidgetConfiguration.'
-			identifier: class.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Pages/CacheHealth.php
-
-		-
-			rawMessage: 'Method Modules\Core\Filament\Pages\CacheHealth::getWidgets() should return array<class-string<Modules\Core\Filament\Pages\Widget>|Modules\Core\Filament\Pages\WidgetConfiguration> but returns array<int, string>.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/app/Filament/Pages/CacheHealth.php
-
-		-
-			rawMessage: 'Parameter #1 $widgets of method Filament\Pages\Page<Filament\Pages\PageConfiguration>::filterVisibleWidgets() expects array<class-string<Filament\Widgets\Widget>|Filament\Widgets\WidgetConfiguration>, array<class-string<Modules\Core\Filament\Pages\Widget>|Modules\Core\Filament\Pages\WidgetConfiguration> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Filament/Pages/CacheHealth.php
-
-		-
 			rawMessage: 'Method Modules\Core\Filament\Pages\HorizonHealth::getVisibleWidgets() has invalid return type Modules\Core\Filament\Pages\Widget.'
 			identifier: class.notFound
 			count: 1
@@ -3392,12 +2870,6 @@ parameters:
 
 		-
 			rawMessage: 'Method Modules\Core\Filament\Pages\Welcome::getGroupedModules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Filament/Pages/Welcome.php
-
-		-
-			rawMessage: 'Method Modules\Core\Filament\Pages\Welcome::getTranslations() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/Core/app/Filament/Pages/Welcome.php
@@ -3451,70 +2923,10 @@ parameters:
 			path: Modules/Core/app/Filament/Resources/Modifications/Pages/ListModifications.php
 
 		-
-			rawMessage: 'Parameter #1 $array of function array_sum expects an array of values castable to number, array<mixed> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Modifications/Pages/ListModifications.php
-
-		-
-			rawMessage: 'Parameter #1 $badge of method Filament\Schemas\Components\Tabs\Tab::badge() expects Closure|float|int|string|null, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Modifications/Pages/ListModifications.php
-
-		-
-			rawMessage: Anonymous function never returns null so it can be removed from the return type.
-			identifier: return.unusedType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Modifications/Tables/ModificationsTable.php
-
-		-
-			rawMessage: 'Argument of an invalid type array<string, mixed>|null supplied for foreach, only iterables are supported.'
-			identifier: foreach.nonIterable
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Modifications/Tables/ModificationsTable.php
-
-		-
-			rawMessage: Binary operation "." between non-falsy-string and mixed results in an error.
-			identifier: binaryOp.invalid
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Modifications/Tables/ModificationsTable.php
-
-		-
-			rawMessage: 'Parameter #1 ...$values of method Illuminate\Support\Collection<string,Filament\Tables\Filters\Filter>::unshift() expects Filament\Tables\Filters\Filter, Filament\Tables\Filters\SelectFilter given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Permissions/Tables/PermissionsTable.php
-
-		-
-			rawMessage: 'Parameter #2 $ttl of static method Illuminate\Cache\Repository::remember() expects Closure|DateInterval|DateTimeInterface|int|null, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Permissions/Tables/PermissionsTable.php
-
-		-
-			rawMessage: 'Parameter #2 ...$values of method Illuminate\Support\Collection<string,Filament\Tables\Filters\Filter>::unshift() expects Filament\Tables\Filters\Filter, Filament\Tables\Filters\SelectFilter given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Permissions/Tables/PermissionsTable.php
-
-		-
-			rawMessage: 'Parameter #3 ...$values of method Illuminate\Support\Collection<string,Filament\Tables\Filters\Filter>::unshift() expects Filament\Tables\Filters\Filter, Filament\Tables\Filters\SelectFilter given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Permissions/Tables/PermissionsTable.php
-
-		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
 			count: 3
 			path: Modules/Core/app/Filament/Resources/Roles/Pages/EditRole.php
-
-		-
-			rawMessage: 'Parameter #1 ...$values of method Illuminate\Support\Collection<string,Filament\Tables\Filters\Filter>::unshift() expects Filament\Tables\Filters\Filter, Filament\Tables\Filters\SelectFilter given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Roles/Tables/RolesTable.php
 
 		-
 			rawMessage: 'Parameter #1 $array of function array_sum expects an array of values castable to number, array<mixed> given.'
@@ -3529,64 +2941,10 @@ parameters:
 			path: Modules/Core/app/Filament/Resources/Settings/Pages/ListSettings.php
 
 		-
-			rawMessage: 'Cannot call static method query() on array<string, mixed>|class-string<Illuminate\Database\Eloquent\Model>|Closure|Illuminate\Database\Eloquent\Model|null.'
-			identifier: staticMethod.nonObject
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Settings/Schemas/SettingForm.php
-
-		-
-			rawMessage: 'Parameter #1 ...$values of method Illuminate\Support\Collection<string,Filament\Tables\Filters\Filter>::unshift() expects Filament\Tables\Filters\Filter, Filament\Tables\Filters\SelectFilter given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Settings/Tables/SettingsTable.php
-
-		-
-			rawMessage: 'Parameter #2 $ttl of static method Illuminate\Cache\Repository::remember() expects Closure|DateInterval|DateTimeInterface|int|null, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Settings/Tables/SettingsTable.php
-
-		-
-			rawMessage: 'Parameter #2 ...$values of method Illuminate\Support\Collection<string,Filament\Tables\Filters\Filter>::unshift() expects Filament\Tables\Filters\Filter, Filament\Tables\Filters\SelectFilter given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Settings/Tables/SettingsTable.php
-
-		-
-			rawMessage: 'Parameter #3 ...$values of method Illuminate\Support\Collection<string,Filament\Tables\Filters\Filter>::unshift() expects Filament\Tables\Filters\Filter, Filament\Tables\Filters\SelectFilter given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Settings/Tables/SettingsTable.php
-
-		-
-			rawMessage: 'Parameter #4 ...$values of method Illuminate\Support\Collection<string,Filament\Tables\Filters\Filter>::unshift() expects Filament\Tables\Filters\Filter, Filament\Tables\Filters\SelectFilter given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Settings/Tables/SettingsTable.php
-
-		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
 			count: 3
 			path: Modules/Core/app/Filament/Resources/Users/Pages/EditUser.php
-
-		-
-			rawMessage: 'Parameter #1 ...$values of method Illuminate\Support\Collection<string,Filament\Tables\Filters\Filter>::unshift() expects Filament\Tables\Filters\Filter, Filament\Tables\Filters\SelectFilter given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Users/Tables/UsersTable.php
-
-		-
-			rawMessage: 'Parameter #2 ...$values of method Illuminate\Support\Collection<string,Filament\Tables\Filters\Filter>::unshift() expects Filament\Tables\Filters\Filter, Filament\Tables\Filters\TernaryFilter given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Users/Tables/UsersTable.php
-
-		-
-			rawMessage: 'Parameter $columns of static method Modules\Core\Filament\Resources\Users\Tables\UsersTable::configureTable() expects (callable(Illuminate\Support\Collection<string, Filament\Tables\Columns\Column>): void)|null, static-Closure(Illuminate\Support\Collection): Illuminate\Support\Collection<string, Filament\Tables\Columns\Column> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Users/Tables/UsersTable.php
 
 		-
 			rawMessage: Cannot cast mixed to string.
@@ -3633,12 +2991,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\Core\Filament\Widgets\SearchEngineHealthTableWidget::fetchSearchEngineData() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Filament/Widgets/SearchEngineHealthTableWidget.php
-
-		-
-			rawMessage: 'Method Modules\Core\Filament\Widgets\SearchEngineHealthTableWidget::fetchSearchEngineData() should return array{driver: string|null, models: array<int, array>, error: string|null} but returns array{driver: mixed, models: list<array{name: string, full_name: class-string<Illuminate\Database\Eloquent\Model>, searchable_as: mixed, count: int<0, max>, index_exists: bool, documents: mixed}>, error: string|null}.'
-			identifier: return.type
 			count: 1
 			path: Modules/Core/app/Filament/Widgets/SearchEngineHealthTableWidget.php
 
@@ -3701,12 +3053,6 @@ parameters:
 			identifier: nullCoalesce.offset
 			count: 1
 			path: Modules/Core/app/Graph/GraphProviderRuleEnforcer.php
-
-		-
-			rawMessage: Instanceof between Illuminate\Database\Eloquent\Relations\Relation and Illuminate\Database\Eloquent\Relations\MorphToMany will always evaluate to false.
-			identifier: instanceof.alwaysFalse
-			count: 1
-			path: Modules/Core/app/Graph/GraphRelationInspector.php
 
 		-
 			rawMessage: 'Argument of an invalid type mixed supplied for foreach, only iterables are supported.'
@@ -3865,12 +3211,6 @@ parameters:
 			path: Modules/Core/app/Helpers/BatchSeeder.php
 
 		-
-			rawMessage: 'Parameter #1 $name of method Illuminate\Redis\RedisManager::purge() expects string|null, int|string given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Helpers/BatchSeeder.php
-
-		-
 			rawMessage: 'Parameter #3 $connectionName of method Modules\Core\Helpers\BatchSeeder::runParallelTasks() expects string, string|null given.'
 			identifier: argument.type
 			count: 1
@@ -3883,20 +3223,8 @@ parameters:
 			path: Modules/Core/app/Helpers/LocaleContext.php
 
 		-
-			rawMessage: 'Method Modules\Core\Helpers\LocaleContext::get() should return string but returns mixed.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/app/Helpers/LocaleContext.php
-
-		-
 			rawMessage: 'Method Modules\Core\Helpers\LocaleContext::getAvailable() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Helpers/LocaleContext.php
-
-		-
-			rawMessage: 'Method Modules\Core\Helpers\LocaleContext::getDefault() should return string but returns mixed.'
-			identifier: return.type
 			count: 1
 			path: Modules/Core/app/Helpers/LocaleContext.php
 
@@ -3939,48 +3267,6 @@ parameters:
 		-
 			rawMessage: Cannot cast mixed to int.
 			identifier: cast.int
-			count: 1
-			path: Modules/Core/app/Helpers/ModuleDatabaseActivator.php
-
-		-
-			rawMessage: 'Method Modules\Core\Helpers\ModuleDatabaseActivator::getModulesStatuses() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Helpers/ModuleDatabaseActivator.php
-
-		-
-			rawMessage: 'Method Modules\Core\Helpers\ModuleDatabaseActivator::readSettings() should return array<int, string> but returns array<mixed>.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/app/Helpers/ModuleDatabaseActivator.php
-
-		-
-			rawMessage: 'Method Modules\Core\Helpers\ModuleDatabaseActivator::updateRecordValue() has parameter $value with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Helpers/ModuleDatabaseActivator.php
-
-		-
-			rawMessage: 'Parameter #1 $name of static method Illuminate\Cache\CacheManager::store() expects string|null, mixed given.'
-			identifier: argument.type
-			count: 2
-			path: Modules/Core/app/Helpers/ModuleDatabaseActivator.php
-
-		-
-			rawMessage: 'Property Modules\Core\Helpers\ModuleDatabaseActivator::$cacheKey (string) does not accept mixed.'
-			identifier: assign.propertyType
-			count: 1
-			path: Modules/Core/app/Helpers/ModuleDatabaseActivator.php
-
-		-
-			rawMessage: Property Modules\Core\Helpers\ModuleDatabaseActivator::$modulesStatuses type has no value type specified in iterable type array.
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Helpers/ModuleDatabaseActivator.php
-
-		-
-			rawMessage: 'Strict comparison using !== between true and true will always evaluate to false.'
-			identifier: notIdentical.alwaysFalse
 			count: 1
 			path: Modules/Core/app/Helpers/ModuleDatabaseActivator.php
 
@@ -4113,12 +3399,6 @@ parameters:
 		-
 			rawMessage: 'Call to an undefined static method Illuminate\Support\Facades\Cache::clearByEntity().'
 			identifier: staticMethod.notFound
-			count: 9
-			path: Modules/Core/app/Http/Controllers/CrudController.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Support\Facades\Cache::tryByRequest().'
-			identifier: staticMethod.notFound
 			count: 1
 			path: Modules/Core/app/Http/Controllers/CrudController.php
 
@@ -4135,43 +3415,7 @@ parameters:
 			path: Modules/Core/app/Http/Controllers/CrudController.php
 
 		-
-			rawMessage: 'Cannot call method getCacheTags() on class-string|object.'
-			identifier: method.nonObject
-			count: 1
-			path: Modules/Core/app/Http/Controllers/DocsController.php
-
-		-
-			rawMessage: 'Cannot call method store() on mixed.'
-			identifier: method.nonObject
-			count: 1
-			path: Modules/Core/app/Http/Controllers/DocsController.php
-
-		-
-			rawMessage: 'Method Modules\Core\Http\Controllers\DocsController::getJson() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Http/Controllers/DocsController.php
-
-		-
-			rawMessage: PHPDoc tag @return with type array<mixed>|ArrayAccess is not subtype of native type array.
-			identifier: return.phpDocType
-			count: 1
-			path: Modules/Core/app/Http/Controllers/DocsController.php
-
-		-
 			rawMessage: 'Parameter #1 $callback of method Illuminate\Support\Collection<(int|string),mixed>::filter() expects (callable(mixed, int|string): bool)|null, Closure(array): bool given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Http/Controllers/DocsController.php
-
-		-
-			rawMessage: 'Parameter #1 $file of method Wotz\SwaggerUi\Http\Controllers\OpenApiJsonController::configureOAuth() expects array, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Http/Controllers/DocsController.php
-
-		-
-			rawMessage: 'Parameter #1 $file of method Wotz\SwaggerUi\Http\Controllers\OpenApiJsonController::configureServer() expects array, mixed given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/Core/app/Http/Controllers/DocsController.php
@@ -4225,12 +3469,6 @@ parameters:
 			path: Modules/Core/app/Http/Controllers/ImportSessionController.php
 
 		-
-			rawMessage: 'Method Modules\Core\Http\Controllers\MediaController::pendingMedia() should return Illuminate\Database\Eloquent\Collection<int, Modules\Core\Models\Media> but returns Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<(int|string), Spatie\MediaLibrary\MediaCollections\Models\Media>.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/app/Http/Controllers/MediaController.php
-
-		-
 			rawMessage: 'Parameter #1 $model of method Spatie\MediaLibrary\MediaCollections\Models\Media::move() expects Spatie\MediaLibrary\HasMedia, Illuminate\Database\Eloquent\Model given.'
 			identifier: argument.type
 			count: 1
@@ -4255,18 +3493,6 @@ parameters:
 			path: Modules/Core/app/Http/Controllers/NotificationController.php
 
 		-
-			rawMessage: 'Call to an undefined static method Illuminate\Support\Facades\Cache::getCacheTags().'
-			identifier: staticMethod.notFound
-			count: 2
-			path: Modules/Core/app/Http/Controllers/SettingController.php
-
-		-
-			rawMessage: 'Parameter #1 $key of method Illuminate\Cache\Repository::rememberForever() expects string|UnitEnum, string|null given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Http/Controllers/SettingController.php
-
-		-
 			rawMessage: 'Method Modules\Core\Http\Controllers\UserController::parseAnonymousUserInfo() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
@@ -4283,18 +3509,6 @@ parameters:
 			identifier: return.phpDocType
 			count: 1
 			path: Modules/Core/app/Http/Controllers/UserController.php
-
-		-
-			rawMessage: 'Parameter #2 $targetUser of callable Modules\Core\Actions\Users\ImpersonateUserAction expects Illuminate\Foundation\Auth\User, Illuminate\Database\Eloquent\Collection<(int|string), Illuminate\Foundation\Auth\User>|Illuminate\Foundation\Auth\User given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Http/Controllers/UserController.php
-
-		-
-			rawMessage: 'Parameter #1 $boolean of function abort_unless expects bool, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Http/Middleware/EnsureCrudApiAreEnabled.php
 
 		-
 			rawMessage: 'Cannot call method isSuperAdmin() on App\Models\User|null.'
@@ -4837,12 +4051,6 @@ parameters:
 			path: Modules/Core/app/Import/Support/ImportRunner.php
 
 		-
-			rawMessage: Cannot access property $value on mixed.
-			identifier: property.nonObject
-			count: 1
-			path: Modules/Core/app/Import/Support/ImportRunner.php
-
-		-
 			rawMessage: 'Method Modules\Core\Import\Support\ImportRunner::errorRow() should return array{import_session_id: int, row_number: int, errors: array<string, list<string>>, raw: array<string, string>} but returns array{import_session_id: mixed, row_number: int, errors: array<string, list<string>>, raw: array<string, string>}.'
 			identifier: return.type
 			count: 1
@@ -4973,18 +4181,6 @@ parameters:
 			identifier: varTag.unresolvableType
 			count: 1
 			path: Modules/Core/app/Listeners/AfterLoginListener.php
-
-		-
-			rawMessage: 'Part $model->getKey() (mixed) of encapsed string cannot be cast to string.'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: Modules/Core/app/Listeners/FinalizeModelIndexingListener.php
-
-		-
-			rawMessage: Binary operation "." between 'modification…' and mixed results in an error.
-			identifier: binaryOp.invalid
-			count: 1
-			path: Modules/Core/app/Listeners/FinalizeModificationModerationListener.php
 
 		-
 			rawMessage: Offset 0 on non-empty-list<string> on left side of ?? always exists and is not nullable.
@@ -5269,12 +4465,6 @@ parameters:
 			path: Modules/Core/app/Models/Concerns/HasClosureTable.php
 
 		-
-			rawMessage: 'Call to function is_object() with null will always evaluate to false.'
-			identifier: function.impossibleType
-			count: 1
-			path: Modules/Core/app/Models/Concerns/HasDynamicContents.php
-
-		-
 			rawMessage: 'Call to function method_exists() with ''Modules\\Core\\Overrides\\Model'' and ''toArray'' will always evaluate to true.'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -5383,18 +4573,6 @@ parameters:
 			path: Modules/Core/app/Models/Entity.php
 
 		-
-			rawMessage: 'Cannot call method getCacheTags() on class-string|object.'
-			identifier: method.nonObject
-			count: 1
-			path: Modules/Core/app/Models/Entity.php
-
-		-
-			rawMessage: 'Cannot call method store() on mixed.'
-			identifier: method.nonObject
-			count: 1
-			path: Modules/Core/app/Models/Entity.php
-
-		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
 			count: 2
@@ -5473,18 +4651,6 @@ parameters:
 			path: Modules/Core/app/Models/Entity.php
 
 		-
-			rawMessage: 'Call to an undefined method object::getKeyName().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Models/Field.php
-
-		-
-			rawMessage: Cannot access constant class on mixed.
-			identifier: classConstant.nonObject
-			count: 1
-			path: Modules/Core/app/Models/Field.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\Field::presets() should return Illuminate\Database\Eloquent\Relations\BelongsToMany<Modules\Core\Models\Preset, Modules\Core\Models\Field, Modules\Core\Models\Pivot\Fieldable, ''pivot''> but returns Illuminate\Database\Eloquent\Relations\BelongsToMany<Modules\Core\Models\Preset, $this(Modules\Core\Models\Field), Modules\Core\Models\Pivot\Fieldable, ''pivot''>.'
 			identifier: return.type
 			count: 1
@@ -5493,12 +4659,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #2 ...$arrays of function array_merge expects array, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/Field.php
-
-		-
-			rawMessage: 'Trait Modules\Core\Models\Concerns\HasApprovals requires using class to implement Modules\Core\Contracts\IModeratableModel, but Modules\Core\Models\Field does not.'
-			identifier: class.missingImplements
 			count: 1
 			path: Modules/Core/app/Models/Field.php
 
@@ -5513,12 +4673,6 @@ parameters:
 			identifier: missingType.generics
 			count: 1
 			path: Modules/Core/app/Models/ImportSession.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::revert().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Models/License.php
 
 		-
 			rawMessage: 'Class Modules\Core\Models\License uses generic trait Illuminate\Database\Eloquent\Factories\HasFactory but does not specify its types: TFactory'
@@ -5553,12 +4707,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\Core\Models\License::occupied() has parameter $query with generic class Illuminate\Database\Eloquent\Builder but does not specify its types: TModel'
 			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\License::trashingVersions() should return Illuminate\Database\Eloquent\Builder<Overtrue\LaravelVersionable\Version> but returns Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>.'
-			identifier: return.type
 			count: 1
 			path: Modules/Core/app/Models/License.php
 
@@ -5617,24 +4765,6 @@ parameters:
 			path: Modules/Core/app/Models/Modification.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::revert().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
-			rawMessage: 'Cannot call method getCacheTags() on class-string|object.'
-			identifier: method.nonObject
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
-			rawMessage: 'Cannot call method store() on mixed.'
-			identifier: method.nonObject
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
 			rawMessage: 'Class Modules\Core\Models\Permission uses generic trait Illuminate\Database\Eloquent\Factories\HasFactory but does not specify its types: TFactory'
 			identifier: missingType.generics
 			count: 1
@@ -5655,12 +4785,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\Core\Models\Permission::getRules() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Permission::trashingVersions() should return Illuminate\Database\Eloquent\Builder<Overtrue\LaravelVersionable\Version> but returns Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>.'
-			identifier: return.type
 			count: 1
 			path: Modules/Core/app/Models/Permission.php
 
@@ -5695,12 +4819,6 @@ parameters:
 			path: Modules/Core/app/Models/Permission.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::revert().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\Pivot\Fieldable::ordered() has parameter $query with generic class Illuminate\Database\Eloquent\Builder but does not specify its types: TModel'
 			identifier: missingType.generics
 			count: 1
@@ -5709,12 +4827,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\Core\Models\Pivot\Fieldable::ordered() return type with generic class Illuminate\Database\Eloquent\Builder does not specify its types: TModel'
 			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Pivot\Fieldable::trashingVersions() should return Illuminate\Database\Eloquent\Builder<Overtrue\LaravelVersionable\Version> but returns Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>.'
-			identifier: return.type
 			count: 1
 			path: Modules/Core/app/Models/Pivot/Fieldable.php
 
@@ -5755,46 +4867,10 @@ parameters:
 			path: Modules/Core/app/Models/Pivot/Presettable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Presettable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Presettable.php
-
-		-
 			rawMessage: Cannot cast mixed to float.
 			identifier: cast.double
 			count: 2
 			path: Modules/Core/app/Models/Place.php
-
-		-
-			rawMessage: 'Call to an undefined method object::getKeyName().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Models/Preset.php
-
-		-
-			rawMessage: Cannot access constant class on mixed.
-			identifier: classConstant.nonObject
-			count: 1
-			path: Modules/Core/app/Models/Preset.php
-
-		-
-			rawMessage: 'Cannot call method getCacheTags() on class-string|object.'
-			identifier: method.nonObject
-			count: 1
-			path: Modules/Core/app/Models/Preset.php
-
-		-
-			rawMessage: 'Cannot call method store() on mixed.'
-			identifier: method.nonObject
-			count: 1
-			path: Modules/Core/app/Models/Preset.php
 
 		-
 			rawMessage: 'Generic type Illuminate\Database\Eloquent\Relations\BelongsTo<Modules\Core\Models\Entity> in PHPDoc tag @return does not specify all template types of class Illuminate\Database\Eloquent\Relations\BelongsTo: TRelatedModel, TDeclaringModel'
@@ -5839,12 +4915,6 @@ parameters:
 			path: Modules/Core/app/Models/Preset.php
 
 		-
-			rawMessage: 'Trait Modules\Core\Models\Concerns\HasApprovals requires using class to implement Modules\Core\Contracts\IModeratableModel, but Modules\Core\Models\Preset does not.'
-			identifier: class.missingImplements
-			count: 1
-			path: Modules/Core/app/Models/Preset.php
-
-		-
 			rawMessage: 'Unable to resolve the template type TRelatedModel in call to method Illuminate\Database\Eloquent\Model::belongsTo()'
 			identifier: argument.templateType
 			count: 1
@@ -5881,27 +4951,9 @@ parameters:
 			path: Modules/Core/app/Models/Role.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::revert().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
 			rawMessage: 'Call to function is_array() with array<int, string> will always evaluate to true.'
 			identifier: function.alreadyNarrowedType
 			count: 2
-			path: Modules/Core/app/Models/Role.php
-
-		-
-			rawMessage: 'Cannot call method getCacheTags() on class-string|object.'
-			identifier: method.nonObject
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
-			rawMessage: 'Cannot call method store() on mixed.'
-			identifier: method.nonObject
-			count: 1
 			path: Modules/Core/app/Models/Role.php
 
 		-
@@ -5953,12 +5005,6 @@ parameters:
 			path: Modules/Core/app/Models/Role.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\Role::trashingVersions() should return Illuminate\Database\Eloquent\Builder<Overtrue\LaravelVersionable\Version> but returns Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\Role::users() should return Illuminate\Database\Eloquent\Relations\BelongsToMany<Modules\Core\Models\User, Illuminate\Database\Eloquent\Relations\Pivot, ''pivot''> but returns Illuminate\Database\Eloquent\Relations\BelongsToMany<Illuminate\Database\Eloquent\Model, Illuminate\Database\Eloquent\Model, Modules\Core\Models\Pivot\ModelHasRole, ''pivot''>.'
 			identifier: return.type
 			count: 1
@@ -5989,30 +5035,6 @@ parameters:
 			path: Modules/Core/app/Models/Role.php
 
 		-
-			rawMessage: 'Call to an undefined method object::getKeyName().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Models/Setting.php
-
-		-
-			rawMessage: Cannot access constant class on mixed.
-			identifier: classConstant.nonObject
-			count: 1
-			path: Modules/Core/app/Models/Setting.php
-
-		-
-			rawMessage: 'Cannot call method getCacheTags() on class-string|object.'
-			identifier: method.nonObject
-			count: 1
-			path: Modules/Core/app/Models/Setting.php
-
-		-
-			rawMessage: 'Cannot call method store() on mixed.'
-			identifier: method.nonObject
-			count: 1
-			path: Modules/Core/app/Models/Setting.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\Setting::requiresApprovalWhen() has parameter $modifications with no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
@@ -6031,18 +5053,6 @@ parameters:
 			path: Modules/Core/app/Models/Setting.php
 
 		-
-			rawMessage: 'Parameter #1 $value of static method Modules\Core\Casts\SettingTypeEnum::tryFrom() expects int|string, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/Setting.php
-
-		-
-			rawMessage: 'Trait Modules\Core\Models\Concerns\HasApprovals requires using class to implement Modules\Core\Contracts\IModeratableModel, but Modules\Core\Models\Setting does not.'
-			identifier: class.missingImplements
-			count: 1
-			path: Modules/Core/app/Models/Setting.php
-
-		-
 			rawMessage: 'Argument of an invalid type mixed supplied for foreach, only iterables are supported.'
 			identifier: foreach.nonIterable
 			count: 1
@@ -6057,18 +5067,6 @@ parameters:
 		-
 			rawMessage: 'Call to an undefined method object::getFillable().'
 			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Models/Taxonomy.php
-
-		-
-			rawMessage: 'Call to an undefined method object::getKeyName().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Models/Taxonomy.php
-
-		-
-			rawMessage: Cannot access constant class on mixed.
-			identifier: classConstant.nonObject
 			count: 1
 			path: Modules/Core/app/Models/Taxonomy.php
 
@@ -6123,12 +5121,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\Core\Models\Taxonomy::_internalDynamicContentsGetComponentsAttribute() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Taxonomy.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Taxonomy::_internalDynamicContentsGetRules() should return array<string, array<string, mixed>> but returns array<string>.'
-			identifier: return.type
 			count: 1
 			path: Modules/Core/app/Models/Taxonomy.php
 
@@ -6367,12 +5359,6 @@ parameters:
 			path: Modules/Core/app/Models/Taxonomy.php
 
 		-
-			rawMessage: 'Trait Modules\Core\Models\Concerns\HasApprovals requires using class to implement Modules\Core\Contracts\IModeratableModel, but Modules\Core\Models\Taxonomy does not.'
-			identifier: class.missingImplements
-			count: 1
-			path: Modules/Core/app/Models/Taxonomy.php
-
-		-
 			rawMessage: 'Trait Modules\Core\Models\Concerns\HasTranslatedDynamicContents uses generic trait Modules\Core\Models\Concerns\HasDynamicContents but does not specify its types: TModel'
 			identifier: missingType.generics
 			count: 1
@@ -6445,12 +5431,6 @@ parameters:
 			path: Modules/Core/app/Models/User.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::revert().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Models/User.php
-
-		-
 			rawMessage: 'Call to an undefined method object::getTable().'
 			identifier: method.notFound
 			count: 1
@@ -6482,12 +5462,6 @@ parameters:
 
 		-
 			rawMessage: 'Method Modules\Core\Models\User::roles() should return Illuminate\Database\Eloquent\Relations\BelongsToMany<Modules\Core\Models\Role, $this(Modules\Core\Models\User), Modules\Core\Models\Pivot\ModelHasRole, ''pivot''> but returns Illuminate\Database\Eloquent\Relations\BelongsToMany<Illuminate\Database\Eloquent\Model, Illuminate\Database\Eloquent\Model, Modules\Core\Models\Pivot\ModelHasRole, ''pivot''>.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/app/Models/User.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\User::trashingVersions() should return Illuminate\Database\Eloquent\Builder<Overtrue\LaravelVersionable\Version> but returns Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>.'
 			identifier: return.type
 			count: 1
 			path: Modules/Core/app/Models/User.php
@@ -6537,7 +5511,7 @@ parameters:
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::versions().'
 			identifier: method.notFound
-			count: 2
+			count: 1
 			path: Modules/Core/app/Models/Version.php
 
 		-
@@ -6613,12 +5587,6 @@ parameters:
 			path: Modules/Core/app/Notifications/PendingApprovalsNotification.php
 
 		-
-			rawMessage: 'Unable to resolve the template type TReturnType in call to method Illuminate\Support\Collection<int,array<string, int|string|null>>::sum()'
-			identifier: argument.templateType
-			count: 3
-			path: Modules/Core/app/Notifications/PendingApprovalsNotification.php
-
-		-
 			rawMessage: Cannot cast mixed to int.
 			identifier: cast.int
 			count: 1
@@ -6643,34 +5611,10 @@ parameters:
 			path: Modules/Core/app/Overrides/CustomSoftDeletingScope.php
 
 		-
-			rawMessage: 'Call to an undefined method TModel of Illuminate\Database\Eloquent\Model::getQualifiedIsDeletedColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Overrides/CustomSoftDeletingScope.php
-
-		-
-			rawMessage: 'Parameter #1 $builder (Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>) of method Modules\Core\Overrides\CustomSoftDeletingScope::addOnlyTrashed() should be compatible with parameter $builder (Illuminate\Database\Eloquent\Builder<*>) of method Illuminate\Database\Eloquent\SoftDeletingScope::addOnlyTrashed()'
-			identifier: method.childParameterType
-			count: 1
-			path: Modules/Core/app/Overrides/CustomSoftDeletingScope.php
-
-		-
-			rawMessage: 'Parameter #1 $builder (Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>) of method Modules\Core\Overrides\CustomSoftDeletingScope::addWithoutTrashed() should be compatible with parameter $builder (Illuminate\Database\Eloquent\Builder<*>) of method Illuminate\Database\Eloquent\SoftDeletingScope::addWithoutTrashed()'
-			identifier: method.childParameterType
-			count: 1
-			path: Modules/Core/app/Overrides/CustomSoftDeletingScope.php
-
-		-
 			rawMessage: 'Parameter #1 $scope of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::withoutGlobalScope() expects Illuminate\Database\Eloquent\Scope|string, Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model> given.'
 			identifier: argument.type
 			count: 2
 			path: Modules/Core/app/Overrides/CustomSoftDeletingScope.php
-
-		-
-			rawMessage: Binary operation "." between 'Default translation…' and mixed results in an error.
-			identifier: binaryOp.invalid
-			count: 1
-			path: Modules/Core/app/Overrides/Factory.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::setForcedApprovalUpdate().'
@@ -6705,12 +5649,6 @@ parameters:
 		-
 			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::getTranslatableFields().'
 			identifier: staticMethod.notFound
-			count: 1
-			path: Modules/Core/app/Overrides/Factory.php
-
-		-
-			rawMessage: Cannot access offset mixed on mixed.
-			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
 			path: Modules/Core/app/Overrides/Factory.php
 
@@ -6799,18 +5737,6 @@ parameters:
 			path: Modules/Core/app/Overrides/LocaleScope.php
 
 		-
-			rawMessage: 'Parameter #3 $default_locale of method Modules\Core\Overrides\LocaleScope::applyLocaleConstraint() expects string, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Overrides/LocaleScope.php
-
-		-
-			rawMessage: 'Parameter #3 $default_locale of method Modules\Core\Overrides\LocaleScope::eagerLoadTranslation() expects string, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Overrides/LocaleScope.php
-
-		-
 			rawMessage: Variable $q in PHPDoc tag @var does not exist.
 			identifier: varTag.variableNotFound
 			count: 1
@@ -6835,12 +5761,6 @@ parameters:
 			path: Modules/Core/app/Overrides/Migrator.php
 
 		-
-			rawMessage: Left side of && is always true.
-			identifier: booleanAnd.leftAlwaysTrue
-			count: 2
-			path: Modules/Core/app/Overrides/Migrator.php
-
-		-
 			rawMessage: 'Parameter #1 $output of class Modules\Core\Console\View\Components\MigrationTask constructor expects Illuminate\Console\OutputStyle, Symfony\Component\Console\Output\OutputInterface given.'
 			identifier: argument.type
 			count: 1
@@ -6853,12 +5773,6 @@ parameters:
 			path: Modules/Core/app/Overrides/Migrator.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::revert().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
 			rawMessage: 'Call to function is_array() with list<string> will always evaluate to true.'
 			identifier: function.alreadyNarrowedType
 			count: 2
@@ -6867,12 +5781,6 @@ parameters:
 		-
 			rawMessage: 'Class Modules\Core\Overrides\Model uses generic trait Illuminate\Database\Eloquent\Factories\HasFactory but does not specify its types: TFactory'
 			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
-			rawMessage: 'Method Modules\Core\Overrides\Model::trashingVersions() should return Illuminate\Database\Eloquent\Builder<Overtrue\LaravelVersionable\Version> but returns Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>.'
-			identifier: return.type
 			count: 1
 			path: Modules/Core/app/Overrides/Model.php
 
@@ -7027,27 +5935,9 @@ parameters:
 			path: Modules/Core/app/Overrides/Seeder.php
 
 		-
-			rawMessage: 'Part $definition[''name''] (mixed) of encapsed string cannot be cast to string.'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: Modules/Core/app/Overrides/Seeder.php
-
-		-
-			rawMessage: Possibly invalid array key type mixed.
-			identifier: offsetAccess.invalidOffset
-			count: 1
-			path: Modules/Core/app/Overrides/Seeder.php
-
-		-
 			rawMessage: 'Type string in generic type Illuminate\Database\Eloquent\Relations\BelongsToMany<Illuminate\Database\Eloquent\Model, Illuminate\Database\Eloquent\Relations\Pivot, string> in PHPDoc tag @var for variable $relation is not subtype of template type TPivotModel of Illuminate\Database\Eloquent\Relations\Pivot = Illuminate\Database\Eloquent\Relations\Pivot of class Illuminate\Database\Eloquent\Relations\BelongsToMany.'
 			identifier: generics.notSubtype
 			count: 1
-			path: Modules/Core/app/Overrides/Seeder.php
-
-		-
-			rawMessage: Using nullsafe method call on non-nullable type Illuminate\Console\Command. Use -> instead.
-			identifier: nullsafe.neverNull
-			count: 3
 			path: Modules/Core/app/Overrides/Seeder.php
 
 		-
@@ -7099,18 +5989,6 @@ parameters:
 			path: Modules/Core/app/Overrides/ServiceProvider.php
 
 		-
-			rawMessage: 'Method Modules\Core\Overrides\StatusCommand::handle() should return int|null but returns mixed.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/app/Overrides/StatusCommand.php
-
-		-
-			rawMessage: 'Parameter #1 $name of method Illuminate\Database\Migrations\Migrator::usingConnection() expects string, string|null given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Overrides/StatusCommand.php
-
-		-
 			rawMessage: 'Method Modules\Core\Providers\CommandListenerProvider::provides() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
@@ -7159,12 +6037,6 @@ parameters:
 			path: Modules/Core/app/Search/Console/DeleteIndexCommand.php
 
 		-
-			rawMessage: 'Call to an undefined method object::invalidateCache().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Search/Console/IndexCommand.php
-
-		-
 			rawMessage: Cannot instantiate class using string|null.
 			identifier: new.nonObject
 			count: 1
@@ -7175,18 +6047,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/Core/app/Search/Console/IndexCommand.php
-
-		-
-			rawMessage: 'Call to an undefined method object::invalidateCache().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Search/Console/SearchReindexCommand.php
-
-		-
-			rawMessage: 'Call to an undefined method object::invalidateCache().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Search/Console/SearchSyncCommand.php
 
 		-
 			rawMessage: 'Method Modules\Core\Search\Contracts\ISchemaTranslator::translate() return type has no value type specified in iterable type array.'
@@ -7307,12 +6167,6 @@ parameters:
 			identifier: arrayValues.list
 			count: 1
 			path: Modules/Core/app/Search/DTOs/SearchQueryAnalysis.php
-
-		-
-			rawMessage: Attribute class Modules\Core\Search\Engines\Override does not exist.
-			identifier: attribute.notFound
-			count: 1
-			path: Modules/Core/app/Search/Engines/DatabaseEngine.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getScoutKeyName().'
@@ -7483,24 +6337,6 @@ parameters:
 			path: Modules/Core/app/Search/Engines/ElasticsearchEngine.php
 
 		-
-			rawMessage: Cannot access offset 'properties' on mixed.
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: Modules/Core/app/Search/Engines/TypesenseEngine.php
-
-		-
-			rawMessage: Cannot access offset 'type' on mixed.
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: Modules/Core/app/Search/Engines/TypesenseEngine.php
-
-		-
-			rawMessage: Cannot access offset 'vector' on mixed.
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: Modules/Core/app/Search/Engines/TypesenseEngine.php
-
-		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
 			count: 2
@@ -7553,18 +6389,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: Modules/Core/app/Search/Engines/TypesenseEngine.php
-
-		-
-			rawMessage: 'Parameter #1 $filters of method Modules\Core\Search\Engines\TypesenseEngine::buildSearchFilters() expects array<string, mixed>, array<mixed, mixed> given.'
-			identifier: argument.type
-			count: 2
-			path: Modules/Core/app/Search/Engines/TypesenseEngine.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Collection::searchable().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Search/Jobs/BulkIndexSearchJob.php
 
 		-
 			rawMessage: Cannot access constant class on Illuminate\Database\Eloquent\Model|null.
@@ -8017,15 +6841,9 @@ parameters:
 			path: Modules/Core/app/Search/Translators/ElasticsearchTranslator.php
 
 		-
-			rawMessage: Cannot cast mixed to int.
-			identifier: cast.int
-			count: 1
-			path: Modules/Core/app/Search/Translators/ElasticsearchTranslator.php
-
-		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
-			count: 2
+			count: 1
 			path: Modules/Core/app/Search/Translators/ElasticsearchTranslator.php
 
 		-
@@ -8113,37 +6931,13 @@ parameters:
 			path: Modules/Core/app/Services/AclResolverService.php
 
 		-
-			rawMessage: 'Cannot call method getPathname() on mixed.'
-			identifier: method.nonObject
-			count: 1
-			path: Modules/Core/app/Services/AclResolverService.php
-
-		-
-			rawMessage: 'Cannot call method isFile() on mixed.'
-			identifier: method.nonObject
-			count: 1
-			path: Modules/Core/app/Services/AclResolverService.php
-
-		-
 			rawMessage: Cannot cast mixed to int.
 			identifier: cast.int
 			count: 1
 			path: Modules/Core/app/Services/AclResolverService.php
 
 		-
-			rawMessage: Cannot cast mixed to string.
-			identifier: cast.string
-			count: 1
-			path: Modules/Core/app/Services/AclResolverService.php
-
-		-
 			rawMessage: 'Method Modules\Core\Services\AclResolverService::assertSharedConnection() should return string but returns string|null.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/app/Services/AclResolverService.php
-
-		-
-			rawMessage: 'Method Modules\Core\Services\AclResolverService::getCombinedFilters() should return Modules\Core\Casts\FiltersGroup|null but returns mixed.'
 			identifier: return.type
 			count: 1
 			path: Modules/Core/app/Services/AclResolverService.php
@@ -8155,33 +6949,9 @@ parameters:
 			path: Modules/Core/app/Services/AclResolverService.php
 
 		-
-			rawMessage: 'Parameter #1 $connection_name of method Modules\Core\Services\AclResolverService::buildCacheKey() expects string, string|null given.'
-			identifier: argument.type
-			count: 2
-			path: Modules/Core/app/Services/AclResolverService.php
-
-		-
-			rawMessage: 'Parameter #1 $key of method Illuminate\Support\Collection<int,Modules\Core\Models\Role>::put() expects int, int|string given.'
-			identifier: argument.type
-			count: 2
-			path: Modules/Core/app/Services/AclResolverService.php
-
-		-
 			rawMessage: 'Parameter #1 $table of method Illuminate\Database\Connection::table() expects Closure|Illuminate\Contracts\Database\Query\Expression|Illuminate\Database\Query\Builder|string|UnitEnum, mixed given.'
 			identifier: argument.type
 			count: 3
-			path: Modules/Core/app/Services/AclResolverService.php
-
-		-
-			rawMessage: 'Parameter $filters of class Modules\Core\Casts\FiltersGroup constructor expects array<Modules\Core\Casts\Filter|Modules\Core\Casts\FiltersGroup>, array<int, mixed> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Services/AclResolverService.php
-
-		-
-			rawMessage: 'Unable to resolve the template type TMapValue in call to method Illuminate\Support\Collection<int,Modules\Core\Models\ACL>::map()'
-			identifier: argument.templateType
-			count: 1
 			path: Modules/Core/app/Services/AclResolverService.php
 
 		-
@@ -8209,18 +6979,6 @@ parameters:
 			path: Modules/Core/app/Services/ApprovalNotificationService.php
 
 		-
-			rawMessage: 'Unable to resolve the template type TReturnType in call to method Illuminate\Support\Collection<int,array<string, int|string>>::sum()'
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Services/ApprovalNotificationService.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::applyModificationChanges().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Services/Crud/CrudService.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::setLockDeadline().'
 			identifier: method.notFound
 			count: 1
@@ -8234,12 +6992,6 @@ parameters:
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Relations\BelongsToMany::getMorphType().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Services/Crud/CrudService.php
-
-		-
-			rawMessage: 'Call to an undefined method object::setConnection().'
 			identifier: method.notFound
 			count: 1
 			path: Modules/Core/app/Services/Crud/CrudService.php
@@ -8281,19 +7033,7 @@ parameters:
 			path: Modules/Core/app/Services/Crud/CrudService.php
 
 		-
-			rawMessage: Class Modules\Core\Services\Crud\AuthorizationException not found.
-			identifier: class.notFound
-			count: 1
-			path: Modules/Core/app/Services/Crud/CrudService.php
-
-		-
 			rawMessage: Instanceof between Illuminate\Database\Eloquent\Model and Illuminate\Database\Eloquent\Model will always evaluate to true.
-			identifier: instanceof.alwaysTrue
-			count: 1
-			path: Modules/Core/app/Services/Crud/CrudService.php
-
-		-
-			rawMessage: Instanceof between Modules\Core\Casts\Filter and Modules\Core\Casts\Filter will always evaluate to true.
 			identifier: instanceof.alwaysTrue
 			count: 1
 			path: Modules/Core/app/Services/Crud/CrudService.php
@@ -8461,12 +7201,6 @@ parameters:
 			path: Modules/Core/app/Services/Crud/CrudService.php
 
 		-
-			rawMessage: 'Parameter #1 $value of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::take() expects int, int|null given.'
-			identifier: argument.type
-			count: 2
-			path: Modules/Core/app/Services/Crud/CrudService.php
-
-		-
 			rawMessage: 'Parameter #2 $items of method Modules\Core\Services\Crud\CrudService::buildFreshnessPresence() expects list<array{id: mixed, updated_at: string|null}>, array<int, array{id: mixed, updated_at: string|null}> given.'
 			identifier: argument.type
 			count: 1
@@ -8487,7 +7221,7 @@ parameters:
 		-
 			rawMessage: 'Parameter #4 $operation of method Modules\Core\Services\Crud\CrudService::castApprovalVote() expects ''approve''|''disapprove'', string given.'
 			identifier: argument.type
-			count: 2
+			count: 1
 			path: Modules/Core/app/Services/Crud/CrudService.php
 
 		-
@@ -8683,12 +7417,6 @@ parameters:
 			path: Modules/Core/app/Services/Docs/ModuleInfoService.php
 
 		-
-			rawMessage: 'Parameter #1 $array of function sort expects TArray of array<T>, mixed given.'
-			identifier: argument.type
-			count: 2
-			path: Modules/Core/app/Services/Docs/ModuleInfoService.php
-
-		-
 			rawMessage: 'Parameter #1 $json of function json_decode expects string, string|false given.'
 			identifier: argument.type
 			count: 1
@@ -8713,12 +7441,6 @@ parameters:
 			path: Modules/Core/app/Services/DynamicContentsService.php
 
 		-
-			rawMessage: Instantiated class Modules\Core\Models\Entity is abstract.
-			identifier: new.abstract
-			count: 1
-			path: Modules/Core/app/Services/DynamicContentsService.php
-
-		-
 			rawMessage: 'Method Modules\Core\Services\DynamicContentsService::fetchAvailablePresets() should return Illuminate\Database\Eloquent\Collection<int, Modules\Core\Models\Preset> but returns Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>.'
 			identifier: return.type
 			count: 1
@@ -8737,12 +7459,6 @@ parameters:
 			path: Modules/Core/app/Services/DynamicContentsService.php
 
 		-
-			rawMessage: 'Parameter #2 $callback of method Illuminate\Contracts\Cache\Repository::rememberForever() expects Closure(): mixed, callable(): Illuminate\Database\Eloquent\Collection<int, TModel> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Services/DynamicContentsService.php
-
-		-
 			rawMessage: 'Property Modules\Core\Services\DynamicContentsService::$presets_cache (array<string, Illuminate\Database\Eloquent\Collection<int, Modules\Core\Models\Preset>>) does not accept non-empty-array<string, Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Collection<int, Modules\Core\Models\Preset>>.'
 			identifier: assign.propertyType
 			count: 1
@@ -8751,12 +7467,6 @@ parameters:
 		-
 			rawMessage: 'Property Modules\Core\Services\DynamicContentsService::$presettables_cache (array<string, Illuminate\Database\Eloquent\Collection<int, Modules\Core\Models\Pivot\Presettable>>) does not accept non-empty-array<string, Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Collection<int, Modules\Core\Models\Pivot\Presettable>>.'
 			identifier: assign.propertyType
-			count: 1
-			path: Modules/Core/app/Services/DynamicContentsService.php
-
-		-
-			rawMessage: 'Unable to resolve the template type TCacheValue in call to method Illuminate\Contracts\Cache\Repository::rememberForever()'
-			identifier: argument.templateType
 			count: 1
 			path: Modules/Core/app/Services/DynamicContentsService.php
 
@@ -8791,12 +7501,6 @@ parameters:
 			path: Modules/Core/app/Services/DynamicEntityService.php
 
 		-
-			rawMessage: Binary operation "." between 'elastic.client…' and mixed results in an error.
-			identifier: binaryOp.invalid
-			count: 1
-			path: Modules/Core/app/Services/ElasticsearchService.php
-
-		-
 			rawMessage: 'Call to an undefined method Elastic\Elasticsearch\Response\Elasticsearch|Http\Promise\Promise::asArray().'
 			identifier: method.notFound
 			count: 3
@@ -8817,24 +7521,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\Core\Services\ElasticsearchService::search() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Services/ElasticsearchService.php
-
-		-
-			rawMessage: 'Parameter #1 $config of static method Elastic\Elasticsearch\ClientBuilder::fromConfig() expects array, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Services/ElasticsearchService.php
-
-		-
-			rawMessage: 'Parameter #1 $params of method Elastic\Elasticsearch\Client::delete() expects array{id: string, index: string, wait_for_active_shards?: string, refresh?: string, routing?: string, timeout?: int|string, if_seq_no?: int, if_primary_term?: int, ...}|null, array{index: string, id: int|string, refresh?: ''true''} given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Services/ElasticsearchService.php
-
-		-
-			rawMessage: 'Parameter #1 $params of method Elastic\Elasticsearch\Client::exists() expects array{id: string, index: string, stored_fields?: array<string>|string, preference?: string, realtime?: bool, refresh?: bool, routing?: string, _source?: array<string>|string, ...}|null, array{index: string, id: int|string} given.'
-			identifier: argument.type
 			count: 1
 			path: Modules/Core/app/Services/ElasticsearchService.php
 
@@ -8947,50 +7633,8 @@ parameters:
 			path: Modules/Core/app/Services/PerModelSettingResolver.php
 
 		-
-			rawMessage: 'Method Modules\Core\Services\PerModelSettingResolver::nameIndex() should return array<string, string> but returns array<mixed, mixed>.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/app/Services/PerModelSettingResolver.php
-
-		-
-			rawMessage: 'Method Modules\Core\Services\PerModelSettingResolver::nameIndex() should return array<string, string> but returns array<mixed>.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/app/Services/PerModelSettingResolver.php
-
-		-
-			rawMessage: 'Property Modules\Core\Services\PerModelSettingResolver::$name_index (array<string, string>|null) does not accept array<mixed, mixed>.'
-			identifier: assign.propertyType
-			count: 1
-			path: Modules/Core/app/Services/PerModelSettingResolver.php
-
-		-
-			rawMessage: 'Property Modules\Core\Services\PerModelSettingResolver::$name_index (array<string, string>|null) does not accept array<mixed>.'
-			identifier: assign.propertyType
-			count: 1
-			path: Modules/Core/app/Services/PerModelSettingResolver.php
-
-		-
-			rawMessage: 'Parameter #1 $callback of method Illuminate\Database\Eloquent\Collection<int,Modules\Core\Models\Field>::map() contains unresolvable type.'
-			identifier: argument.unresolvableType
-			count: 1
-			path: Modules/Core/app/Services/PresetVersioningService.php
-
-		-
 			rawMessage: 'Parameter #1 $json of function json_decode expects string, string|false given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Services/PresetVersioningService.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Database\Eloquent\Collection<int,Modules\Core\Models\Field>::map() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
-			count: 1
-			path: Modules/Core/app/Services/PresetVersioningService.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Support\Collection<int,array<string, mixed>>::all() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
 			count: 1
 			path: Modules/Core/app/Services/PresetVersioningService.php
 
@@ -9087,17 +7731,11 @@ parameters:
 		-
 			rawMessage: Cannot cast mixed to int.
 			identifier: cast.int
-			count: 2
-			path: Modules/Core/app/Versioning/ActiveVersionSet.php
-
-		-
-			rawMessage: 'Parameter #2 $persisted of class Modules\Core\Versioning\Exceptions\VersionSequenceMismatchException constructor expects list<int>, array<int, int> given.'
-			identifier: argument.type
 			count: 1
 			path: Modules/Core/app/Versioning/ActiveVersionSet.php
 
 		-
-			rawMessage: 'Parameter #3 $visible of class Modules\Core\Versioning\Exceptions\VersionSequenceMismatchException constructor expects list<int>, array<int, int> given.'
+			rawMessage: 'Parameter #2 $persisted of class Modules\Core\Versioning\Exceptions\VersionSequenceMismatchException constructor expects list<int>, array<int, int> given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/Core/app/Versioning/ActiveVersionSet.php
@@ -9119,36 +7757,6 @@ parameters:
 			identifier: return.type
 			count: 1
 			path: Modules/Core/app/Versioning/Data/VersionSetRoot.php
-
-		-
-			rawMessage: 'Parameter #1 $connection of method Modules\Core\Versioning\VersionSetManager::enlist() expects string, string|null given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Versioning/VersionSetManager.php
-
-		-
-			rawMessage: 'Parameter #1 $connection_name of method Modules\Core\Versioning\ActiveVersionSet::setEnlistedConnectionName() expects string, string|null given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Versioning/VersionSetManager.php
-
-		-
-			rawMessage: 'Parameter #2 $connection_name of method Modules\Core\Versioning\ActiveVersionSet::activate() expects string, string|null given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Versioning/VersionSetManager.php
-
-		-
-			rawMessage: 'Parameter #2 $ids of method Illuminate\Database\Eloquent\ModelNotFoundException<Illuminate\Database\Eloquent\Model>::setModel() expects array<int, int|string>|int|string, array<int, mixed> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Versioning/VersionSetManager.php
-
-		-
-			rawMessage: 'Parameter #2 $requested of static method Modules\Core\Versioning\Exceptions\MultipleVersionConnectionsNotSupportedException::forConnections() expects string, string|null given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Versioning/VersionSetManager.php
 
 		-
 			rawMessage: 'Parameter #3 $actual of static method Modules\Core\Versioning\Exceptions\InvalidRevertedVersionSetException::wrongConnection() expects string, string|null given.'
@@ -9379,18 +7987,6 @@ parameters:
 			path: Modules/Core/database/migrations/2024_03_15_224941_create_permission_tables.php
 
 		-
-			rawMessage: 'Parameter #1 $key of method Illuminate\Contracts\Cache\Repository::forget() expects string, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/database/migrations/2024_03_15_224941_create_permission_tables.php
-
-		-
-			rawMessage: 'Parameter #1 $name of method Illuminate\Cache\CacheManager::store() expects string|null, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/database/migrations/2024_03_15_224941_create_permission_tables.php
-
-		-
 			rawMessage: 'Parameter #1 $table of method Illuminate\Database\Grammar::wrapTable() expects Illuminate\Contracts\Database\Query\Expression|string, mixed given.'
 			identifier: argument.type
 			count: 1
@@ -9511,18 +8107,6 @@ parameters:
 			path: Modules/Core/database/seeders/CoreDatabaseSeeder.php
 
 		-
-			rawMessage: 'Method Modules\Core\Database\Seeders\CoreDatabaseSeeder::runtimeSettingDefinitions() should return array<int, array{name: string, value: mixed, type: Modules\Core\Casts\SettingTypeEnum, group_name: string, description: string, choices?: array<int, mixed>}> but returns array{array, array, array, array, array, array, array, array, ...}.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/database/seeders/CoreDatabaseSeeder.php
-
-		-
-			rawMessage: 'Method Modules\Core\Database\Seeders\CoreDatabaseSeeder::seedAiModerationModel() has parameter $defaultSettings with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/database/seeders/CoreDatabaseSeeder.php
-
-		-
 			rawMessage: 'Method Modules\Core\Database\Seeders\CoreDatabaseSeeder::seedAutoTranslateModel() has parameter $defaultSettings with no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
@@ -9625,88 +8209,10 @@ parameters:
 			path: Modules/Core/database/seeders/CoreDatabaseSeeder.php
 
 		-
-			rawMessage: Using nullsafe method call on non-nullable type Illuminate\Console\Command. Use -> instead.
-			identifier: nullsafe.neverNull
-			count: 10
-			path: Modules/Core/database/seeders/CoreDatabaseSeeder.php
-
-		-
 			rawMessage: Variable $owner in PHPDoc tag @var does not exist.
 			identifier: varTag.variableNotFound
 			count: 1
 			path: Modules/Core/database/seeders/CoreDatabaseSeeder.php
-
-		-
-			rawMessage: Cannot cast mixed to string.
-			identifier: cast.string
-			count: 1
-			path: Modules/Core/database/seeders/PermissionRefreshSeeder.php
-
-		-
-			rawMessage: 'Parameter #1 $model of method Modules\Core\Overrides\Seeder::logOperation() expects class-string, string given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/database/seeders/PermissionRefreshSeeder.php
-
-		-
-			rawMessage: Using nullsafe method call on non-nullable type Illuminate\Console\Command. Use -> instead.
-			identifier: nullsafe.neverNull
-			count: 1
-			path: Modules/Core/database/seeders/PermissionRefreshSeeder.php
-
-		-
-			rawMessage: Cannot cast mixed to string.
-			identifier: cast.string
-			count: 1
-			path: Modules/Core/lang/de/passwords.php
-
-		-
-			rawMessage: Cannot cast mixed to string.
-			identifier: cast.string
-			count: 1
-			path: Modules/Core/lang/de/validation.php
-
-		-
-			rawMessage: Cannot cast mixed to string.
-			identifier: cast.string
-			count: 1
-			path: Modules/Core/lang/en/passwords.php
-
-		-
-			rawMessage: Cannot cast mixed to string.
-			identifier: cast.string
-			count: 1
-			path: Modules/Core/lang/en/validation.php
-
-		-
-			rawMessage: Cannot cast mixed to string.
-			identifier: cast.string
-			count: 1
-			path: Modules/Core/lang/es/passwords.php
-
-		-
-			rawMessage: Cannot cast mixed to string.
-			identifier: cast.string
-			count: 1
-			path: Modules/Core/lang/es/validation.php
-
-		-
-			rawMessage: Cannot cast mixed to string.
-			identifier: cast.string
-			count: 1
-			path: Modules/Core/lang/it/passwords.php
-
-		-
-			rawMessage: Cannot cast mixed to string.
-			identifier: cast.string
-			count: 1
-			path: Modules/Core/lang/it/validation.php
-
-		-
-			rawMessage: Cannot cast mixed to string.
-			identifier: cast.string
-			count: 1
-			path: Modules/Core/lang/sl/passwords.php
 
 		-
 			rawMessage: 'Method Modules\ERP\Casts\PaymentRequestStatus::values() return type has no value type specified in iterable type array.'
@@ -9825,36 +8331,6 @@ parameters:
 		-
 			rawMessage: Cannot cast mixed to int.
 			identifier: cast.int
-			count: 1
-			path: Modules/ERP/app/Filament/Pages/SalesPipelinePage.php
-
-		-
-			rawMessage: 'Parameter #1 $options of method Filament\Forms\Components\Select::options() expects array<array<string>|string>|Closure|Illuminate\Contracts\Support\Arrayable|string|null, array<mixed> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Pages/SalesPipelinePage.php
-
-		-
-			rawMessage: 'Parameter #1 $report of method Modules\ERP\Services\Reporting\OperationalReportCsvExporter::salesPipeline() expects array{by_status: array<string, array{status: string, count: int, expected_value_doc: string, expected_value_local: string}>, total_count: int, won_count: int, lost_count: int, won_value_doc: string, won_value_local: string, total_expected_value_doc: string, total_expected_value_local: string}, array<string, mixed> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Pages/SalesPipelinePage.php
-
-		-
-			rawMessage: 'Parameter #2 $filters of method Modules\ERP\Services\Reporting\SalesPipelineService::generate() expects array{won_from?: string|null, won_to?: string|null}, array{won_from: mixed, won_to: mixed} given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Pages/SalesPipelinePage.php
-
-		-
-			rawMessage: Property Modules\ERP\Filament\Pages\SalesPipelinePage::$data type has no value type specified in iterable type array.
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/ERP/app/Filament/Pages/SalesPipelinePage.php
-
-		-
-			rawMessage: Cannot cast mixed to int.
-			identifier: cast.int
 			count: 3
 			path: Modules/ERP/app/Filament/Pages/StockValuationPage.php
 
@@ -9919,19 +8395,7 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/BankStatements/Pages/EditBankStatement.php
 
 		-
-			rawMessage: 'Parameter #1 $ids of method Illuminate\Database\Eloquent\Relations\BelongsToMany<Modules\ERP\Models\Party,Modules\ERP\Models\Contact,Illuminate\Database\Eloquent\Relations\Pivot,string>::sync() expects array|Illuminate\Database\Eloquent\Model|Illuminate\Support\Collection|int|string, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Contacts/Pages/CreateContact.php
-
-		-
-			rawMessage: 'Parameter #1 $ids of method Illuminate\Database\Eloquent\Relations\BelongsToMany<Modules\ERP\Models\Party,Modules\ERP\Models\Contact,Illuminate\Database\Eloquent\Relations\Pivot,string>::sync() expects array|Illuminate\Database\Eloquent\Model|Illuminate\Support\Collection|int|string, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Contacts/Pages/EditContact.php
-
-		-
-			rawMessage: 'Parameter #1 $array of function array_values expects array<T>, mixed given.'
+			rawMessage: 'Parameter #1 $array of static method Illuminate\Support\Arr::only() expects array, mixed given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/DeliveryNotes/Pages/CreateDeliveryNote.php
@@ -9939,36 +8403,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $array of static method Illuminate\Support\Arr::only() expects array, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/DeliveryNotes/Pages/CreateDeliveryNote.php
-
-		-
-			rawMessage: 'Parameter #1 $array of function array_values expects array<T>, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/DeliveryNotes/Pages/EditDeliveryNote.php
-
-		-
-			rawMessage: 'Parameter #1 $array of static method Illuminate\Support\Arr::only() expects array, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/DeliveryNotes/Pages/EditDeliveryNote.php
-
-		-
-			rawMessage: 'Parameter #1 $callback of method Illuminate\Database\Eloquent\Collection<int,Modules\ERP\Models\DeliveryNoteLine>::map() contains unresolvable type.'
-			identifier: argument.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/DeliveryNotes/Pages/EditDeliveryNote.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Database\Eloquent\Collection<int,Modules\ERP\Models\DeliveryNoteLine>::map() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/DeliveryNotes/Pages/EditDeliveryNote.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Support\Collection<int,array<string, mixed>>::all() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/DeliveryNotes/Pages/EditDeliveryNote.php
 
@@ -9979,7 +8413,7 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/FiscalPeriods/Schemas/FiscalPeriodForm.php
 
 		-
-			rawMessage: 'Parameter #1 $array of function array_values expects array<T>, mixed given.'
+			rawMessage: 'Parameter #1 $array of static method Illuminate\Support\Arr::only() expects array, mixed given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/GoodsReceipts/Pages/CreateGoodsReceipt.php
@@ -9987,36 +8421,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $array of static method Illuminate\Support\Arr::only() expects array, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/GoodsReceipts/Pages/CreateGoodsReceipt.php
-
-		-
-			rawMessage: 'Parameter #1 $array of function array_values expects array<T>, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/GoodsReceipts/Pages/EditGoodsReceipt.php
-
-		-
-			rawMessage: 'Parameter #1 $array of static method Illuminate\Support\Arr::only() expects array, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/GoodsReceipts/Pages/EditGoodsReceipt.php
-
-		-
-			rawMessage: 'Parameter #1 $callback of method Illuminate\Database\Eloquent\Collection<int,Modules\ERP\Models\GoodsReceiptLine>::map() contains unresolvable type.'
-			identifier: argument.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/GoodsReceipts/Pages/EditGoodsReceipt.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Database\Eloquent\Collection<int,Modules\ERP\Models\GoodsReceiptLine>::map() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/GoodsReceipts/Pages/EditGoodsReceipt.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Support\Collection<int,array<string, mixed>>::all() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/GoodsReceipts/Pages/EditGoodsReceipt.php
 
@@ -10047,12 +8451,6 @@ parameters:
 		-
 			rawMessage: Cannot cast mixed to int.
 			identifier: cast.int
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Invoices/Pages/CreateInvoice.php
-
-		-
-			rawMessage: 'Parameter #1 $array of function array_values expects array<T>, mixed given.'
-			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Invoices/Pages/CreateInvoice.php
 
@@ -10135,20 +8533,8 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Invoices/Pages/EditInvoice.php
 
 		-
-			rawMessage: 'Parameter #1 $array of function array_values expects array<T>, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Invoices/Pages/EditInvoice.php
-
-		-
 			rawMessage: 'Parameter #1 $array of static method Illuminate\Support\Arr::only() expects array, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Invoices/Pages/EditInvoice.php
-
-		-
-			rawMessage: 'Parameter #1 $callback of method Illuminate\Database\Eloquent\Collection<int,Modules\ERP\Models\InvoiceLine>::map() contains unresolvable type.'
-			identifier: argument.unresolvableType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Invoices/Pages/EditInvoice.php
 
@@ -10179,18 +8565,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #2 $line_data of method Modules\ERP\Filament\Resources\Invoices\Pages\EditInvoice::syncDeliveryNoteLineLinks() expects array<string, mixed>, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Invoices/Pages/EditInvoice.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Database\Eloquent\Collection<int,Modules\ERP\Models\InvoiceLine>::map() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Invoices/Pages/EditInvoice.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Support\Collection<int,array<string, mixed>>::all() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Invoices/Pages/EditInvoice.php
 
@@ -10245,12 +8619,6 @@ parameters:
 		-
 			rawMessage: 'Only iterables can be unpacked, mixed given.'
 			identifier: arrayUnpacking.nonIterable
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/JournalEntries/Pages/CreateJournalEntry.php
-
-		-
-			rawMessage: 'Parameter #1 $array of function array_values expects array<T>, mixed given.'
-			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/JournalEntries/Pages/CreateJournalEntry.php
 
@@ -10329,12 +8697,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\ERP\Filament\Resources\JournalEntries\Schemas\JournalEntryLineSchema::forEditRelationship() should return array<int, Filament\Forms\Components\Component> but returns array<int, Filament\Forms\Components\Select|Filament\Forms\Components\Textarea|Filament\Forms\Components\TextInput>.'
 			identifier: return.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/JournalEntries/Schemas/JournalEntryLineSchema.php
-
-		-
-			rawMessage: 'Unable to resolve the template type TMapWithKeysValue in call to method Illuminate\Database\Eloquent\Collection<int,Modules\ERP\Models\TaxCode>::mapWithKeys()'
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/JournalEntries/Schemas/JournalEntryLineSchema.php
 
@@ -10429,7 +8791,7 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Pages/CreatePurchaseOrder.php
 
 		-
-			rawMessage: 'Parameter #1 $array of function array_values expects array<T>, mixed given.'
+			rawMessage: 'Parameter #1 $array of static method Illuminate\Support\Arr::only() expects array, mixed given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Pages/CreatePurchaseOrder.php
@@ -10437,36 +8799,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $array of static method Illuminate\Support\Arr::only() expects array, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Pages/CreatePurchaseOrder.php
-
-		-
-			rawMessage: 'Parameter #1 $array of function array_values expects array<T>, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Pages/EditPurchaseOrder.php
-
-		-
-			rawMessage: 'Parameter #1 $array of static method Illuminate\Support\Arr::only() expects array, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Pages/EditPurchaseOrder.php
-
-		-
-			rawMessage: 'Parameter #1 $callback of method Illuminate\Database\Eloquent\Collection<int,Modules\ERP\Models\PurchaseOrderLine>::map() contains unresolvable type.'
-			identifier: argument.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Pages/EditPurchaseOrder.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Database\Eloquent\Collection<int,Modules\ERP\Models\PurchaseOrderLine>::map() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Pages/EditPurchaseOrder.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Support\Collection<int,array<string, mixed>>::all() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Pages/EditPurchaseOrder.php
 
@@ -10495,18 +8827,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Schemas/PurchaseOrderForm.php
 
 		-
-			rawMessage: 'Method Modules\ERP\Filament\Resources\PurchaseOrders\Schemas\PurchaseOrderForm::partyLabel() should return string|null but returns mixed.'
-			identifier: return.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Schemas/PurchaseOrderForm.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Filament\Resources\PurchaseOrders\Schemas\PurchaseOrderForm::partyOptions() should return array<int, string> but returns array<mixed>.'
-			identifier: return.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Schemas/PurchaseOrderForm.php
-
-		-
 			rawMessage: 'Parameter #1 $callback of method Illuminate\Database\Eloquent\Collection<int,Illuminate\Database\Eloquent\Model>::mapWithKeys() expects callable(Illuminate\Database\Eloquent\Model, int): array<int, non-falsy-string>, Closure(Modules\ERP\Models\Item): non-empty-array<int, non-falsy-string> given.'
 			identifier: argument.type
 			count: 1
@@ -10517,24 +8837,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Schemas/PurchaseOrderForm.php
-
-		-
-			rawMessage: 'Parameter #1 $query of static method Modules\ERP\Filament\Resources\PurchaseOrders\Schemas\PurchaseOrderForm::applySearch() expects Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>, Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\Item> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Schemas/PurchaseOrderForm.php
-
-		-
-			rawMessage: 'Parameter #1 $query of static method Modules\ERP\Filament\Resources\PurchaseOrders\Schemas\PurchaseOrderForm::applySearch() expects Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>, Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\Party> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Schemas/PurchaseOrderForm.php
-
-		-
-			rawMessage: 'Parameter #1 $array of function array_values expects array<T>, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Quotations/Pages/CreateQuotation.php
 
 		-
 			rawMessage: 'Parameter #1 $array of static method Illuminate\Support\Arr::only() expects array, mixed given.'
@@ -10549,32 +8851,8 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Quotations/Pages/EditQuotation.php
 
 		-
-			rawMessage: 'Parameter #1 $array of function array_values expects array<T>, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Quotations/Pages/EditQuotation.php
-
-		-
 			rawMessage: 'Parameter #1 $array of static method Illuminate\Support\Arr::only() expects array, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Quotations/Pages/EditQuotation.php
-
-		-
-			rawMessage: 'Parameter #1 $callback of method Illuminate\Database\Eloquent\Collection<int,Modules\ERP\Models\QuotationItem>::map() contains unresolvable type.'
-			identifier: argument.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Quotations/Pages/EditQuotation.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Database\Eloquent\Collection<int,Modules\ERP\Models\QuotationItem>::map() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Quotations/Pages/EditQuotation.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Support\Collection<int,array<string, mixed>>::all() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Quotations/Pages/EditQuotation.php
 
@@ -10633,12 +8911,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/SalesOrders/Pages/CreateSalesOrder.php
 
 		-
-			rawMessage: 'Parameter #1 $array of function array_values expects array<T>, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SalesOrders/Pages/CreateSalesOrder.php
-
-		-
 			rawMessage: 'Parameter #1 $array of static method Illuminate\Support\Arr::only() expects array, mixed given.'
 			identifier: argument.type
 			count: 1
@@ -10651,32 +8923,8 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/SalesOrders/Pages/EditSalesOrder.php
 
 		-
-			rawMessage: 'Parameter #1 $array of function array_values expects array<T>, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SalesOrders/Pages/EditSalesOrder.php
-
-		-
 			rawMessage: 'Parameter #1 $array of static method Illuminate\Support\Arr::only() expects array, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SalesOrders/Pages/EditSalesOrder.php
-
-		-
-			rawMessage: 'Parameter #1 $callback of method Illuminate\Database\Eloquent\Collection<int,Modules\ERP\Models\SalesOrderLine>::map() contains unresolvable type.'
-			identifier: argument.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SalesOrders/Pages/EditSalesOrder.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Database\Eloquent\Collection<int,Modules\ERP\Models\SalesOrderLine>::map() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SalesOrders/Pages/EditSalesOrder.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Support\Collection<int,array<string, mixed>>::all() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/SalesOrders/Pages/EditSalesOrder.php
 
@@ -10723,18 +8971,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/SalesOrders/Schemas/SalesOrderForm.php
 
 		-
-			rawMessage: 'Method Modules\ERP\Filament\Resources\SalesOrders\Schemas\SalesOrderForm::partyLabel() should return string|null but returns mixed.'
-			identifier: return.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SalesOrders/Schemas/SalesOrderForm.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Filament\Resources\SalesOrders\Schemas\SalesOrderForm::partyOptions() should return array<int, string> but returns array<mixed>.'
-			identifier: return.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SalesOrders/Schemas/SalesOrderForm.php
-
-		-
 			rawMessage: 'Method Modules\ERP\Filament\Resources\SalesOrders\Schemas\SalesOrderForm::projectLabel() should return string|null but returns mixed.'
 			identifier: return.type
 			count: 1
@@ -10766,30 +9002,6 @@ parameters:
 
 		-
 			rawMessage: 'Parameter #1 $query of static method Modules\ERP\Filament\Resources\SalesOrders\Schemas\SalesOrderForm::applySearch() expects Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>, Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\Company> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SalesOrders/Schemas/SalesOrderForm.php
-
-		-
-			rawMessage: 'Parameter #1 $query of static method Modules\ERP\Filament\Resources\SalesOrders\Schemas\SalesOrderForm::applySearch() expects Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>, Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\Item> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SalesOrders/Schemas/SalesOrderForm.php
-
-		-
-			rawMessage: 'Parameter #1 $query of static method Modules\ERP\Filament\Resources\SalesOrders\Schemas\SalesOrderForm::applySearch() expects Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>, Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\Party> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SalesOrders/Schemas/SalesOrderForm.php
-
-		-
-			rawMessage: 'Parameter #1 $query of static method Modules\ERP\Filament\Resources\SalesOrders\Schemas\SalesOrderForm::applySearch() expects Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>, Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\Project> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SalesOrders/Schemas/SalesOrderForm.php
-
-		-
-			rawMessage: 'Parameter #1 $query of static method Modules\ERP\Filament\Resources\SalesOrders\Schemas\SalesOrderForm::applySearch() expects Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>, Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\SalesOrder> given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/SalesOrders/Schemas/SalesOrderForm.php
@@ -10915,12 +9127,6 @@ parameters:
 			path: Modules/ERP/app/Import/Services/ExternalExpenseAllocationService.php
 
 		-
-			rawMessage: 'Trait Modules\Core\Models\Concerns\HasApprovals requires using class to implement Modules\Core\Contracts\IModeratableModel, but Modules\ERP\Models\Activity does not.'
-			identifier: class.missingImplements
-			count: 1
-			path: Modules/ERP/app/Models/Activity.php
-
-		-
 			rawMessage: 'Method Modules\ERP\Models\AnalyticDimension::values() return type with generic class Illuminate\Database\Eloquent\Relations\HasMany does not specify its types: TRelatedModel, TDeclaringModel'
 			identifier: missingType.generics
 			count: 1
@@ -10939,32 +9145,8 @@ parameters:
 			path: Modules/ERP/app/Models/AnalyticDimensionValue.php
 
 		-
-			rawMessage: 'Method Modules\ERP\Models\Contact::parties() should return Illuminate\Database\Eloquent\Relations\BelongsToMany<Modules\ERP\Models\Party, $this(Modules\ERP\Models\Contact), Illuminate\Database\Eloquent\Relations\Pivot, ''pivot''> but returns Illuminate\Database\Eloquent\Relations\BelongsToMany<Modules\ERP\Models\Party, $this(Modules\ERP\Models\Contact), Modules\ERP\Models\Pivot\Contactable, ''pivot''>.'
-			identifier: return.type
-			count: 1
-			path: Modules/ERP/app/Models/Contact.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\Contact::user() should return Illuminate\Database\Eloquent\Relations\BelongsTo<Modules\Core\Models\User, $this(Modules\ERP\Models\Contact)> but returns Illuminate\Database\Eloquent\Relations\BelongsTo<Illuminate\Foundation\Auth\User, $this(Modules\ERP\Models\Contact)>.'
-			identifier: return.type
-			count: 1
-			path: Modules/ERP/app/Models/Contact.php
-
-		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
-			count: 1
-			path: Modules/ERP/app/Models/DeliveryNoteLine.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\DeliveryNoteLine::invoice_lines() should return Illuminate\Database\Eloquent\Relations\BelongsToMany<Modules\ERP\Models\InvoiceLine, $this(Modules\ERP\Models\DeliveryNoteLine), Illuminate\Database\Eloquent\Relations\Pivot, ''pivot''> but returns Illuminate\Database\Eloquent\Relations\BelongsToMany<Modules\ERP\Models\InvoiceLine, $this(Modules\ERP\Models\DeliveryNoteLine), Modules\ERP\Models\Pivot\InvoiceLineHasDeliveryNoteLine, ''pivot''>.'
-			identifier: return.type
-			count: 1
-			path: Modules/ERP/app/Models/DeliveryNoteLine.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\DeliveryNoteLine::salesOrderLineForLifecycle() should return Modules\ERP\Models\SalesOrderLine|null but returns Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\SalesOrderLine>|Modules\ERP\Models\SalesOrderLine|null.'
-			identifier: return.type
 			count: 1
 			path: Modules/ERP/app/Models/DeliveryNoteLine.php
 
@@ -10973,42 +9155,6 @@ parameters:
 			identifier: generics.lessTypes
 			count: 1
 			path: Modules/ERP/app/Models/Entity.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\Entity::activities() should return Illuminate\Database\Eloquent\Relations\HasManyThrough<Modules\ERP\Models\Activity> but returns Illuminate\Database\Eloquent\Relations\HasManyThrough<Modules\ERP\Models\Activity, Modules\ERP\Models\Pivot\Presettable, $this(Modules\ERP\Models\Entity)>.'
-			identifier: return.type
-			count: 1
-			path: Modules/ERP/app/Models/Entity.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::revert().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\FiscalPeriod::trashingVersions() should return Illuminate\Database\Eloquent\Builder<Overtrue\LaravelVersionable\Version> but returns Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>.'
-			identifier: return.type
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\InvoiceLine::delivery_note_lines() should return Illuminate\Database\Eloquent\Relations\BelongsToMany<Modules\ERP\Models\DeliveryNoteLine, $this(Modules\ERP\Models\InvoiceLine), Illuminate\Database\Eloquent\Relations\Pivot, ''pivot''> but returns Illuminate\Database\Eloquent\Relations\BelongsToMany<Modules\ERP\Models\DeliveryNoteLine, $this(Modules\ERP\Models\InvoiceLine), Modules\ERP\Models\Pivot\InvoiceLineHasDeliveryNoteLine, ''pivot''>.'
-			identifier: return.type
-			count: 1
-			path: Modules/ERP/app/Models/InvoiceLine.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\JournalEntryLine::analytic_dimension_values() should return Illuminate\Database\Eloquent\Relations\BelongsToMany<Modules\ERP\Models\AnalyticDimensionValue, $this(Modules\ERP\Models\JournalEntryLine), Illuminate\Database\Eloquent\Relations\Pivot, ''pivot''> but returns Illuminate\Database\Eloquent\Relations\BelongsToMany<Modules\ERP\Models\AnalyticDimensionValue, $this(Modules\ERP\Models\JournalEntryLine), Modules\ERP\Models\Pivot\JournalEntryLineHasAnalyticDimensionValue, ''pivot''>.'
-			identifier: return.type
-			count: 1
-			path: Modules/ERP/app/Models/JournalEntryLine.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\Lead::owner() should return Illuminate\Database\Eloquent\Relations\BelongsTo<Modules\Core\Models\User, $this(Modules\ERP\Models\Lead)> but returns Illuminate\Database\Eloquent\Relations\BelongsTo<Illuminate\Foundation\Auth\User, $this(Modules\ERP\Models\Lead)>.'
-			identifier: return.type
-			count: 1
-			path: Modules/ERP/app/Models/Lead.php
 
 		-
 			rawMessage: 'Method Modules\ERP\Models\Movement::allocations() return type with generic class Illuminate\Database\Eloquent\Relations\HasMany does not specify its types: TRelatedModel, TDeclaringModel'
@@ -11035,22 +9181,10 @@ parameters:
 			path: Modules/ERP/app/Models/MovementAllocation.php
 
 		-
-			rawMessage: 'Trait Modules\Core\Models\Concerns\HasApprovals requires using class to implement Modules\Core\Contracts\IModeratableModel, but Modules\ERP\Models\OpportunityStage does not.'
-			identifier: class.missingImplements
-			count: 1
-			path: Modules/ERP/app/Models/OpportunityStage.php
-
-		-
 			rawMessage: 'Method Modules\ERP\Models\PartnerPool::members() return type with generic class Illuminate\Database\Eloquent\Relations\BelongsToMany does not specify its types: TRelatedModel, TDeclaringModel, TPivotModel, TAccessor (2-4 required)'
 			identifier: missingType.generics
 			count: 1
 			path: Modules/ERP/app/Models/PartnerPool.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\Party::contacts() should return Illuminate\Database\Eloquent\Relations\BelongsToMany<Modules\ERP\Models\Contact, $this(Modules\ERP\Models\Party), Illuminate\Database\Eloquent\Relations\Pivot, ''pivot''> but returns Illuminate\Database\Eloquent\Relations\BelongsToMany<Modules\ERP\Models\Contact, $this(Modules\ERP\Models\Party), Modules\ERP\Models\Pivot\Contactable, ''pivot''>.'
-			identifier: return.type
-			count: 1
-			path: Modules/ERP/app/Models/Party.php
 
 		-
 			rawMessage: PHPDoc tag @throws with type InvalidFormatException is not subtype of Throwable
@@ -11139,18 +9273,6 @@ parameters:
 		-
 			rawMessage: 'Generic type Illuminate\Database\Eloquent\Relations\HasManyThrough<Modules\ERP\Models\Activity> in PHPDoc tag @return does not specify all template types of class Illuminate\Database\Eloquent\Relations\HasManyThrough: TRelatedModel, TIntermediateModel, TDeclaringModel'
 			identifier: generics.lessTypes
-			count: 1
-			path: Modules/ERP/app/Models/Preset.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\Preset::activities() should return Illuminate\Database\Eloquent\Relations\HasManyThrough<Modules\ERP\Models\Activity> but returns Illuminate\Database\Eloquent\Relations\HasManyThrough<Modules\Core\Overrides\Model, Modules\ERP\Models\Pivot\Presettable, $this(Modules\ERP\Models\Preset)>.'
-			identifier: return.type
-			count: 1
-			path: Modules/ERP/app/Models/Preset.php
-
-		-
-			rawMessage: 'Trait Modules\Core\Models\Concerns\HasApprovals requires using class to implement Modules\Core\Contracts\IModeratableModel, but Modules\ERP\Models\Preset does not.'
-			identifier: class.missingImplements
 			count: 1
 			path: Modules/ERP/app/Models/Preset.php
 
@@ -11311,12 +9433,6 @@ parameters:
 			path: Modules/ERP/app/Models/Task.php
 
 		-
-			rawMessage: 'Method Modules\ERP\Models\TimeEntry::user() should return Illuminate\Database\Eloquent\Relations\BelongsTo<Modules\Core\Models\User, $this(Modules\ERP\Models\TimeEntry)> but returns Illuminate\Database\Eloquent\Relations\BelongsTo<Illuminate\Foundation\Auth\User, $this(Modules\ERP\Models\TimeEntry)>.'
-			identifier: return.type
-			count: 1
-			path: Modules/ERP/app/Models/TimeEntry.php
-
-		-
 			rawMessage: 'Call to function is_int() with int will always evaluate to true.'
 			identifier: function.alreadyNarrowedType
 			count: 2
@@ -11332,12 +9448,6 @@ parameters:
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
 			count: 2
-			path: Modules/ERP/app/Services/Accounting/DocumentSequenceAuditService.php
-
-		-
-			rawMessage: 'Parameter #1 $callback of method Illuminate\Support\Collection<(int|string),mixed>::map() expects callable(mixed, int|string): non-falsy-string, Closure(int, string): non-falsy-string given.'
-			identifier: argument.type
-			count: 1
 			path: Modules/ERP/app/Services/Accounting/DocumentSequenceAuditService.php
 
 		-
@@ -11373,12 +9483,6 @@ parameters:
 		-
 			rawMessage: 'Call to function is_int() with int will always evaluate to true.'
 			identifier: function.alreadyNarrowedType
-			count: 1
-			path: Modules/ERP/app/Services/Accounting/InvoicePostingService.php
-
-		-
-			rawMessage: 'Parameter #1 $posted_entry of method Modules\ERP\Services\Accounting\JournalPostingService::reverse() expects Modules\ERP\Models\JournalEntry, Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\JournalEntry>|Modules\ERP\Models\JournalEntry given.'
-			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Services/Accounting/InvoicePostingService.php
 
@@ -11485,12 +9589,6 @@ parameters:
 			path: Modules/ERP/app/Services/Cash/CashBalanceService.php
 
 		-
-			rawMessage: 'Match expression does not handle remaining value: mixed'
-			identifier: match.unhandled
-			count: 2
-			path: Modules/ERP/app/Services/Cash/MovementPostingService.php
-
-		-
 			rawMessage: 'Parameter #2 $lines of method Modules\ERP\Services\Accounting\JournalPostingService::post() expects list<array{account_id: int, amount_doc: float|string, currency_doc: string, amount_local: float|string, currency_local: string, fx_rate: float|string, description?: string|null, tax_code?: string|null, ...}>, list<array<string, int|string>> given.'
 			identifier: argument.type
 			count: 1
@@ -11575,12 +9673,6 @@ parameters:
 			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
 
 		-
-			rawMessage: Binary operation "." between non-falsy-string and non-empty-array<string>|decimal-int-string|non-falsy-string results in an error.
-			identifier: binaryOp.invalid
-			count: 1
-			path: Modules/ERP/app/Services/EInvoice/ArubaEInvoiceProvider.php
-
-		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
 			count: 1
@@ -11603,12 +9695,6 @@ parameters:
 			identifier: cast.string
 			count: 1
 			path: Modules/ERP/app/Services/EInvoice/EInvoiceSubmissionService.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Services\EInvoice\FatturaPaAnagraphicMapper::safeTransmissionProgressive() should return string but returns array<string>|string.'
-			identifier: return.type
-			count: 1
-			path: Modules/ERP/app/Services/EInvoice/FatturaPaAnagraphicMapper.php
 
 		-
 			rawMessage: Cannot access offset 'formato_trasmissione' on mixed.
@@ -11647,30 +9733,6 @@ parameters:
 			path: Modules/ERP/app/Services/EInvoice/FatturaPaXmlBuilder.php
 
 		-
-			rawMessage: 'Parameter #1 $callback of method Illuminate\Database\Eloquent\Collection<int,Modules\ERP\Models\InvoiceLine>::map() contains unresolvable type.'
-			identifier: argument.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Services/EInvoice/StubEInvoiceProvider.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Database\Eloquent\Collection<int,Modules\ERP\Models\InvoiceLine>::map() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
-			count: 1
-			path: Modules/ERP/app/Services/EInvoice/StubEInvoiceProvider.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Support\Collection<int,array<string, mixed>>::all() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
-			count: 1
-			path: Modules/ERP/app/Services/EInvoice/StubEInvoiceProvider.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Support\Collection<int,array<string, mixed>>::values() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
-			count: 1
-			path: Modules/ERP/app/Services/EInvoice/StubEInvoiceProvider.php
-
-		-
 			rawMessage: 'Call to function is_int() with int will always evaluate to true.'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -11693,12 +9755,6 @@ parameters:
 			identifier: nullsafe.neverNull
 			count: 1
 			path: Modules/ERP/app/Services/Payments/CbiBonificiExporter.php
-
-		-
-			rawMessage: 'Parameter #4 $value of method Modules\ERP\Services\Payments\ItalianReceivableBankFileExporter::append() expects string|null, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/Payments/ItalianReceivableBankFileExporter.php
 
 		-
 			rawMessage: Using nullsafe property access "?->name" on left side of ?? is unnecessary. Use -> instead.
@@ -11767,12 +9823,6 @@ parameters:
 			path: Modules/ERP/app/Services/Pricing/PriceResolverService.php
 
 		-
-			rawMessage: 'Match expression does not handle remaining value: mixed'
-			identifier: match.unhandled
-			count: 1
-			path: Modules/ERP/app/Services/Pricing/PriceResolverService.php
-
-		-
 			rawMessage: 'Call to function array_is_list() with non-empty-array<string, mixed> will always evaluate to false.'
 			identifier: function.impossibleType
 			count: 1
@@ -11789,30 +9839,6 @@ parameters:
 			identifier: return.type
 			count: 1
 			path: Modules/ERP/app/Services/Reporting/ReportSnapshotService.php
-
-		-
-			rawMessage: Access to an undefined property object::$lost_at.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Services/Reporting/SalesPipelineService.php
-
-		-
-			rawMessage: Access to an undefined property object::$status.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Services/Reporting/SalesPipelineService.php
-
-		-
-			rawMessage: Access to an undefined property object::$won_at.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Services/Reporting/SalesPipelineService.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Services\Reporting\SalesPipelineService::loadOpportunities() should return Illuminate\Support\Enumerable<int, object> but returns Illuminate\Support\LazyCollection<int, Modules\ERP\Models\Opportunity>.'
-			identifier: return.type
-			count: 1
-			path: Modules/ERP/app/Services/Reporting/SalesPipelineService.php
 
 		-
 			rawMessage: Using nullsafe property access "?->total_quantity" on left side of ?? is unnecessary. Use -> instead.
@@ -11839,12 +9865,6 @@ parameters:
 			path: Modules/ERP/app/Services/Returns/ReturnOrderService.php
 
 		-
-			rawMessage: 'Method Modules\ERP\Services\Returns\ReturnOrderService::creditNoteLineOverridePayload() should return array<int, array{quantity: numeric-string, unit_price: numeric-string}> but returns array<int, array{quantity: string, unit_price: string}>.'
-			identifier: return.type
-			count: 1
-			path: Modules/ERP/app/Services/Returns/ReturnOrderService.php
-
-		-
 			rawMessage: 'Call to function is_int() with int will always evaluate to true.'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -11853,12 +9873,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\ERP\Services\Returns\SupplierReturnService::sourceInvoiceFromDebitOverrides() should return Modules\ERP\Models\Invoice but returns Modules\ERP\Models\Invoice|null.'
 			identifier: return.type
-			count: 1
-			path: Modules/ERP/app/Services/Returns/SupplierReturnService.php
-
-		-
-			rawMessage: 'Parameter $unit_price of class Modules\ERP\Data\Returns\ReturnLineCreditOverride constructor expects numeric-string, string given.'
-			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Services/Returns/SupplierReturnService.php
 
@@ -11947,30 +9961,6 @@ parameters:
 			path: Modules/ERP/database/migrations/2026_04_08_103200_create_journal_entry_lines_table.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Schema\ForeignKeyDefinition::nullable().'
-			identifier: method.notFound
-			count: 2
-			path: Modules/ERP/database/migrations/2026_04_08_191727_create_contactables_table.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Schema\IndexDefinition::comment().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/database/migrations/2026_04_08_191727_create_contactables_table.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Schema\ForeignKeyDefinition::comment().'
-			identifier: method.notFound
-			count: 2
-			path: Modules/ERP/database/migrations/2026_04_08_191729_create_leads_table.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Schema\ForeignKeyDefinition::comment().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/database/migrations/2026_04_08_191729_create_opportunities_table.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Schema\ForeignKeyDefinition::comment().'
 			identifier: method.notFound
 			count: 3
@@ -12019,30 +10009,6 @@ parameters:
 			path: Modules/ERP/database/seeders/DevERPDatabaseSeeder.php
 
 		-
-			rawMessage: Using nullsafe method call on non-nullable type Illuminate\Console\Command. Use -> instead.
-			identifier: nullsafe.neverNull
-			count: 9
-			path: Modules/ERP/database/seeders/DevERPDatabaseSeeder.php
-
-		-
-			rawMessage: 'Parameter #1 $rows of method Modules\Core\Seeding\SeedDefinition::rows() expects list<array<string, mixed>>, array<int, array{name: string, value: mixed, encrypted: bool, choices: list<string>|null, type: Modules\Core\Casts\SettingTypeEnum, group_name: string, description: string}> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/database/seeders/ERPDatabaseSeeder.php
-
-		-
-			rawMessage: Using nullsafe method call on non-nullable type Illuminate\Console\Command. Use -> instead.
-			identifier: nullsafe.neverNull
-			count: 8
-			path: Modules/ERP/database/seeders/ERPDatabaseSeeder.php
-
-		-
-			rawMessage: Using nullsafe method call on non-nullable type Illuminate\Console\Command. Use -> instead.
-			identifier: nullsafe.neverNull
-			count: 3
-			path: Modules/ERP/database/seeders/ItalianTaxCodesSeeder.php
-
-		-
 			rawMessage: Cannot cast mixed to float.
 			identifier: cast.double
 			count: 1
@@ -12081,12 +10047,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\MES\Listeners\NotifyMaterialShortage::recipients() return type with generic class Illuminate\Database\Eloquent\Collection does not specify its types: TKey, TModel'
 			identifier: missingType.generics
-			count: 1
-			path: Modules/MES/app/Listeners/NotifyMaterialShortage.php
-
-		-
-			rawMessage: Relation 'roles' is not found in Illuminate\Foundation\Auth\User model.
-			identifier: larastan.relationExistence
 			count: 1
 			path: Modules/MES/app/Listeners/NotifyMaterialShortage.php
 
@@ -12265,12 +10225,6 @@ parameters:
 			path: Modules/MES/app/Services/DomainActions/MesDomainActionRegistrar.php
 
 		-
-			rawMessage: Cannot cast mixed to float.
-			identifier: cast.double
-			count: 1
-			path: Modules/MES/app/Services/ErpStockReader.php
-
-		-
 			rawMessage: Cannot cast mixed to int.
 			identifier: cast.int
 			count: 1
@@ -12295,52 +10249,10 @@ parameters:
 			path: Modules/MES/app/Services/ProductionLeadTimeEstimator.php
 
 		-
-			rawMessage: 'Method Modules\MES\Services\ProductionOrderService::buildBomSnapshot() should return array{id: int|null, version: string|null, lines: list<array<string, mixed>>} but returns array{id: int, version: mixed, lines: array<int, array{bom_line_id: mixed, item_id: mixed, quantity: float, uom: mixed, consumption_method: mixed, routing_operation_id: mixed}>}.'
-			identifier: return.type
-			count: 1
-			path: Modules/MES/app/Services/ProductionOrderService.php
-
-		-
-			rawMessage: 'Method Modules\MES\Services\ProductionOrderService::buildRoutingSnapshot() should return array{id: int|null, version: string|null, operations: list<array<string, mixed>>} but returns array{id: int, version: mixed, operations: array<int, array{routing_operation_id: mixed, work_center_id: mixed, sequence: mixed, description: mixed, setup_time_minutes: mixed, cycle_time_minutes: float, is_parallel: mixed}>}.'
-			identifier: return.type
-			count: 1
-			path: Modules/MES/app/Services/ProductionOrderService.php
-
-		-
-			rawMessage: 'Parameter #1 $callback of method Illuminate\Database\Eloquent\Collection<int,Modules\MES\Models\BomLine>::map() contains unresolvable type.'
-			identifier: argument.unresolvableType
-			count: 1
-			path: Modules/MES/app/Services/ProductionOrderService.php
-
-		-
-			rawMessage: 'Parameter #1 $callback of method Illuminate\Database\Eloquent\Collection<int,Modules\MES\Models\RoutingOperation>::map() contains unresolvable type.'
-			identifier: argument.unresolvableType
-			count: 1
-			path: Modules/MES/app/Services/ProductionOrderService.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Database\Eloquent\Collection<int,Modules\MES\Models\BomLine>::map() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
-			count: 1
-			path: Modules/MES/app/Services/ProductionOrderService.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Database\Eloquent\Collection<int,Modules\MES\Models\RoutingOperation>::map() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
-			count: 1
-			path: Modules/MES/app/Services/ProductionOrderService.php
-
-		-
 			rawMessage: Cannot cast mixed to int.
 			identifier: cast.int
 			count: 1
 			path: Modules/MES/app/Services/ProductionWarehouseResolver.php
-
-		-
-			rawMessage: 'Parameter #1 $measurement of method Modules\MES\Services\QualityCheckService::isWithinLimits() expects array{measured_value: float|int|string, lower_limit?: float|int|string|null, upper_limit?: float|int|string|null}, array{characteristic: string, measured_value: float|int|string, nominal?: float|int|string|null, lower_limit?: float|int|string|null, upper_limit?: float|int|string|null} given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/MES/app/Services/QualityCheckService.php
 
 		-
 			rawMessage: Cannot cast mixed to string.
@@ -12421,30 +10333,6 @@ parameters:
 			path: Modules/MES/database/factories/WorkCenterFactory.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Schema\ForeignKeyDefinition::restricadeOnDelete().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/MES/database/migrations/2026_05_08_000001_create_mes_work_centers_table.php
-
-		-
-			rawMessage: Using nullsafe method call on non-nullable type Illuminate\Console\Command. Use -> instead.
-			identifier: nullsafe.neverNull
-			count: 3
-			path: Modules/MES/database/seeders/DevMESDatabaseSeeder.php
-
-		-
-			rawMessage: 'Parameter #1 $rows of method Modules\Core\Seeding\SeedDefinition::rows() expects list<array<string, mixed>>, array<int, array{name: string, value: mixed, encrypted: bool, choices: array<int, mixed>|null, type: Modules\Core\Casts\SettingTypeEnum, group_name: string, description: string}> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/MES/database/seeders/MESDatabaseSeeder.php
-
-		-
-			rawMessage: Using nullsafe method call on non-nullable type Illuminate\Console\Command. Use -> instead.
-			identifier: nullsafe.neverNull
-			count: 2
-			path: Modules/MES/database/seeders/MESDatabaseSeeder.php
-
-		-
 			rawMessage: 'Call to function is_array() with array<string, mixed> will always evaluate to true.'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -12465,7 +10353,7 @@ parameters:
 		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
-			count: 3
+			count: 2
 			path: Modules/SAO/app/ApplicationContent/SaoApplicationContentRetrievalProvider.php
 
 		-
@@ -12555,24 +10443,6 @@ parameters:
 		-
 			rawMessage: Cannot cast mixed to int.
 			identifier: cast.int
-			count: 1
-			path: Modules/SAO/app/Console/AutoOpenSignalTicketsCommand.php
-
-		-
-			rawMessage: 'Parameter #1 $callback of method Illuminate\Support\Collection<int,array<int, mixed>>::filter() contains unresolvable type.'
-			identifier: argument.unresolvableType
-			count: 1
-			path: Modules/SAO/app/Console/AutoOpenSignalTicketsCommand.php
-
-		-
-			rawMessage: 'Parameter #1 $value of function collect contains unresolvable type.'
-			identifier: argument.unresolvableType
-			count: 1
-			path: Modules/SAO/app/Console/AutoOpenSignalTicketsCommand.php
-
-		-
-			rawMessage: Return type of call to function collect contains unresolvable type.
-			identifier: function.unresolvableReturnType
 			count: 1
 			path: Modules/SAO/app/Console/AutoOpenSignalTicketsCommand.php
 
@@ -13003,18 +10873,6 @@ parameters:
 			path: Modules/SAO/app/Drivers/Internal/InternalIssuesDriver.php
 
 		-
-			rawMessage: 'Parameter #1 $project of method Modules\SAO\Services\TicketCreationService::open() expects Modules\SAO\Models\Project, Illuminate\Database\Eloquent\Collection<(int|string), Modules\SAO\Models\Project>|Modules\SAO\Models\Project given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Drivers/Internal/InternalIssuesDriver.php
-
-		-
-			rawMessage: 'Parameter #2 $type of method Modules\SAO\Services\TicketCreationService::open() expects Modules\SAO\Models\TicketType, Illuminate\Database\Eloquent\Collection<(int|string), Modules\SAO\Models\TicketType>|Modules\SAO\Models\TicketType given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Drivers/Internal/InternalIssuesDriver.php
-
-		-
 			rawMessage: 'Method Modules\SAO\Drivers\Support\ConnectionCredentialResolver::resolve() should return array<string, mixed> but returns array<mixed, mixed>.'
 			identifier: return.type
 			count: 1
@@ -13063,48 +10921,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/OwnershipSuggestions/Schemas/OwnershipSuggestionInfolist.php
 
 		-
-			rawMessage: 'Parameter #1 ...$values of method Illuminate\Support\Collection<string,Filament\Tables\Filters\Filter>::push() expects Filament\Tables\Filters\Filter, Filament\Tables\Filters\SelectFilter given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Signals/Tables/SignalsTable.php
-
-		-
-			rawMessage: 'Parameter #2 ...$values of method Illuminate\Support\Collection<string,Filament\Tables\Filters\Filter>::push() expects Filament\Tables\Filters\Filter, Filament\Tables\Filters\SelectFilter given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Signals/Tables/SignalsTable.php
-
-		-
-			rawMessage: 'Parameter #2 $to of method Modules\SAO\Services\WorkflowService::transition() expects Modules\SAO\Models\TicketStatus, Illuminate\Database\Eloquent\Collection<(int|string), Modules\SAO\Models\TicketStatus>|Modules\SAO\Models\TicketStatus given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Tickets/Pages/ViewTicket.php
-
-		-
-			rawMessage: Access to constant OutlinedPaperClip on an unknown class Modules\SAO\Filament\Resources\Tickets\Schemas\Heroicon.
-			identifier: class.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Tickets/Schemas/TicketForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Filament\Forms\Components\SpatieMediaLibraryFileUpload::icon().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Tickets/Schemas/TicketForm.php
-
-		-
-			rawMessage: 'Parameter #1 ...$values of method Illuminate\Support\Collection<string,Filament\Tables\Filters\Filter>::push() expects Filament\Tables\Filters\Filter, Filament\Tables\Filters\SelectFilter given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Tickets/Tables/TicketsTable.php
-
-		-
-			rawMessage: 'Parameter #2 ...$values of method Illuminate\Support\Collection<string,Filament\Tables\Filters\Filter>::push() expects Filament\Tables\Filters\Filter, Filament\Tables\Filters\SelectFilter given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Tickets/Tables/TicketsTable.php
-
-		-
 			rawMessage: 'Call to function is_array() with list<string|null> will always evaluate to true.'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -13123,12 +10939,6 @@ parameters:
 			path: Modules/SAO/app/Ingest/CodeWebhookIngestService.php
 
 		-
-			rawMessage: 'Method Modules\SAO\Ingest\CodeWebhookIngestService::ingest() should return Modules\SAO\Ingest\WebhookIngestOutcome but returns mixed.'
-			identifier: return.type
-			count: 1
-			path: Modules/SAO/app/Ingest/CodeWebhookIngestService.php
-
-		-
 			rawMessage: 'Parameter #4 $projectId of method Modules\SAO\Ingest\CodeWebhookIngestService::record() expects int|null, mixed given.'
 			identifier: argument.type
 			count: 1
@@ -13139,12 +10949,6 @@ parameters:
 			identifier: encapsedStringPart.nonString
 			count: 1
 			path: Modules/SAO/app/Ingest/CodeWebhookIngestService.php
-
-		-
-			rawMessage: 'Method Modules\SAO\Ingest\DeployWebhookIngestService::ingest() should return Modules\SAO\Ingest\WebhookIngestOutcome but returns mixed.'
-			identifier: return.type
-			count: 1
-			path: Modules/SAO/app/Ingest/DeployWebhookIngestService.php
 
 		-
 			rawMessage: 'Parameter #4 $projectId of method Modules\SAO\Ingest\DeployWebhookIngestService::record() expects int|null, mixed given.'
@@ -13165,46 +10969,10 @@ parameters:
 			path: Modules/SAO/app/Ingest/DriverWebhookIngestService.php
 
 		-
-			rawMessage: 'Method Modules\SAO\Ingest\DriverWebhookIngestService::ingest() should return Modules\SAO\Ingest\WebhookIngestOutcome but returns mixed.'
-			identifier: return.type
-			count: 1
-			path: Modules/SAO/app/Ingest/DriverWebhookIngestService.php
-
-		-
-			rawMessage: 'Part $binding->getKey() (mixed) of encapsed string cannot be cast to string.'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: Modules/SAO/app/Ingest/DriverWebhookIngestService.php
-
-		-
-			rawMessage: Unable to resolve the template type T in call to function array_values
-			identifier: argument.templateType
-			count: 1
-			path: Modules/SAO/app/Ingest/DriverWebhookIngestService.php
-
-		-
-			rawMessage: 'Method Modules\SAO\Ingest\IngestReplayService::dryRun() should return array{matches: bool, canonical: array<string, mixed>, project_id: int|null, winning_rule: string|null, would_be_status: string} but returns array{matches: true, canonical: array<string, mixed>, project_id: mixed, winning_rule: string|null, would_be_status: ''ingested''|''uncorrelated''}.'
-			identifier: return.type
-			count: 1
-			path: Modules/SAO/app/Ingest/IngestReplayService.php
-
-		-
 			rawMessage: Cannot cast mixed to int.
 			identifier: cast.int
 			count: 2
 			path: Modules/SAO/app/Ingest/SignalIngestService.php
-
-		-
-			rawMessage: 'Method Modules\SAO\Ingest\WebhookIngestService::ingest() should return Modules\SAO\Models\IngestEvent but returns mixed.'
-			identifier: return.type
-			count: 1
-			path: Modules/SAO/app/Ingest/WebhookIngestService.php
-
-		-
-			rawMessage: 'Method Modules\SAO\Models\Label::tickets() should return Illuminate\Database\Eloquent\Relations\BelongsToMany<Modules\SAO\Models\Ticket, $this(Modules\SAO\Models\Label), Illuminate\Database\Eloquent\Relations\Pivot, ''pivot''> but returns Illuminate\Database\Eloquent\Relations\BelongsToMany<Modules\SAO\Models\Ticket, $this(Modules\SAO\Models\Label), Modules\SAO\Models\Pivot\TicketLabel, ''pivot''>.'
-			identifier: return.type
-			count: 1
-			path: Modules/SAO/app/Models/Label.php
 
 		-
 			rawMessage: 'Method Modules\SAO\Models\Pivot\TicketLabel::label() return type with generic class Illuminate\Database\Eloquent\Relations\BelongsTo does not specify its types: TRelatedModel, TDeclaringModel'
@@ -13269,7 +11037,7 @@ parameters:
 		-
 			rawMessage: Cannot cast mixed to int.
 			identifier: cast.int
-			count: 2
+			count: 1
 			path: Modules/SAO/app/Models/Ticket.php
 
 		-
@@ -13315,52 +11083,10 @@ parameters:
 			path: Modules/SAO/app/Services/BlameConcentrationOwnershipResolver.php
 
 		-
-			rawMessage: 'Anonymous function should return Modules\SAO\Models\TicketStatus|null but returns Illuminate\Database\Eloquent\Collection<(int|string), Modules\SAO\Models\TicketStatus>|Modules\SAO\Models\TicketStatus|null.'
-			identifier: return.type
-			count: 1
-			path: Modules/SAO/app/Services/ClosureApplicationService.php
-
-		-
 			rawMessage: 'Parameter #1 $array (non-empty-list<string>) of array_values is already a list, call has no effect.'
 			identifier: arrayValues.list
 			count: 1
 			path: Modules/SAO/app/Services/CodeownersOwnershipResolver.php
-
-		-
-			rawMessage: 'Parameter #1 $callback of method Illuminate\Support\Collection<int,Modules\SAO\Models\WorkflowTransition>::map() contains unresolvable type.'
-			identifier: argument.unresolvableType
-			count: 1
-			path: Modules/SAO/app/Services/DomainActions/SaoDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #2 $to of method Modules\SAO\Services\WorkflowService::transition() expects Modules\SAO\Models\TicketStatus, Illuminate\Database\Eloquent\Collection<(int|string), Modules\SAO\Models\TicketStatus>|Modules\SAO\Models\TicketStatus given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Services/DomainActions/SaoDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Support\Collection<int,Modules\SAO\Models\WorkflowTransition>::map() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
-			count: 1
-			path: Modules/SAO/app/Services/DomainActions/SaoDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Support\Collection<int,array<string, mixed>>::all() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
-			count: 1
-			path: Modules/SAO/app/Services/DomainActions/SaoDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Support\Collection<int,array<string, mixed>>::values() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
-			count: 1
-			path: Modules/SAO/app/Services/DomainActions/SaoDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Cannot call method environments() on Modules\SAO\Models\Project|null.'
-			identifier: method.nonObject
-			count: 1
-			path: Modules/SAO/app/Services/FixStatusResolver.php
 
 		-
 			rawMessage: 'Parameter $deployed_environments of class Modules\SAO\Data\FixStatus constructor expects list<string>, array<int, string> given.'
@@ -13418,12 +11144,6 @@ parameters:
 
 		-
 			rawMessage: 'Parameter #2 $array of function implode expects array<string>, array<int, mixed> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Services/IssueSyncService.php
-
-		-
-			rawMessage: 'Parameter #2 $type of method Modules\SAO\Services\TicketCreationService::open() expects Modules\SAO\Models\TicketType, Illuminate\Database\Eloquent\Collection<(int|string), Modules\SAO\Models\TicketType>|Modules\SAO\Models\TicketType given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/SAO/app/Services/IssueSyncService.php
@@ -13567,34 +11287,10 @@ parameters:
 			path: Modules/SAO/app/Services/TrackerImportService.php
 
 		-
-			rawMessage: 'Method Modules\SAO\Services\WorkflowService::openingStatusFor() should return Modules\SAO\Models\TicketStatus but returns Illuminate\Database\Eloquent\Collection<(int|string), Modules\SAO\Models\TicketStatus>|Modules\SAO\Models\TicketStatus.'
-			identifier: return.type
-			count: 1
-			path: Modules/SAO/app/Services/WorkflowService.php
-
-		-
-			rawMessage: 'Method Modules\SAO\Services\WorkflowService::schemeFor() should return Modules\SAO\Models\WorkflowScheme but returns Illuminate\Database\Eloquent\Collection<(int|string), Modules\SAO\Models\WorkflowScheme>|Modules\SAO\Models\WorkflowScheme.'
-			identifier: return.type
-			count: 1
-			path: Modules/SAO/app/Services/WorkflowService.php
-
-		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Schema\Blueprint::integer() expects string, mixed given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/SAO/database/migrations/2026_08_01_100600_create_sao_tickets_table.php
-
-		-
-			rawMessage: Using nullsafe method call on non-nullable type Illuminate\Console\Command. Use -> instead.
-			identifier: nullsafe.neverNull
-			count: 3
-			path: Modules/SAO/database/seeders/DevSAODatabaseSeeder.php
-
-		-
-			rawMessage: Using nullsafe method call on non-nullable type Illuminate\Console\Command. Use -> instead.
-			identifier: nullsafe.neverNull
-			count: 1
-			path: Modules/SAO/database/seeders/SAOPermissionSeeder.php
 
 		-
 			rawMessage: Instanceof between Illuminate\Http\Request and Illuminate\Http\Request will always evaluate to true.
@@ -13619,9 +11315,3 @@ parameters:
 			identifier: class.missingExtends
 			count: 1
 			path: Modules/Shop/database/factories/VariantItemFactory.php
-
-		-
-			rawMessage: Using nullsafe method call on non-nullable type Illuminate\Console\Command. Use -> instead.
-			identifier: nullsafe.neverNull
-			count: 1
-			path: Modules/Shop/database/seeders/ShopDatabaseSeeder.php
