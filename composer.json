@@ -113,6 +113,7 @@
     "refactor": "rector",
     "test:type-coverage": [
       "Composer\\Config::disableProcessTimeout",
+      "@putenv XDEBUG_MODE=off",
       "php -d memory_limit=4G vendor/bin/pest --type-coverage --min=100"
     ],
     "test:typos": "peck",
@@ -120,24 +121,43 @@
       "pint --parallel --test",
       "rector --dry-run"
     ],
-    "test:coverage": "pest --parallel --coverage --exactly=100",
-    "test:unit": "php artisan test --parallel --compact --testsuite=Unit",
-    "test:integration": "php artisan test --parallel --compact --testsuite=Integration",
-    "test:feature": "php artisan test --parallel --compact --testsuite=Feature",
+    "test:coverage": [
+      "Composer\\Config::disableProcessTimeout",
+      "@putenv XDEBUG_MODE=coverage",
+      "pest --parallel --coverage --exactly=100",
+      "@putenv XDEBUG_MODE=off"
+    ],
+    "test:unit": [
+      "@putenv XDEBUG_MODE=off",
+      "php artisan test --parallel --compact --testsuite=Unit"
+    ],
+    "test:integration": [
+      "@putenv XDEBUG_MODE=off",
+      "php artisan test --parallel --compact --testsuite=Integration"
+    ],
+    "test:feature": [
+      "@putenv XDEBUG_MODE=off",
+      "php artisan test --parallel --compact --testsuite=Feature"
+    ],
     "test:modules": [
       "@test:unit",
       "@test:integration",
       "@test:feature"
     ],
-    "test:pest": "vendor/bin/pest --parallel --compact",
-    "test:pest:serial": "vendor/bin/pest --compact",
+    "test:pest": [
+      "@putenv XDEBUG_MODE=off",
+      "vendor/bin/pest --parallel --compact"
+    ],
+    "test:pest:serial": [
+      "@putenv XDEBUG_MODE=off",
+      "vendor/bin/pest --compact"
+    ],
     "test:types": "phpstan",
     "test:refactor": "rector",
     "test:licenses": "vendor/bin/check-licenses",
     "test": [
       "@test:type-coverage",
       "@test:coverage",
-      "@test:modules",
       "@test:lint",
       "@test:types",
       "@test:refactor",
