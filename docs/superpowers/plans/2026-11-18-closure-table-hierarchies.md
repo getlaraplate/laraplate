@@ -62,18 +62,26 @@ Written and run on today's code, before anything changes. Everything here passes
 
 **Baseline (filled by Step 2):**
 
-Re-measured 2026-11-23 with Xdebug off from 0623a60 (`XDEBUG_MODE=off`, 20 iterations, three runs alternating with the branch, runs during which another test process ran discarded; median of the run p50s and p95s, spread of the run p50s in brackets). The content case was renamed from "page of 50 contents + category urls" to "50 contents indexed with category paths": it now prepares 50 contents through the search indexer (`makeAllSearchableUsing()`, `makeSearchableUsing()`, `toSearchableArray()`), the code path that reads category paths; this checkout ran the same case as a local, uncommitted edit, through its own indexing load:
+Re-measured with Xdebug off from 0623a60 (`XDEBUG_MODE=off`, 20 iterations, runs alternating with the branch, runs during which another test process ran repeated; median of the run p50s and p95s, spread of the run p50s in brackets). SQLite: three runs, 2026-11-24. MySQL 8.0.21 on a remote server (a dedicated throwaway database, `phpunit.bench-mysql.xml`): six runs, 2026-11-24; every query there is a network round trip of 4-6 ms with jitter of the same size, so the spreads are wide (ACL resolution, whose three queries are byte-identical on both sides, moves by 13 % between the two medians). The content case was renamed from "page of 50 contents + category urls" to "50 contents indexed with category paths": it now prepares 50 contents through the search indexer (`makeAllSearchableUsing()`, `makeSearchableUsing()`, `toSearchableArray()`), the code path that reads category paths; this checkout ran the same case as a local, uncommitted edit, through its own indexing load:
 
 | Case | Driver | p50 ms | p95 ms | Queries |
 |---|---|---|---|---|
-| acl resolution (5 roles) | sqlite | 1.64 [1.57-1.82] | 1.90 | 3 |
-| 50 contents indexed with category paths | sqlite | 133.34 [133.16-143.12] | 167.39 | 72 |
-| crud tree: parents | sqlite | 177.55 [154.50-178.65] | 202.05 | 14 |
-| crud tree: children | sqlite | 171.69 [161.08-173.69] | 198.53 | 14 |
-| crud tree: parents + children | sqlite | 203.77 [191.86-213.54] | 237.57 | 14 |
-| create a leaf comment | sqlite | 3.17 [3.01-3.42] | 3.38 | 11 |
-| move a 200-node category subtree | sqlite | 3.67 [3.49-3.82] | 3.84 | 10 |
-| delete a middle category | sqlite | 2.46 [2.34-2.70] | 2.67 | 6 |
+| acl resolution (5 roles) | sqlite | 1.50 [1.28-1.52] | 1.65 | 3 |
+| 50 contents indexed with category paths | sqlite | 130.08 [128.31-130.14] | 133.26 | 72 |
+| crud tree: parents | sqlite | 170.21 [168.81-173.75] | 181.87 | 14 |
+| crud tree: children | sqlite | 171.01 [167.49-172.82] | 181.15 | 14 |
+| crud tree: parents + children | sqlite | 208.48 [207.36-210.39] | 222.94 | 14 |
+| create a leaf comment | sqlite | 3.43 [3.21-3.50] | 3.65 | 11 |
+| move a 200-node category subtree | sqlite | 4.04 [4.00-4.11] | 5.00 | 10 |
+| delete a middle category | sqlite | 2.61 [2.59-2.62] | 2.81 | 6 |
+| acl resolution (5 roles) | mysql | 20.27 [18.84-39.21] | 26.27 | 3 |
+| 50 contents indexed with category paths | mysql | 661.51 [580.12-1294.75] | 980.69 | 72 |
+| crud tree: parents | mysql | 260.93 [246.38-365.58] | 305.29 | 14 |
+| crud tree: children | mysql | 280.44 [263.52-330.65] | 349.38 | 14 |
+| crud tree: parents + children | mysql | 459.39 [419.63-506.81] | 544.36 | 14 |
+| create a leaf comment | mysql | 71.25 [65.11-95.22] | 106.91 | 11 |
+| move a 200-node category subtree | mysql | 78.13 [64.95-96.95] | 90.57 | 10 |
+| delete a middle category | mysql | 41.80 [38.93-61.48] | 50.94 | 6 |
 
 First measurement, Xdebug on (`develop,debug,coverage`, `start_with_request=yes`), not comparable (the content case under its old name and code):
 
@@ -88,7 +96,7 @@ First measurement, Xdebug on (`develop,debug,coverage`, `start_with_request=yes`
 | move a 200-node category subtree | sqlite | 17.75 | 18.59 | 10 |
 | delete a middle category | sqlite | 11.58 | 14.59 | 6 |
 
-Server database: pending, measured later from this commit.
+Server database: measured on MySQL 8.0.21 from this commit, see the MySQL rows of the re-measured table above.
 
 ### Task 2: `ClosureTableMaintainer` and the migration helper
 
@@ -237,7 +245,7 @@ One task: the models, their tables and `CrudService::tree()` change together, or
 - Modify: `Modules/Core/README.md` (dependency list line 727), `Modules/Core/docs/CRUD_SYSTEM.md` (example around line 785), `Modules/Core/docs/rag/PERFORMANCE_TOOLKIT.md` (`depth_cache` row), `Modules/Core/docs/rag/MODULE.md` and `Modules/CMS/docs/rag/MODULE.md` where they describe role inheritance, category paths or comment threads
 - Modify: `docs/superpowers/specs/2026-11-18-closure-table-hierarchies-design.md` (status), `docs/superpowers/plans/INDEX.md`
 
-- [ ] **Step 1: Rerun the Task 1 benchmark on both databases and fill the After table.** (SQLite rows are in; server database pending the user's decision, see line under the table)
+- [ ] **Step 1: Rerun the Task 1 benchmark on both databases and fill the After table.** (SQLite and MySQL 8.0.21 rows are in)
 - [ ] **Step 2: Apply the gate.** Every read case: p50 and p95 no higher than baseline beyond noise (5 %), queries no more; ACL resolution, content URLs and tree with parents faster. Writes recorded, no gate. If a read case fails, stop and report to the user with both tables; do not merge.
 - [x] **Step 3: Write the documentation.** `HIERARCHIES_DEVELOPER.md`: giving a model a hierarchy (trait, `MigrateUtils::closureTable()`, overridable column names), the twelve relations and their order, what the trait maintains, what a bulk writer must do (`rebuildClosure()` or `ClosureTableMaintainer::detachSubtreesOf()`), the cascade guard. The other files as listed.
 - [ ] **Step 4: Close the plan.** All boxes resolved; `status: completed`; `## Delivery status (date): ...` with divergences and `**Documented in:**` naming the docs above. Spec status `Implemented`. Run: `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php`
@@ -245,17 +253,25 @@ One task: the models, their tables and `CrudService::tree()` change together, or
 
 **After (filled by Step 1):**
 
-Branch with Core 675d661d, 43cb65e8, 3a9c6b60, 8899251d, a61ba02b and CMS 03060eb, b033372, measured in the same alternating runs as the re-measured baseline above (Xdebug off; median of the run p50s and p95s, spread of the run p50s in brackets). "50 contents indexed with category paths" is the former "page of 50 contents + category urls", see above:
+Branch at Core 70b490c5 and CMS 3f716a8, measured in the same alternating runs as the re-measured baseline above (Xdebug off; median of the run p50s and p95s, spread of the run p50s in brackets). "50 contents indexed with category paths" is the former "page of 50 contents + category urls", see above:
 
 | Case | Driver | p50 ms | p95 ms | Queries |
 |---|---|---|---|---|
-| acl resolution (5 roles) | sqlite | 1.40 [1.25-1.46] | 1.46 | 3 |
-| 50 contents indexed with category paths | sqlite | 108.76 [93.66-113.18] | 113.93 | 73 |
-| crud tree: parents | sqlite | 161.68 [143.30-162.82] | 171.12 | 15 |
-| crud tree: children | sqlite | 160.23 [155.72-165.49] | 177.10 | 15 |
-| crud tree: parents + children | sqlite | 192.04 [179.55-196.56] | 213.77 | 15 |
-| create a leaf comment | sqlite | 3.76 [3.24-3.77] | 3.95 | 12 |
-| move a 200-node category subtree | sqlite | 7.71 [6.34-7.92] | 9.33 | 17 |
-| delete a middle category | sqlite | 2.27 [2.12-2.69] | 2.53 | 6 |
+| acl resolution (5 roles) | sqlite | 1.49 [1.48-1.53] | 1.71 | 3 |
+| 50 contents indexed with category paths | sqlite | 116.69 [115.34-118.26] | 126.50 | 72 |
+| crud tree: parents | sqlite | 162.39 [160.21-164.58] | 171.17 | 14 |
+| crud tree: children | sqlite | 162.68 [162.43-165.95] | 170.31 | 15 |
+| crud tree: parents + children | sqlite | 199.69 [198.87-200.11] | 213.39 | 15 |
+| create a leaf comment | sqlite | 3.52 [3.49-3.58] | 3.81 | 12 |
+| move a 200-node category subtree | sqlite | 6.91 [6.89-7.19] | 7.52 | 17 |
+| delete a middle category | sqlite | 2.26 [2.24-2.29] | 2.50 | 6 |
+| acl resolution (5 roles) | mysql | 22.99 [18.90-26.54] | 31.41 | 3 |
+| 50 contents indexed with category paths | mysql | 607.22 [540.09-677.47] | 733.84 | 72 |
+| crud tree: parents | mysql | 269.19 [245.35-314.56] | 335.05 | 14 |
+| crud tree: children | mysql | 304.84 [244.84-312.35] | 326.44 | 15 |
+| crud tree: parents + children | mysql | 366.37 [318.65-402.09] | 446.34 | 15 |
+| create a leaf comment | mysql | 90.88 [69.65-94.03] | 109.25 | 12 |
+| move a 200-node category subtree | mysql | 149.69 [135.69-164.21] | 200.72 | 17 |
+| delete a middle category | mysql | 43.75 [34.91-70.79] | 56.75 | 6 |
 
-Every read case is faster than the re-measured baseline. The tree cases issue one query more, the `ClosurePaths` read that gives each node its `path`, by design. The indexed contents issue one more: `Taxonomy::assignPaths()` reads the closure rows of the chunk's categories, then their distinct ancestors and translations once, where the baseline ran its recursive CTE and the translations. Writes: the subtree move rewrites 200 x 3 closure rows (inherent), the leaf comment inserts its closure rows (+1 query). The first After measurement, taken with Xdebug on, is replaced by this one. Server database: pending the user's decision.
+SQLite: every read case is faster, with spreads disjoint from the baseline's on indexing and the three trees. MySQL: indexing and parents + children faster; ACL resolution (identical queries on both sides), the tree with parents and the tree with children within the spreads, each branch spread starting at or below the baseline's. Queries: indexing and the tree with parents at par with the baseline; the trees with children issue one more, the `ClosurePaths` read of the descendants' closure rows that gives each node below the starting node its `path` (above it, the rows the relation loaded are enough). On MySQL the eager closure query is cheaper than the CTE it replaces (tree with children: 22.8 ms against 29.0 ms wall, 3.8 ms of server time), so the extra round trip is what separates the two. Writes: the subtree move rewrites 200 x 3 closure rows (inherent), the leaf comment inserts its closure rows (+1 query). The first After measurement, taken with Xdebug on, is replaced by this one.
