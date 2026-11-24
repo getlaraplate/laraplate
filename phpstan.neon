@@ -141,6 +141,30 @@ parameters:
         -
           identifier: function.alreadyNarrowedType
           path: Modules/Core/app/Search/Engines/TypesenseEngine.php
+        # HasApprovals and HasVersions are also used by models that do not extend Core's
+        # Model (test stubs such as HasApprovalsStubModel, a plain Eloquent model in a
+        # module), which lack validateWithRules(), forceDelete(), isForceDeleting() or
+        # softDeletesEnabledBySettings(). Their method_exists() guards are for those.
+        # Against every class PHPStan analyses they are always true, and the count moves
+        # with the analysed contexts, so the guard is named here, limited to these traits.
+        -
+          identifier: function.alreadyNarrowedType
+          message: '#^Call to function method_exists\(\) with .+ will always evaluate to true\.$#'
+          paths:
+            - Modules/Core/app/Models/Concerns/HasApprovals.php
+            - Modules/Core/app/Models/Concerns/HasVersions.php
+        # Trigger and function DDL (CREATE TRIGGER, CREATE FUNCTION, Oracle blocks) cannot
+        # go through a prepared statement, so it runs through unprepared(), and the trigger
+        # names are built from the table names: a literal string is impossible. What is
+        # interpolated is a table, trigger or constraint name taken from code (the module's
+        # table enums), wrapped by the query grammar, never input. Limited to migrations and
+        # MigrateUtils, so an unprepared() anywhere else is still reported.
+        -
+          identifier: argument.type
+          message: '#^Parameter \#1 \$query of method Illuminate\\Database\\Connection::unprepared\(\) expects literal-string, .+ given\.$#'
+          paths:
+            - Modules/*/database/migrations/*
+            - Modules/Core/app/Helpers/MigrateUtils.php
         # Laravel Scout - methods added by the Searchable trait
         - '#Call to an undefined method.*::searchableAs\(\)#'
         # Cache::remember with an array as TTL (likely a bug, but ignore for now)
