@@ -187,7 +187,21 @@ parameters:
     reportUnmatchedIgnoredErrors: false
 
     # Laravel configuration
-    checkModelProperties: true
+    # Off on purpose, for the same fact as the property.notFound rule above: the models
+    # carry no @property docblocks (ide-helper writes them to the gitignored
+    # _ide_helper_models.php since 2026-09-16, so model files keep their own comments)
+    # and Larastan cannot read the schema from migrations that name tables through
+    # enums. On, it checked every column name passed as a string to where(), pluck(),
+    # forceFill(), create() or update() against properties that exist nowhere, and
+    # reported all of them: 498 reports after the Larastan 3.15 upgrade, none a defect.
+    #
+    # Measured on 2026-11-24 before choosing this: loading _ide_helper_models.php as
+    # stubFiles cut those reports to 195 but added 7.671 inside the generated file and
+    # traded 338 other reports for 323, and needs a database to regenerate.
+    #
+    # The cost, already accepted for property.notFound: a misspelled column in a query
+    # is not reported. Turn this back on if the models ever declare their columns.
+    checkModelProperties: false
     checkOctaneCompatibility: true
     noEnvCallsOutsideOfConfig: true
     checkModelAppends: true
