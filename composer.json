@@ -101,8 +101,8 @@
       "@php artisan migrate --graceful --ansi"
     ],
     "lint": [
-      "rector",
-      "pint --parallel",
+      "vendor/bin/rector",
+      "vendor/bin/pint --parallel",
       "php artisan ide-helper:generate",
       "php artisan ide-helper:models --nowrite --reset",
       "php artisan ide-helper:meta"
@@ -110,39 +110,31 @@
     "check": "vendor/bin/phpstan analyse --memory-limit=4G -v",
     "check:debt": "@php scripts/phpstan-debt.php",
     "fix": "vendor/bin/phpstan analyse --memory-limit=4G -v --fix",
-    "refactor": "rector",
+    "refactor": "vendor/bin/rector",
     "test:type-coverage": [
       "Composer\\Config::disableProcessTimeout",
       "@putenv XDEBUG_MODE=off",
       "php -d memory_limit=4G vendor/bin/pest --type-coverage --min=100"
     ],
-    "test:typos": "peck",
-    "test:lint": [
-      "pint --parallel --test",
-      "rector --dry-run"
-    ],
+    "test:typos": "vendor/bin/peck",
+    "test:lint": "vendor/bin/pint --parallel --test",
     "test:coverage": [
       "Composer\\Config::disableProcessTimeout",
       "@putenv XDEBUG_MODE=coverage",
-      "pest --parallel --coverage --exactly=100",
+      "php -d memory_limit=4G vendor/bin/pest --parallel --coverage --exactly=100",
       "@putenv XDEBUG_MODE=off"
     ],
     "test:unit": [
       "@putenv XDEBUG_MODE=off",
-      "php artisan test --parallel --compact --testsuite=Unit"
+      "vendor/bin/pest --parallel --compact --testsuite=Unit"
     ],
     "test:integration": [
       "@putenv XDEBUG_MODE=off",
-      "php artisan test --parallel --compact --testsuite=Integration"
+      "vendor/bin/pest --parallel --compact --testsuite=Integration"
     ],
     "test:feature": [
       "@putenv XDEBUG_MODE=off",
-      "php artisan test --parallel --compact --testsuite=Feature"
-    ],
-    "test:modules": [
-      "@test:unit",
-      "@test:integration",
-      "@test:feature"
+      "vendor/bin/pest --parallel --compact --testsuite=Feature"
     ],
     "test:pest": [
       "@putenv XDEBUG_MODE=off",
@@ -152,8 +144,8 @@
       "@putenv XDEBUG_MODE=off",
       "vendor/bin/pest --compact"
     ],
-    "test:types": "phpstan",
-    "test:refactor": "rector",
+    "test:types": "@check",
+    "test:refactor": "vendor/bin/rector --dry-run",
     "test:licenses": "vendor/bin/check-licenses",
     "test": [
       "@test:type-coverage",
