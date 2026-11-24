@@ -4875,17 +4875,11 @@ parameters:
 		-
 			rawMessage: Access to an undefined property object::$children.
 			identifier: property.notFound
-			count: 4
-			path: Modules/Core/app/Helpers/TreeCollection.php
-
-		-
-			rawMessage: Access to an undefined property object::$id.
-			identifier: property.notFound
 			count: 1
 			path: Modules/Core/app/Helpers/TreeCollection.php
 
 		-
-			rawMessage: Access to an undefined property object::$path.
+			rawMessage: Access to an undefined property object::$id.
 			identifier: property.notFound
 			count: 1
 			path: Modules/Core/app/Helpers/TreeCollection.php
@@ -4898,12 +4892,6 @@ parameters:
 
 		-
 			rawMessage: 'Class Modules\Core\Helpers\TreeCollection extends generic class Illuminate\Database\Eloquent\Collection but does not specify its types: TKey, TModel'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Helpers/TreeCollection.php
-
-		-
-			rawMessage: 'Method Modules\Core\Helpers\TreeCollection::withPaths() return type with generic class Illuminate\Support\Collection does not specify its types: TKey, TValue'
 			identifier: missingType.generics
 			count: 1
 			path: Modules/Core/app/Helpers/TreeCollection.php
