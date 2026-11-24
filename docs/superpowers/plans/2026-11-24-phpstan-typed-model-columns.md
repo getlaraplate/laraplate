@@ -20,6 +20,7 @@ status: open
 - **D1. Models declare their columns.** Each model carries `@property` (or `@property-read` for a column the model never writes) for every column of its table, in its own class docblock, maintained by hand with the migrations. Generated once by Task 2, never regenerated over hand edits. Only columns: relations, relation counts and accessors are left to Larastan, which reads them from the methods. This does not reverse the 2026-09-16 decision, which was against ide-helper *rewriting* model files (`--write` regenerates the whole docblock and loses human comments); `ide-helper:models --nowrite` keeps writing the gitignored `_ide_helper_models.php` for the IDE.
 - **D2. The analyser sees the columns.** Once D1 has landed in every module, `checkModelProperties: true` returns and the two `property.notFound` rules on `\Models\` classes leave `phpstan.neon`, with their comments.
 - **D3. The translation trait honours its contract.** `HasTranslations` implements all of `ITranslatableModel`; every model that uses it declares `implements ITranslatableModel`. Nothing checks the interface at runtime today (only `@phpstan-assert` in AI), so no behaviour depends on the change.
+- **D5. Attributes read from another model are declared too** (owner, 2026-11-24, during Task 5): a translatable model declares the fields it reads from its translation (written by the command, typed as the translation declares them, nullable); ERP's `Party` and `PartyBankAccount` declare the counterparty attributes they proxy (by hand). The drift test accepts them by name: `getTranslatableFields()`, `counterpartyAttributes()`, `bankAccountAttributes()`.
 - **D4. No new baseline entries.** The backlog is fixed in the code. A rule in `phpstan.neon` only when a check conflicts with how the code must be written, scoped by message and path, its reason next to it (as #81 and #82 did). Entries the fixes make stale are removed from `phpstan-baseline.neon` and nothing else changes in it.
 
 Already done in this cleanup, not part of the tasks: laraplate#81 (`checkModelProperties` off, 877 stale entries), laracore#65 (trait typing), laracore#66 (`user_class()` answers Core's User), laracrm#6/#7, larames#8, larashop#8, laracms#27, larasao#15, laraplate#82 (named rules for trigger DDL and trait guards).
@@ -112,12 +113,14 @@ One step per repository, in this order: Core first (others extend its models), t
 - Modify: `phpstan.neon` (`checkModelProperties: true`, delete the two `property.notFound` rules on `\Models\` and their comment, rewrite the `checkModelProperties` comment to point at D1)
 - Modify: `phpstan-baseline.neon` (remove entries that no longer match)
 
-- [ ] **Step 1: Measure** `composer check` before and after the neon change, report by report.
-- [ ] **Step 2: List stale baseline entries** with a probe config that sets `reportUnmatchedIgnoredErrors: true`; remove exactly those, verify the remaining entries are byte-identical.
-- [ ] **Step 3: Fix what the change reports as real** (a column read that is not in the schema, a wrong type now visible): each in the module that owns it, one PR per module, before the neon PR merges. Report the rest by category in the PR body; it is the backlog of Task 6.
-- [ ] **Step 4: Commit and open the app PR.**
+- [x] **Step 1: Measure** `composer check` before and after the neon change, report by report.
+- [x] **Step 2: List stale baseline entries** with a probe config that sets `reportUnmatchedIgnoredErrors: true`; remove exactly those, verify the remaining entries are byte-identical.
+- [-] **Step 3: Fix what the change reports as real** (moved to Task 6: the 120 reports left are per-site work, listed there; the neon PR merges after them) (a column read that is not in the schema, a wrong type now visible): each in the module that owns it, one PR per module, before the neon PR merges. Report the rest by category in the PR body; it is the backlog of Task 6.
+- [x] **Step 4: Commit and open the app PR.**
 
 ### Task 6: The module backlog
+
+What turning the column checks on left (2026-11-24, report by report): pivot reads (`Field::$pivot`, `DeliveryNoteLine::$pivot`), aggregate aliases read as properties (`StockCostLayer::$qty_sum`, `StockLevel::$total_quantity`, `License::$count`), `Model&Contract` intersections whose contract declares no column (`ITranslated::$locale`, `Authenticatable&Model::$password`), `Product` reading content attributes, `Location::$geolocation` and a few columns to verify (`User::$social_id`, `CronJob::$last_run_at`, `Content::$period_from`), and the arrays passed to `create()`/`fill()` in the ERP document pages and MES. Also 32 inline `@phpstan-ignore` comments that no longer match and 26 baseline counts the code now exceeds.
 
 One step per module, smallest first. Each step: list the module's reports from `composer check --error-format=json`, fix them in the code (D4), run the module suite and type coverage, measure report by report, PR. Reports that need a behaviour decision are not guessed: they are listed for the owner in the PR body.
 
