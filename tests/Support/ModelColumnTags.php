@@ -6,6 +6,7 @@ namespace Tests\Support;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
+use Modules\Core\Contracts\ITranslatableModel;
 use ReflectionClass;
 
 /**
@@ -50,7 +51,7 @@ final class ModelColumnTags
     public static function unknown(string $class): array
     {
         $model = new ReflectionClass($class)->newInstance();
-        $columns = self::columns($model);
+        $columns = [...self::columns($model), ...self::readFromAnotherModel($class)];
 
         return array_values(array_filter(
             self::declared($class),
@@ -60,6 +61,28 @@ final class ModelColumnTags
                 && ! $model->hasGetMutator($name)
                 && ! $model->hasAttributeGetMutator($name),
         ));
+    }
+
+    /**
+     * Attributes the model reads from another model: the fields of its translation (HasTranslations) and the
+     * counterparty and bank account attributes ERP's ProxiesCounterparty and ProxiesCounterpartyBankAccount delegate.
+     *
+     * @param  class-string<Model>  $class
+     * @return list<string>
+     */
+    private static function readFromAnotherModel(string $class): array
+    {
+        $names = is_a($class, ITranslatableModel::class, true) ? $class::getTranslatableFields() : [];
+
+        foreach (['counterpartyAttributes', 'bankAccountAttributes'] as $proxy) {
+            $proxied = method_exists($class, $proxy) ? $class::{$proxy}() : [];
+
+            if (is_array($proxied)) {
+                array_push($names, ...array_filter($proxied, is_string(...)));
+            }
+        }
+
+        return array_values($names);
     }
 
     /**

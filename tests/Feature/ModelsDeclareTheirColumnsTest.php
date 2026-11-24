@@ -102,3 +102,16 @@ it('declares no tag that names nothing', function (): void {
 
     expect($unknown)->toBe([], 'these @property tags name no column, relation or accessor');
 });
+
+it('accepts the tags of attributes a model reads from another model', function (): void {
+    // ERP's ProxiesCounterparty reads these from the counterparty; translated fields are covered the same way.
+    $class = columnTagsProbeModel(
+        $this->directory,
+        $this->namespace,
+        'Article',
+        "/**\n * @property int \$id\n * @property string \$title\n * @property string|null \$vat_number\n */\n",
+        body: "    protected \$table = '{$this->table}';\n\n    /**\n     * @return list<string>\n     */\n    public static function counterpartyAttributes(): array\n    {\n        return ['vat_number'];\n    }\n",
+    );
+
+    expect(ModelColumnTags::unknown($class))->toBe([]);
+});
