@@ -1,11 +1,12 @@
 ---
-description: Releases are cut by the maintainers, not from this checkout
+description: Release law lives at the stack root; here, never touch versions by hand
 alwaysApply: true
 ---
 
 # Versioning (caveman)
 
-- Releases are cut by the maintainers with private tooling. Never run or invent a release command here.
-- Do not bump `version` in any `composer.json`, create tags, or edit `CHANGELOG.md` by hand.
-- Use conventional commits (`feat:`, `fix:`, `feat!:`); level and changelog come from them.
-- Do not propose or ask for a version bump on commit/push requests.
+- The law is `laraplate-stack/.cursor/rules/09-versioning.mdc`. Read it before proposing or cutting a release.
+- This repository has no release tool. The only one is `scripts/version.sh` at the stack root: it releases every repository of the stack (application, each `Modules/*` submodule, `laraedge`, UI packages), so it cannot live inside the backend. Releases are cut from the stack, not from this checkout.
+- Here: never bump a `version` in any `composer.json`, never write a `CHANGELOG.md` entry, never create a tag by hand, never invent a release command.
+- Use conventional commits (`feat:`, `fix:`, `feat!:`): level and changelog are read from them.
+- The application and each module version themselves. At the end of a plan, task or self-contained feature, once committed and green, ask the user whether to cut a release and motivate the level per affected target. The stack rule says how.

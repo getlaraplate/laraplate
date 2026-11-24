@@ -22,6 +22,14 @@ alwaysApply: false
   - Constant: UPPER_SNAKE_CASE.
   - Enum case: PascalCase.
 
+- Typing is strong and measured, not aspirational:
+  - Every parameter, return and property carries a native type. So does every **closure** parameter and every **class constant** (`private const array PALETTES = [...]`): those are the two that get forgotten, and they are findings like any other.
+  - `composer test:type-coverage` runs `--min=100` and must stay green. It is a gate, not a report.
+  - The type is the one the **call site really passes**, not the one that looks right. A `whereHas`, `when` or scope callback gets `Illuminate\Database\Eloquent\Builder`; the same chain after `->toBase()` gets `Illuminate\Database\Query\Builder`; an eager-load constraint in `with([...])` gets a `Relation`, so it takes `Illuminate\Contracts\Database\Eloquent\Builder`. Static analysis accepts all three: only the call decides, and the wrong one is a runtime `TypeError`. Run the affected module's tests after typing closures.
+  - Never widen to `mixed` to satisfy the gate. `mixed` is correct only where the value genuinely is anything and the body narrows it (`is_string($value)`).
+  - `@pest-ignore-type` on the line, with the reason, only when an upstream contract forbids the type: `Modules/Core/app/Contracts/ISearchableModel.php` keeps Scout's untyped return types because a model inheriting them from the `Searchable` trait would otherwise be incompatible. Never to park work.
+  - `phpunit.xml` `<source>` lists each `Modules/<Name>/app` one by one. PHPUnit expands a glob in a `<testsuite>` `<directory>` but not in a `<source>` one, so a wildcard there silently measures nothing; `tests/Unit/ModuleSourcePathsAreAnalysedTest.php` guards it.
+
 - Keep code simple, modular, reusable.
 - Prefer interfaces/traits/abstractions for shared logic.
 - PHPDoc in English. Inline comments.

@@ -60,6 +60,7 @@
 - Do not tick a plan's checkboxes from the artifact names it imagined. Read what the code does and map it. Names can survive a design the implementation replaced.
 - Tick a task's checkbox when that task finishes, in the same work block. Not at the end of the plan, not next month. A plan whose boxes lag is worse than one with none: it reports work as outstanding that is done, and the drift is only ever found by the user.
 - A plan is finished when its boxes are ticked, it carries a delivery status, its documentation exists, and it lives in the repository that owns its subject. See `Where specs and plans live` in the stack `AGENTS.md`: a finished plan at the stack root whose subject is only the backend moves here, spec included, with links and indexes repaired.
+- At the end of a plan, task or self-contained feature, once committed and green, ask the user whether to cut a release, and motivate the level per affected target (the application and each module version themselves). Read the facts first: last tag, pending commits, and the plan from the stack tool `scripts/version.sh <target> --dry-run` (it lives at the stack root, not here). Never bump a `version`, a `CHANGELOG.md` or a tag by hand, and never release without an explicit go-ahead. See `.cursor/rules/08-versioning.mdc`, which points at the stack law.
 
 ## Project
 
@@ -82,7 +83,8 @@
 
 - Every PHP file: `declare(strict_types=1);`.
 - Always braces for control structures.
-- Explicit param types and return types.
+- Explicit param types and return types, closure parameters and class constants included.
+- `composer test:type-coverage` is a gate at `--min=100`, not a report: it must stay green. Type a closure with what the call site passes, not with what reads well (`->toBase()` turns an Eloquent builder into a query builder, an eager-load constraint receives a `Relation`), and run that module's tests, because the wrong choice passes analysis and fails at runtime. Never widen to `mixed` to satisfy the gate. Details and the `@pest-ignore-type` exception: `.cursor/rules/01-php-laravel-standards.mdc`.
 - Prefer constructor property promotion.
 - Use `#[Override]` when overriding.
 - Use `final`, `readonly`, `static` where existing rules require.
@@ -108,6 +110,7 @@
 ## Testing
 
 - Every code change needs automated test proof.
+- Type coverage stays at 100% and never falls because of a change: `composer test:type-coverage` (`--min=100`). Close a gap by typing the code, never by widening a type to `mixed`, lowering the threshold or excluding a path. When a type genuinely cannot be expressed, say so on the line with the reason (`@pest-ignore-type`) and state the judgment when finishing.
 - Prefer Pest and feature tests unless unit test fits better.
 - Keep tests inside module `tests/` for module work.
 - Use factories/states for setup.
