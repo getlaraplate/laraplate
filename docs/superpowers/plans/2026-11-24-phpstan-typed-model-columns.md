@@ -102,9 +102,9 @@ One step per repository, in this order: Core first (others extend its models), t
 **Files:**
 - Create: `tests/Feature/ModelsDeclareTheirColumnsTest.php` (app)
 
-- [ ] **Step 1: Write the tests:** `it declares every column of every model` (columns of the table, migrated by `RefreshDatabase`, against the `@property`/`@property-read` names of the class and its parent models), `it names the model and the column that has no tag`, `it accepts columns declared on a parent model of the same table`, `it refuses a tag that is neither a column, a relation nor an accessor` (a name with no method of that name and no `get…Attribute`/`Attribute` accessor). Read the tags with `ReflectionClass::getDocComment()` and a regex on `@property(-read)?\s+\S+\s+\$(\w+)`.
-- [ ] **Step 2: Run against a stub with a missing tag** to see the failure message, then against the real models. Expected: PASS once Task 3 is merged everywhere.
-- [ ] **Step 3: Commit and open the app PR.**
+- [x] **Step 1: Write the tests:** `it declares every column of every model` (columns of the table, migrated by `RefreshDatabase`, against the `@property`/`@property-read` names of the class and its parent models), `it names the model and the column that has no tag`, `it accepts columns declared on a parent model of the same table`, `it refuses a tag that is neither a column, a relation nor an accessor` (a name with no method of that name and no `get…Attribute`/`Attribute` accessor). Read the tags with `ReflectionClass::getDocComment()` and a regex on `@property(-read)?\s+\S+\s+\$(\w+)`.
+- [x] **Step 2: Run against a stub with a missing tag** to see the failure message, then against the real models. Expected: PASS once Task 3 is merged everywhere.
+- [x] **Step 3: Commit and open the app PR.**
 
 ### Task 5: Turn the column checks back on
 
