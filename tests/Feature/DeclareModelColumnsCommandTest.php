@@ -186,3 +186,55 @@ it('leaves a parent model of another module to that module run', function (): vo
     expect((string) file_get_contents($parent))->toBe($parent_before)
         ->and((string) file_get_contents($child_file))->not->toContain('@property');
 });
+
+it('keeps the text around the class when the docblock holds multibyte characters', function (): void {
+    declareColumnsArticleTable($this);
+    $model = declareColumnsProbeModel($this, 'Article', "/**\n * Shareable — across types, città and 日本.\n */\n");
+    $helper = declareColumnsHelperFile($this, ['Article' => declareColumnsArticleTags()]);
+
+    $this->artisan('models:declare-columns', ['--module' => [$this->probe], '--from' => $helper])->assertSuccessful();
+
+    expect((string) file_get_contents($model))->toContain("/**\n * Shareable — across types, città and 日本.\n *\n * @property int \$id\n * @property string \$title\n * @property string|null \$body\n */\nclass Article extends");
+});
+
+it('keeps a column tag written by hand and adds only the missing ones', function (): void {
+    declareColumnsArticleTable($this);
+    $model = declareColumnsProbeModel($this, 'Article', "/**\n * @property non-empty-string \$title\n */\n");
+    $helper = declareColumnsHelperFile($this, ['Article' => declareColumnsArticleTags()]);
+
+    $this->artisan('models:declare-columns', ['--module' => [$this->probe], '--from' => $helper])->assertSuccessful();
+
+    $code = (string) file_get_contents($model);
+
+    expect($code)->toContain('@property non-empty-string $title')
+        ->and($code)->not->toContain('@property string $title')
+        ->and($code)->toContain('@property int $id')
+        ->and($code)->toContain('@property string|null $body');
+});
+
+it('declares a column cast to decimal as a numeric string', function (): void {
+    Schema::create(($this->tableFor)('Line'), static function (Blueprint $table): void {
+        $table->id();
+        $table->decimal('amount', 12, 2);
+        $table->decimal('raw', 12, 2)->nullable();
+    });
+    $model = declareColumnsProbeModel($this, 'Line', '', "\n    protected \$casts = ['amount' => 'decimal:2'];\n");
+    $helper = declareColumnsHelperFile($this, ['Line' => ['@property int $id', '@property numeric $amount', '@property numeric|null $raw']]);
+
+    $this->artisan('models:declare-columns', ['--module' => [$this->probe], '--from' => $helper])->assertSuccessful();
+
+    // Laravel's decimal cast returns a string; a decimal column without a cast is a string on MySQL and a float on
+    // SQLite, so it keeps ide-helper's numeric.
+    expect((string) file_get_contents($model))->toContain(" * @property numeric-string \$amount\n * @property numeric|null \$raw\n");
+});
+
+it('leaves a model untouched when none of its lines is a column', function (): void {
+    declareColumnsArticleTable($this);
+    $model = declareColumnsProbeModel($this, 'Article', '');
+    $before = (string) file_get_contents($model);
+    $helper = declareColumnsHelperFile($this, ['Article' => ['@property-read int|null $authors_count']]);
+
+    $this->artisan('models:declare-columns', ['--module' => [$this->probe], '--from' => $helper])->assertSuccessful();
+
+    expect((string) file_get_contents($model))->toBe($before);
+});

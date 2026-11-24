@@ -76,55 +76,55 @@ final class DeclareModelColumnsCommand extends Command
 
     /**
      * $code with $tags as the column block of the class docblock of $short: the docblock is created when missing,
-     * placed above the class attributes, and every other line of it is kept. Tags already present for the same
-     * names are replaced, so running twice changes nothing.
+     * placed above the class attributes, and every line of it is kept, column tags included: a tag written by hand
+     * stays as written and only the missing columns are added, so running twice changes nothing.
      *
      * @param  list<string>  $tags
      */
     private static function withColumnTags(string $code, string $short, array $tags): string
     {
-        if (preg_match('/^(?:(?:final|abstract|readonly)\s+)*class\s+' . preg_quote($short, '/') . '\b/m', $code, $match, PREG_OFFSET_CAPTURE) !== 1) {
-            return $code;
-        }
+        // One match, rebuilt from its groups: the docblock right above the class (if any), the attribute lines between
+        // them, and the class line. No byte offsets, which a multibyte character in the docblock would shift.
+        $pattern = '/^(?<doc>\/\*\*(?:(?!\*\/).)*\*\/\n)?(?<attributes>(?:#\[[^\n]*\]\n)*)(?<class>(?:(?:final|abstract|readonly)\s+)*class\s+'
+            . preg_quote($short, '/') . '\b)/ms';
 
-        $class_at = $match[0][1];
-        $before = mb_substr($code, 0, $class_at);
-        preg_match('/((?:^#\[[^\n]*\]\n)*)\z/m', $before, $attributes);
-        $attributes_text = $attributes[1] ?? '';
-        $head = mb_substr($before, 0, mb_strlen($before) - mb_strlen($attributes_text));
-        $names = array_map(static fn (string $tag): string => preg_match('/\$(\w+)/', $tag, $name) === 1 ? $name[1] : '', $tags);
+        return preg_replace_callback($pattern, static function (array $match) use ($tags): string {
+            $body = [];
+            $declared = [];
 
-        $body = [];
+            if ($match['doc'] !== '') {
+                foreach (explode("\n", mb_trim(mb_substr($match['doc'], 3, -3))) as $line) {
+                    $text = preg_replace('/^\s*\*\s?/', '', mb_rtrim($line)) ?? '';
+                    $body[] = $text;
 
-        if (preg_match('/\/\*\*(.*?)\*\/\n$/s', $head, $docblock, PREG_OFFSET_CAPTURE) === 1 && mb_trim(mb_substr($head, $docblock[0][1] + mb_strlen($docblock[0][0]))) === '') {
-            $head = mb_substr($head, 0, $docblock[0][1]);
-
-            foreach (explode("\n", $docblock[1][0]) as $line) {
-                $text = preg_replace('/^\s*\*\s?/', '', mb_rtrim($line)) ?? '';
-
-                if (mb_trim($line) === '' && $body === []) {
-                    continue;
+                    if (preg_match('/^@property(?:-read|-write)?\s+\S+\s+\$(\w+)/', $text, $name) === 1) {
+                        $declared[] = $name[1];
+                    }
                 }
-
-                if (preg_match('/^@property(?:-read|-write)?\s+\S+\s+\$(\w+)/', $text, $name) === 1 && in_array($name[1], $names, true)) {
-                    continue;
-                }
-
-                $body[] = $text;
             }
-        }
 
-        while ($body !== [] && mb_trim((string) end($body)) === '') {
-            array_pop($body);
-        }
+            // A column tag already in the docblock was written by hand, or by an earlier run: it stays as it is.
+            $missing = array_values(array_filter(
+                $tags,
+                static fn (string $tag): bool => preg_match('/\$(\w+)/', $tag, $name) === 1 && ! in_array($name[1], $declared, true),
+            ));
 
-        if ($body !== []) {
-            $body[] = '';
-        }
+            if ($missing === []) {
+                return $match[0];
+            }
 
-        $lines = array_map(static fn (string $text): string => $text === '' ? ' *' : ' * ' . $text, [...$body, ...$tags]);
+            while ($body !== [] && mb_trim((string) end($body)) === '') {
+                array_pop($body);
+            }
 
-        return $head . "/**\n" . implode("\n", $lines) . "\n */\n" . $attributes_text . mb_substr($code, $class_at);
+            if ($body !== [] && preg_match('/^@property/', (string) end($body)) !== 1) {
+                $body[] = '';
+            }
+
+            $lines = array_map(static fn (string $text): string => $text === '' ? ' *' : ' * ' . $text, [...$body, ...$missing]);
+
+            return "/**\n" . implode("\n", $lines) . "\n */\n" . $match['attributes'] . $match['class'];
+        }, $code, 1) ?? $code;
     }
 
     private function helperFile(): ?string
@@ -256,11 +256,18 @@ final class DeclareModelColumnsCommand extends Command
         }
 
         $tags = [];
+        $casts = $model->getCasts();
 
         foreach ($columns as $column) {
-            if (isset($by_name[$column])) {
-                $tags[] = $by_name[$column];
+            if (! isset($by_name[$column])) {
+                continue;
             }
+
+            // ide-helper types the decimal cast as numeric, but Laravel's cast always returns a string.
+            $cast = $casts[$column] ?? null;
+            $tags[] = is_string($cast) && str_starts_with($cast, 'decimal')
+                ? (preg_replace('/^(@property(?:-read|-write)?\s+)numeric\b/', '$1numeric-string', $by_name[$column]) ?? $by_name[$column])
+                : $by_name[$column];
         }
 
         return $tags;
