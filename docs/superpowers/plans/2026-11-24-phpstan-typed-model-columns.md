@@ -121,10 +121,10 @@ One step per repository, in this order: Core first (others extend its models), t
 
 One step per module, smallest first. Each step: list the module's reports from `composer check --error-format=json`, fix them in the code (D4), run the module suite and type coverage, measure report by report, PR. Reports that need a behaviour decision are not guessed: they are listed for the owner in the PR body.
 
-- [ ] **Step 1: Shop**
-- [ ] **Step 2: MES**
-- [ ] **Step 3: CRM** (includes `SalesPipelineService` reading `object` properties, the `sync()` arguments in the contact pages)
-- [ ] **Step 4: CMS**
+- [x] **Step 1: Shop** (nothing left once Tasks 1-5 merged)
+- [x] **Step 2: MES** (larames#10; the production order snapshots typed by hand)
+- [x] **Step 3: CRM** (laracrm#9) (includes `SalesPipelineService` reading `object` properties, the `sync()` arguments in the contact pages)
+- [x] **Step 4: CMS** (laracms#30; 7 reports wait for Core: IOwnerAuthorizer variance, BatchSeeder command accessor)
 - [ ] **Step 5: SAO**
 - [ ] **Step 6: ERP** (includes the three `->comment()` calls after `->constrained()` in `create_companies_table`, `create_parties_table`, `create_party_bank_accounts_table`, as laracrm#6 did)
 - [ ] **Step 7: AI**
