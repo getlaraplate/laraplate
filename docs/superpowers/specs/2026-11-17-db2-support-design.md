@@ -110,8 +110,8 @@ Each item is one branch and one upstream pull request, with unit tests in the pa
 The claim covers the whole application, so the phase gate covers the vendor query paths Laraplate uses (Filament backoffice, spatie permission and medialibrary, the Scout database engine), not only Laraplate's own code.
 
 - `staudenmeir/laravel-cte` throws `This database is not supported.` for any driver outside its list (`BuildsExpressionQueries::getQueryGrammar`). `Role`, `Taxonomy` and the CMS `Comment` use `HasRecursiveRelationships`, so every query on them throws on Db2, including a plain `find`, and seeding fails. `staudenmeir/laravel-adjacency-list` has the same kind of list for recursive queries.
-- Fix, my call: the same model as the driver. A Db2 grammar is offered upstream to the staudenmeir packages as pull requests; until merged, Core overrides the grammar resolution for the Db2 family only.
-- The first task of the Laraplate work is an audit of `vendor/` for other driver allowlists (`getDriverName()` matches that throw by default) among the packages Laraplate uses; each one found gets the same treatment.
+- Fix, decided by the user on 2026-11-18: the three hierarchies move to Core's closure table and the `staudenmeir` packages leave the dependencies, see `2026-11-18-closure-table-hierarchies-design.md`. That work is a prerequisite of the Db2 work; no pull requests to `staudenmeir` and no grammar override in Core.
+- The first task of the Laraplate work is an audit of `vendor/` for other driver allowlists (`getDriverName()` matches that throw by default) among the packages Laraplate uses. Each one found is fixed in the package that owns it: a generic Db2 change offered upstream as a pull request, with a Core override for the Db2 family only until it is merged.
 
 ### Transactions on IBM i
 
