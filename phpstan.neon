@@ -175,14 +175,6 @@ parameters:
           message: '#^Parameter \#1 \$(value|sql|expression) of (class Illuminate\\Database\\Query\\Expression constructor|method Illuminate\\Database\\Query\\Builder::(selectRaw|orderByRaw|groupByRaw|whereRaw)\(\)) expects (TValue of float\|int\|literal-string|literal-string|Illuminate\\Contracts\\Database\\Query\\Expression\|literal-string), (non-falsy-string|string) given\.$#'
           paths:
             - Modules/Core/app/Services/Crud/*
-        # Laravel Scout - the other Searchable methods that AI's embedding switch and repair call on a
-        # class-string<Model> taken from a list filtered by class_uses_trait(Searchable): PHPStan cannot
-        # narrow a class by the traits it uses, and Scout ships no interface for them.
-        -
-          message: '#^Call to an undefined (static )?method Illuminate\\Database\\Eloquent\\Model::(searchableUsing|makeSearchableUsing|makeAllSearchableQuery|search)\(\)\.$#'
-          paths:
-            - Modules/AI/app/Ai/Embeddings/Switching/*
-            - Modules/AI/app/Console/RepairMissingEmbeddingsCommand.php
         # Cache::remember with an array as TTL (likely a bug, but ignore for now)
         - '#Parameter.*\$ttl.*Cache::remember.*array given#'
         -
