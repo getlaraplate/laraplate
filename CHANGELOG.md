@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.17.0] - 2026-11-25
+
+### 🚀 Features
+
+- *(modules)* Bump Core v2.0.1, AI v3.3.0, CMS v1.50.1, CRM v1.1.2, ERP v2.2.0, MES v1.4.0, SAO v1.6.2, Shop v0.1.2
+
+### 🧪 Testing
+
+- *(models)* Every model declares its columns, and no tag names nothing
+- *(models)* Accept the attributes a model reads from another model
+
+### ⚙️ Miscellaneous Tasks
+
+- *(phpstan)* Check column names against the declared columns again
+
 ## [1.16.0] - 2026-11-25
 
 ### 🚀 Features
