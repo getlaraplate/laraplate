@@ -6151,12 +6151,6 @@ parameters:
 			path: Modules/Core/app/Models/Taxonomy.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\Taxonomy::buildAncestorChain() should return string but returns mixed.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/app/Models/Taxonomy.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\Taxonomy::dynamicSlugFields() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
