@@ -270,7 +270,7 @@ One task: the models, their tables and `CrudService::tree()` change together, or
 - [x] **Step 2: Apply the gate.** Every read case: p50 and p95 no higher than baseline beyond noise (5 %), queries no more; ACL resolution, content URLs and tree with parents faster. Writes recorded, no gate. If a read case fails, stop and report to the user with both tables; do not merge. (Gate approved by the user on 2026-11-24, accepting the MySQL "crud tree: parents" median at +2.0 %.)
 - [x] **Step 3: Write the documentation.** `HIERARCHIES_DEVELOPER.md`: giving a model a hierarchy (trait, `MigrateUtils::closureTable()`, overridable column names), the twelve relations and their order, what the trait maintains, what a bulk writer must do (`rebuildClosure()` or `ClosureTableMaintainer::detachSubtreesOf()`), the cascade guard. The other files as listed.
 - [x] **Step 4: Close the plan.** All boxes resolved; `status: completed`; `## Delivery status (date): ...` with divergences and `**Documented in:**` naming the docs above. Spec status `Implemented`. Run: `vendor/bin/pest --compact tests/Unit/ClosedPlansPointToDocumentationTest.php`
-- [ ] **Step 5: Commit and open the three PRs** (Core, CMS, root), bodies listing the gate numbers.
+- [x] **Step 5: Commit and open the three PRs** (Core, CMS, root), bodies listing the gate numbers.
 
 **After (filled by Step 1):**
 
