@@ -1,6 +1,6 @@
 # Hierarchies on a closure table
 
-**Status:** Approved (2026-11-18)
+**Status:** Implemented (2026-11-24). Divergences from this record (no hierarchy path, `/tree` payload without `path`, soft-delete purge through `TrashedRowsPurger`) are in the delivery status of `../plans/2026-11-18-closure-table-hierarchies.md`.
 
 **Date:** 2026-11-18
 
