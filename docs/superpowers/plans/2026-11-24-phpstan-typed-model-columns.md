@@ -125,10 +125,10 @@ One step per module, smallest first. Each step: list the module's reports from `
 - [x] **Step 2: MES** (larames#10; the production order snapshots typed by hand)
 - [x] **Step 3: CRM** (laracrm#9) (includes `SalesPipelineService` reading `object` properties, the `sync()` arguments in the contact pages)
 - [x] **Step 4: CMS** (laracms#30; 7 reports wait for Core: IOwnerAuthorizer variance, BatchSeeder command accessor)
-- [ ] **Step 5: SAO**
-- [ ] **Step 6: ERP** (includes the three `->comment()` calls after `->constrained()` in `create_companies_table`, `create_parties_table`, `create_party_bank_accounts_table`, as laracrm#6 did)
-- [ ] **Step 7: AI**
-- [ ] **Step 8: Core** (includes `HasFilamentFormDataSanitizer`: split the create and edit overrides so no page calls a parent that does not exist)
+- [x] **Step 5: SAO** (larasao#17, larasao#18; the last report closed by laracore#70's covariant `IOwnerAuthorizer`)
+- [x] **Step 6: ERP** (laraerp#9; also fixes ICS line folding with multibyte text and Party's missing boolean casts) (includes the three `->comment()` calls after `->constrained()` in `create_companies_table`, `create_parties_table`, `create_party_bank_accounts_table`, as laracrm#6 did)
+- [x] **Step 7: AI** (laraai#34, laraai#35 after laracore#70; the Scout calls on `class-string<Model>` are a named rule in `phpstan.neon` until a `Searchable` contract exists)
+- [ ] **Step 8: Core** (includes `HasFilamentFormDataSanitizer`: split the create and edit overrides so no page calls a parent that does not exist) — in progress: laracore#70 (models, contracts, sanitizer split), laracore#71 (CRUD, cache labels, relation overrides), laracms#31; Core 431 -> 267
 
 ### Task 7: Close the plan
 
