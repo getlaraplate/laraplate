@@ -33,6 +33,7 @@ This avoids accidentally indexing every Markdown file under `docs/` that was nev
 ## Engineering audits
 
 - [Database connection affinity audit](database-connection-affinity-audit.md)
+- [Static analysis](static-analysis.md): PHPStan commands, the baseline, model column tags, trait contracts, and when a rule in `phpstan.neon` is allowed
 
 ## Operations
 

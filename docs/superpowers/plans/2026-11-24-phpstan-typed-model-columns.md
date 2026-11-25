@@ -1,7 +1,7 @@
 ---
 created_on: 2026-11-24
 module: core, ai, cms, crm, erp, mes, sao, shop
-status: open
+status: completed
 ---
 # PHPStan cleanup: typed model columns, the translation contract, the module backlog. Implementation Plan
 
@@ -15,11 +15,24 @@ status: open
 
 **Spec:** none written; the decisions were taken with the owner on 2026-11-24 and are recorded below. Measurements behind them are in the PR bodies of getlaraplate/laraplate#81 and #82.
 
+## Delivery status (2026-11-25): shipped, Core backlog left open
+
+**Documented in:** `docs/static-analysis.md` (app), `Modules/Core/docs/rag/MODULE.md` (*Built-in abstractions*: trait contracts; *Static analysis*: `models:declare-columns`; *For module developers*), `Modules/Core/docs/rag/VERSIONING_DEVELOPER.md`, `Modules/Core/docs/rag/SEARCH_RETRIEVAL_PIPELINE.md` (`scout:sync`).
+
+Every model declares its columns, the drift test guards them, `checkModelProperties` is on and the two `property.notFound` rules are gone; `HasTranslations`, `HasVersions` and `Searchable` require their contracts. Each task names its PRs below; the block that closes the plan is laracore#75, laraerp#11, laracms#35, larashop#11, larames#12 and the laraplate PR that carries this file. Divergences from the steps:
+
+- **Tasks 4 and 5 reached master late.** laraplate#85 and #86 were merged into the stacked branches they were opened against, not into master, so the drift test and `checkModelProperties: true` were missing from master while Task 6 ran, and Task 6 was measured with the check off. The block that closes the plan merges them into master and fixes the 170 reports the check then raised, in Core, ERP, CMS, Shop and MES (laracore#75, laraerp#11, laracms#35, larashop#11, larames#12).
+- **Four bugs the column check found** (each with a test seen failing first): social login wrote five `social_*` columns no migration created, and its tokens were serialized (now created, encrypted, hidden); the Cron Jobs list read `last_run_at`/`next_run_at`, which exist nowhere (now computed from the cron expression); `auth:licenses` printed its Status column inverted; `Searchable` read a `softDeletesEnabled` attribute no model has.
+- **Two named rules more than planned** (D4): the base-model rule covers Core's `Overrides\Model` and a base model with a contract (`Model&ITranslated`, `Authenticatable&Model`), because Larastan reads no `@property` tag of an interface (measured); and table-qualified columns in the joins of ERP's report services.
+- **Attributes delegated to another model** are declared on the trait that delegates them (`ProxiesCounterparty`, `ProxiesCounterpartyBankAccount`, `HasPlace`) or read through the model they live on (`Product::mergedContent()`), which the plan, foreseeing only columns, relations and accessors, did not say.
+- **Not done: Task 6 Step 8, the rest of Core.** 324 reports remain in Core (Search services and engines, Filament, Http, Helpers, Providers), plus 11 in AI and 5 in CMS, MES and ERP that close when laraai#36, laracms#33, larames#11 and laraerp#10 merge. They are visible reports, not baseline entries; a later plan takes them.
+
 ## Decisions
 
 - **D1. Models declare their columns.** Each model carries `@property` (or `@property-read` for a column the model never writes) for every column of its table, in its own class docblock, maintained by hand with the migrations. Generated once by Task 2, never regenerated over hand edits. Only columns: relations, relation counts and accessors are left to Larastan, which reads them from the methods. This does not reverse the 2026-09-16 decision, which was against ide-helper *rewriting* model files (`--write` regenerates the whole docblock and loses human comments); `ide-helper:models --nowrite` keeps writing the gitignored `_ide_helper_models.php` for the IDE.
 - **D2. The analyser sees the columns.** Once D1 has landed in every module, `checkModelProperties: true` returns and the two `property.notFound` rules on `\Models\` classes leave `phpstan.neon`, with their comments.
 - **D3. The translation trait honours its contract.** `HasTranslations` implements all of `ITranslatableModel`; every model that uses it declares `implements ITranslatableModel`. Nothing checks the interface at runtime today (only `@phpstan-assert` in AI), so no behaviour depends on the change.
+- **D5. Attributes read from another model are declared too** (owner, 2026-11-24, during Task 5): a translatable model declares the fields it reads from its translation (written by the command, typed as the translation declares them, nullable); ERP's `Party` and `PartyBankAccount` declare the counterparty attributes they proxy (by hand). The drift test accepts them by name: `getTranslatableFields()`, `counterpartyAttributes()`, `bankAccountAttributes()`.
 - **D4. No new baseline entries.** The backlog is fixed in the code. A rule in `phpstan.neon` only when a check conflicts with how the code must be written, scoped by message and path, its reason next to it (as #81 and #82 did). Entries the fixes make stale are removed from `phpstan-baseline.neon` and nothing else changes in it.
 
 Already done in this cleanup, not part of the tasks: laraplate#81 (`checkModelProperties` off, 877 stale entries), laracore#65 (trait typing), laracore#66 (`user_class()` answers Core's User), laracrm#6/#7, larames#8, larashop#8, laracms#27, larasao#15, laraplate#82 (named rules for trigger DDL and trait guards).
@@ -102,9 +115,9 @@ One step per repository, in this order: Core first (others extend its models), t
 **Files:**
 - Create: `tests/Feature/ModelsDeclareTheirColumnsTest.php` (app)
 
-- [ ] **Step 1: Write the tests:** `it declares every column of every model` (columns of the table, migrated by `RefreshDatabase`, against the `@property`/`@property-read` names of the class and its parent models), `it names the model and the column that has no tag`, `it accepts columns declared on a parent model of the same table`, `it refuses a tag that is neither a column, a relation nor an accessor` (a name with no method of that name and no `get…Attribute`/`Attribute` accessor). Read the tags with `ReflectionClass::getDocComment()` and a regex on `@property(-read)?\s+\S+\s+\$(\w+)`.
-- [ ] **Step 2: Run against a stub with a missing tag** to see the failure message, then against the real models. Expected: PASS once Task 3 is merged everywhere.
-- [ ] **Step 3: Commit and open the app PR.**
+- [x] **Step 1: Write the tests:** `it declares every column of every model` (columns of the table, migrated by `RefreshDatabase`, against the `@property`/`@property-read` names of the class and its parent models), `it names the model and the column that has no tag`, `it accepts columns declared on a parent model of the same table`, `it refuses a tag that is neither a column, a relation nor an accessor` (a name with no method of that name and no `get…Attribute`/`Attribute` accessor). Read the tags with `ReflectionClass::getDocComment()` and a regex on `@property(-read)?\s+\S+\s+\$(\w+)`.
+- [x] **Step 2: Run against a stub with a missing tag** to see the failure message, then against the real models. Expected: PASS once Task 3 is merged everywhere.
+- [x] **Step 3: Commit and open the app PR.**
 
 ### Task 5: Turn the column checks back on
 
@@ -112,12 +125,14 @@ One step per repository, in this order: Core first (others extend its models), t
 - Modify: `phpstan.neon` (`checkModelProperties: true`, delete the two `property.notFound` rules on `\Models\` and their comment, rewrite the `checkModelProperties` comment to point at D1)
 - Modify: `phpstan-baseline.neon` (remove entries that no longer match)
 
-- [ ] **Step 1: Measure** `composer check` before and after the neon change, report by report.
-- [ ] **Step 2: List stale baseline entries** with a probe config that sets `reportUnmatchedIgnoredErrors: true`; remove exactly those, verify the remaining entries are byte-identical.
-- [ ] **Step 3: Fix what the change reports as real** (a column read that is not in the schema, a wrong type now visible): each in the module that owns it, one PR per module, before the neon PR merges. Report the rest by category in the PR body; it is the backlog of Task 6.
-- [ ] **Step 4: Commit and open the app PR.**
+- [x] **Step 1: Measure** `composer check` before and after the neon change, report by report.
+- [x] **Step 2: List stale baseline entries** with a probe config that sets `reportUnmatchedIgnoredErrors: true`; remove exactly those, verify the remaining entries are byte-identical.
+- [x] **Step 3: Fix what the change reports as real** (a column read that is not in the schema, a wrong type now visible): each in the module that owns it, one PR per module, before the neon PR merges. Done after Task 6, once the check reached master: laracore#75, laraerp#11, laracms#35, larashop#11, larames#12.
+- [x] **Step 4: Commit and open the app PR.**
 
 ### Task 6: The module backlog
+
+What turning the column checks on left (2026-11-24, report by report): pivot reads (`Field::$pivot`, `DeliveryNoteLine::$pivot`), aggregate aliases read as properties (`StockCostLayer::$qty_sum`, `StockLevel::$total_quantity`, `License::$count`), `Model&Contract` intersections whose contract declares no column (`ITranslated::$locale`, `Authenticatable&Model::$password`), `Product` reading content attributes, `Location::$geolocation` and a few columns to verify (`User::$social_id`, `CronJob::$last_run_at`, `Content::$period_from`), and the arrays passed to `create()`/`fill()` in the ERP document pages and MES. Also 32 inline `@phpstan-ignore` comments that no longer match and 26 baseline counts the code now exceeds.
 
 One step per module, smallest first. Each step: list the module's reports from `composer check --error-format=json`, fix them in the code (D4), run the module suite and type coverage, measure report by report, PR. Reports that need a behaviour decision are not guessed: they are listed for the owner in the PR body.
 
@@ -128,9 +143,9 @@ One step per module, smallest first. Each step: list the module's reports from `
 - [x] **Step 5: SAO** (larasao#17, larasao#18; the last report closed by laracore#70's covariant `IOwnerAuthorizer`)
 - [x] **Step 6: ERP** (laraerp#9; also fixes ICS line folding with multibyte text and Party's missing boolean casts) (includes the three `->comment()` calls after `->constrained()` in `create_companies_table`, `create_parties_table`, `create_party_bank_accounts_table`, as laracrm#6 did)
 - [x] **Step 7: AI** (laraai#34, laraai#35 after laracore#70; laraai#36 takes searchable models by `ISearchableModel`, which removes the named Scout rule from `phpstan.neon`)
-- [ ] **Step 8: Core** (includes `HasFilamentFormDataSanitizer`: split the create and edit overrides so no page calls a parent that does not exist) — in progress: laracore#70 (models, contracts, sanitizer split), laracore#71 (CRUD, cache labels, relation overrides), laracms#31, laracore#73 (`IVersionedModel` and `ISearchableModel` required by their traits, with laraerp#10, larames#11, laracms#33, laraai#36; also fixes `scout:sync`); Core 431 -> 281
+- [-] **Step 8: Core**, partly (includes `HasFilamentFormDataSanitizer`: split the create and edit overrides so no page calls a parent that does not exist) — in progress: laracore#70 (models, contracts, sanitizer split), laracore#71 (CRUD, cache labels, relation overrides), laracms#31, laracore#73 (`IVersionedModel` and `ISearchableModel` required by their traits, with laraerp#10, larames#11, laracms#33, laraai#36; also fixes `scout:sync`); Core 431 -> 281. The rest is left to a later plan, see Delivery status
 
 ### Task 7: Close the plan
 
-- [ ] **Step 1: Document** the convention in `docs/static-analysis.md` (new, app): what a model declares and why (D1), the command, the drift test, the named rules in `phpstan.neon` and how to add one (D4). Add the `ITranslatableModel` requirement to the translations section of `Modules/Core/docs/rag/MODULE.md`.
-- [ ] **Step 2: Close** with `status: completed`, a `## Delivery status (date):` section with the `**Documented in:**` line, every box resolved; update `INDEX.md`.
+- [x] **Step 1: Document** the convention in `docs/static-analysis.md` (new, app): what a model declares and why (D1), the command, the drift test, the named rules in `phpstan.neon` and how to add one (D4). Add the `ITranslatableModel` requirement to the translations section of `Modules/Core/docs/rag/MODULE.md`.
+- [x] **Step 2: Close** with `status: completed`, a `## Delivery status (date):` section with the `**Documented in:**` line, every box resolved; update `INDEX.md`.

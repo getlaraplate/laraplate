@@ -72,31 +72,38 @@ parameters:
           identifier: larastan.noEnvCallsOutsideOfConfig
           path: Modules/*/config/*
         # - '#Static call to instance method __construct\(\)#'
-        # Eloquent columns read off a model. The models carry no @property docblocks
-        # (the generated ones were dropped on 2026-09-16) and Larastan cannot infer
-        # the schema here: databaseMigrationsPath was measured and changed nothing,
-        # because the migrations name their tables through enums (ERPTables::Invoices)
-        # and build columns through helpers (MigrateUtils::timestamps).
-        #
-        # This covers 1.790 of the 1.910 reports, all of them the same fact: a column
-        # exists in the database and nowhere in the type system. It is scoped to
-        # properties whose owner sits under a \Models\ namespace, so an undefined
-        # property on a service, a Filament page or a vendor class is still reported
-        # (120 of those remain, and they are the ones worth reading).
-        #
-        # The cost: a genuinely misspelled column on a model is now silent. Restoring
-        # `ide-helper:models --write` would let this rule go.
+        # A column name passed as a string through a Builder or a Model typed only as a
+        # base model class, Illuminate's or Core's Overrides\Model, alone or with a contract
+        # (Model&ITranslated in HasTranslations, Authenticatable&Model in the Fortify
+        # actions): generic code (HasTable, CrudService, the importers, Preset's related
+        # models) that works on any model. The base class declares no column, so
+        # Larastan's column check (checkModelProperties) reports every such name, none a
+        # defect. A contract cannot carry the columns instead:
+        # measured on 2026-11-25, Larastan reads no @property tag of an interface for
+        # this check. Limited to the base class: a concrete model is still checked
+        # against the columns it declares.
         -
-          identifier: property.notFound
-          message: '#^Access to an undefined property [\w\\]+\\Models\\[\w\\]+::\$\w+\.$#'
-        # Same fact, written by PHPStan as a union or an intersection: a narrowing
-        # `instanceof A || instanceof B` leaves `A|B`, and a relation carrying pivot
-        # data leaves `Release&object{pivot: Pivot}`. The owner is still a model and
-        # the property is still a column, so the rule above has to accept both shapes
-        # or the pattern would only cover the case where one class survives narrowing.
+          identifier: argument.type
+          message: '#model property of (?:[\w\\\\]+&)*(?:Illuminate\\Database\\Eloquent|Modules\\Core\\Overrides)\\Model(?:&[\w\\\\]+)*[,>]#'
+        # A column qualified with its table (`erp_journal_entries.posted_at`) in a report
+        # that joins several tables: the qualifier keeps the SQL unambiguous, and Larastan
+        # checks the whole string as a column of the builder's model, so it reports every
+        # qualified name, of its own table or of a joined one. Limited to the ERP services
+        # that build these joins. A name needs its dot, or the `…` PHPStan puts where it
+        # truncates a long name, so a plain misspelled column there is still reported.
         -
-          identifier: property.notFound
-          message: '#^Access to an undefined property [\w\\]+\\Models\\[\w\\]+(&object\{[^}]*\})?(\|[\w\\]+\\Models\\[\w\\]+(&object\{[^}]*\})?)*::\$\w+\.$#'
+          identifier: argument.type
+          message: '#model property of [^,]+, mixed>.*, ''\w+(?:\.\w+|\.?\w*…)'' given\.$#'
+          paths:
+            - Modules/ERP/app/Services/Reporting/*
+            - Modules/ERP/app/Services/Payments/AgingReportService.php
+        # A JSON path (`meta->erp_role`), Laravel's way to query inside a json column.
+        # Larastan checks the whole string as a column name and reports every path.
+        # Limited to strings shaped column->key, so a plain misspelled column is still
+        # reported. PHPStan truncates long names in the message, hence the `…`.
+        -
+          identifier: argument.type
+          message: '#model property of [^,]+, ''\w+-(?:>[\w>-]*|…)'' given\.$#'
         # Query scopes called on a Builder whose model type is a contract rather than
         # a concrete class. Larastan's BuilderHelper resolves $query->locked() by
         # reading `scope` . ucfirst($method) off the method tags of every class in the
@@ -175,65 +182,25 @@ parameters:
           message: '#^Parameter \#1 \$(value|sql|expression) of (class Illuminate\\Database\\Query\\Expression constructor|method Illuminate\\Database\\Query\\Builder::(selectRaw|orderByRaw|groupByRaw|whereRaw)\(\)) expects (TValue of float\|int\|literal-string|literal-string|Illuminate\\Contracts\\Database\\Query\\Expression\|literal-string), (non-falsy-string|string) given\.$#'
           paths:
             - Modules/Core/app/Services/Crud/*
-        # Cache::remember with an array as TTL (likely a bug, but ignore for now)
-        - '#Parameter.*\$ttl.*Cache::remember.*array given#'
-        -
-          message: '#Property Modules\\CMS\\Models\\Pivot\\Categorizable::\$primaryKey \(string\) does not accept default value#'
-          path: Modules/CMS/app/Models/Pivot/Categorizable.php
         # Carried over from the module phpstan.neon files when the toolchain was centralized
         # (2026-09-15). Their paths were module-relative; they are prefixed here.
-        -
-            identifier: generics.lessTypes
-            path: Modules/*/app/Models
-        -
-            identifier: return.type
-            path: Modules/*/app/Models
-        -
-            identifier: property.onlyWritten
-            path: Modules/CMS/app/Models/Content.php
-        -
-            identifier: property.onlyWritten
-            path: Modules/CMS/app/Models/Pivot/Fieldable.php
-        -
-            identifier: return.unusedType
-            path: Modules/CMS/app/Models/Tag.php
-        -
-            identifier: return.unusedType
-            path: Modules/CMS/app/Models/Contributor.php
         -
             identifier: new.staticInAbstractClassStaticMethod
             path: Modules/CMS/app/Services/Contracts/AbstractGeocodingService.php
         -
             identifier: new.static
             path: Modules/CMS/app/Services/Contracts/AbstractGeocodingService.php
-        -
-            identifier: return.type
-            path: Modules/CMS/app/Services/Contracts/AbstractGeocodingService.php
-        -
-            identifier: method.notFound
-            path: Modules/CMS/app/Helpers/HasMedia.php
-        -
-            identifier: arguments.count
-            path: Modules/AI/app/Listeners/*
     # Do not report unmatched patterns (to avoid warnings on IDE helper files)
     reportUnmatchedIgnoredErrors: false
 
     # Laravel configuration
-    # Off on purpose, for the same fact as the property.notFound rule above: the models
-    # carry no @property docblocks (ide-helper writes them to the gitignored
-    # _ide_helper_models.php since 2026-09-16, so model files keep their own comments)
-    # and Larastan cannot read the schema from migrations that name tables through
-    # enums. On, it checked every column name passed as a string to where(), pluck(),
-    # forceFill(), create() or update() against properties that exist nowhere, and
-    # reported all of them: 498 reports after the Larastan 3.15 upgrade, none a defect.
-    #
-    # Measured on 2026-11-24 before choosing this: loading _ide_helper_models.php as
-    # stubFiles cut those reports to 195 but added 7.671 inside the generated file and
-    # traded 338 other reports for 323, and needs a database to regenerate.
-    #
-    # The cost, already accepted for property.notFound: a misspelled column in a query
-    # is not reported. Turn this back on if the models ever declare their columns.
-    checkModelProperties: false
+    # On: every model declares its columns as @property tags (plan
+    # 2026-11-24-phpstan-typed-model-columns, D1; written once by Core's
+    # models:declare-columns, guarded by the app test ModelsDeclareTheirColumnsTest),
+    # so a column name passed as a string to where(), pluck(), forceFill(), create()
+    # or update() is checked against the columns the model declares. It was off from
+    # laraplate#81 until then, when the models declared none.
+    checkModelProperties: true
     checkOctaneCompatibility: true
     noEnvCallsOutsideOfConfig: true
     checkModelAppends: true
