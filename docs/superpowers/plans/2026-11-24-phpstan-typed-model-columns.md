@@ -127,8 +127,8 @@ One step per module, smallest first. Each step: list the module's reports from `
 - [x] **Step 4: CMS** (laracms#30; 7 reports wait for Core: IOwnerAuthorizer variance, BatchSeeder command accessor)
 - [x] **Step 5: SAO** (larasao#17, larasao#18; the last report closed by laracore#70's covariant `IOwnerAuthorizer`)
 - [x] **Step 6: ERP** (laraerp#9; also fixes ICS line folding with multibyte text and Party's missing boolean casts) (includes the three `->comment()` calls after `->constrained()` in `create_companies_table`, `create_parties_table`, `create_party_bank_accounts_table`, as laracrm#6 did)
-- [x] **Step 7: AI** (laraai#34, laraai#35 after laracore#70; the Scout calls on `class-string<Model>` are a named rule in `phpstan.neon` until a `Searchable` contract exists)
-- [ ] **Step 8: Core** (includes `HasFilamentFormDataSanitizer`: split the create and edit overrides so no page calls a parent that does not exist) — in progress: laracore#70 (models, contracts, sanitizer split), laracore#71 (CRUD, cache labels, relation overrides), laracms#31; Core 431 -> 267
+- [x] **Step 7: AI** (laraai#34, laraai#35 after laracore#70; laraai#36 takes searchable models by `ISearchableModel`, which removes the named Scout rule from `phpstan.neon`)
+- [ ] **Step 8: Core** (includes `HasFilamentFormDataSanitizer`: split the create and edit overrides so no page calls a parent that does not exist) — in progress: laracore#70 (models, contracts, sanitizer split), laracore#71 (CRUD, cache labels, relation overrides), laracms#31, laracore#73 (`IVersionedModel` and `ISearchableModel` required by their traits, with laraerp#10, larames#11, laracms#33, laraai#36; also fixes `scout:sync`); Core 431 -> 281
 
 ### Task 7: Close the plan
 
