@@ -4,7 +4,7 @@
   "vendor": "getlaraplate",
   "type": "project",
   "description": "Modular Laravel platform with a Filament backoffice: install only the modules you need.",
-  "version": "v1.17.0",
+  "version": "v1.18.0",
   "keywords": [
     "laravel",
     "laraplate",
