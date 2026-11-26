@@ -149,6 +149,7 @@
       "@putenv XDEBUG_MODE=off",
       "vendor/bin/pest --compact"
     ],
+    "test:db2": "vendor/bin/pest -c phpunit.db2.xml --group=db2",
     "test:types": "@check",
     "test:refactor": "vendor/bin/rector --dry-run",
     "test:licenses": "vendor/bin/check-licenses",

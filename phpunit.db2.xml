@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
+         colors="true"
+>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory suffix="Test.php">tests/Unit</directory>
+            <directory suffix="Test.php">Modules/*/tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory suffix="Test.php">tests/Integration</directory>
+            <directory suffix="Test.php">Modules/*/tests/Integration</directory>
+            <directory suffix="Test.php">Modules/*/tests/UnitShell</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory suffix="Test.php">tests/Feature</directory>
+            <directory suffix="Test.php">Modules/*/tests/Feature</directory>
+        </testsuite>
+    </testsuites>
+    <groups>
+        <include>
+            <group>db2</group>
+        </include>
+    </groups>
+    <!--
+        Used by PHPUnit code coverage and by pestphp/pest-plugin-type-coverage (include dirs only).
+        Module application code lives under Modules/*/app and every module is listed one by one:
+        PHPUnit globs a <testsuite> <directory> but not a <source> one, so "Modules/*/app" resolved
+        to nothing here and both coverage and type coverage silently measured only the three files
+        under app/. ModuleSourcePathsAreAnalysedTest keeps this list complete as modules are added.
+    -->
+    <source>
+        <include>
+            <directory suffix=".php">app</directory>
+            <directory suffix=".php">Modules/AI/app</directory>
+            <directory suffix=".php">Modules/CMS/app</directory>
+            <directory suffix=".php">Modules/CRM/app</directory>
+            <directory suffix=".php">Modules/Core/app</directory>
+            <directory suffix=".php">Modules/ERP/app</directory>
+            <directory suffix=".php">Modules/MES/app</directory>
+            <directory suffix=".php">Modules/SAO/app</directory>
+            <directory suffix=".php">Modules/Shop/app</directory>
+        </include>
+    </source>
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="APP_LOCALE" value="en" force="true"/>
+        <env name="APP_FALLBACK_LOCALE" value="en" force="true"/>
+        <env name="CMS_IMPORT_LOCALE" value="en" force="true"/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="CACHE_STORE" value="array"/>
+        <env name="DB_CONNECTION" value="db2"/>
+        <env name="MAIL_MAILER" value="array"/>
+        <env name="PULSE_ENABLED" value="false"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="SCOUT_DRIVER" value="collection"/>
+        <!--
+            Vector search and AI embeddings reach real services. With
+            QUEUE_CONNECTION=sync the job the observer dispatches runs in-process,
+            so every save of an embeddable translation made an outbound call and
+            waited 30s for it to time out. The tests that need them turn them on
+            themselves with Config::set, which is what they already assume.
+        -->
+        <!--
+            The tests never reach the Elasticsearch of .env: a test that empties or writes an index
+            (a full rebuild of the documentation index, for one) did that to a real one. An unreachable
+            local address makes such a call fail at once instead of touching data, and the
+            environment guard refuses a remote ELASTIC_HOST set from outside.
+        -->
+        <env name="ELASTIC_HOST" value="http://127.0.0.1:9" force="true"/>
+        <env name="ELASTIC_API_KEY" value="" force="true"/>
+        <env name="ELASTIC_RETRIES" value="0" force="true"/>
+        <env name="ELASTIC_TIMEOUT" value="2" force="true"/>
+        <!--
+            The Db2 run reaches a real server, so DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME,
+            DB_PASSWORD, DB_PREFIX and DB_SCHEMA are not forced here: they come from the shell or
+            .env, and TestEnvironmentGuard refuses a remote DB_HOST unless ALLOW_REMOTE_TEST_DATABASE=1
+            is set knowingly. Redis stays pinned to an unreachable local port as in phpunit.xml.
+        -->
+        <env name="REDIS_HOST" value="127.0.0.1" force="true"/>
+        <env name="REDIS_PORT" value="9" force="true"/>
+        <env name="REDIS_URL" value="" force="true"/>
+        <env name="AI_EMBEDDINGS_ENABLED" value="false"/>
+        <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="LOG_CHANNEL" value="null"/>
+        <env name="LOG_LEVEL" value="emergency"/>
+    </php>
+</phpunit>
