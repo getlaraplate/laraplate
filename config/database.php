@@ -190,6 +190,9 @@ return [
             'schema' => env('DB_SCHEMA', ''),
             'quote_reserved_words' => true,
             'schema_transactions' => true,
+            // CCSID of new character and text columns, 1208 = UTF-8; lengths stay in bytes. The driver parses it
+            // strictly: an integer, or empty (DB2_CCSID=) to leave columns to the system default.
+            'ccsid' => env('DB2_CCSID', 1208),
             'date_format' => 'Y-m-d H:i:s',
             'version' => env('DB2_SERVER_VERSION', '7.5'),
             'odbc_keywords' => [
