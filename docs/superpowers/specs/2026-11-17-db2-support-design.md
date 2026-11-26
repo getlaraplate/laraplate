@@ -1,6 +1,6 @@
 # IBM Db2 as a primary database
 
-**Status:** Proposed
+**Status:** Approved by the user on 2026-11-26; implemented by `../plans/2026-11-26-db2-support.md` (phase 1)
 
 **Date:** 2026-11-17
 
@@ -72,7 +72,7 @@ Gaps found in `easi-power/laravel-db2` that this work must close:
 ## Approaches
 
 1. **Subclasses inside Core.** Core extends the package's connection and grammars and registers its own resolver. Rejected: gaps 1 to 6 are generic Db2 work, not Laraplate's, and keeping them in Core means maintaining a second Db2 driver hooked to protected internals of a single-maintainer package.
-2. **Fork, then pull requests upstream.** Chosen. The fork lives at `github.com/swolley/laravel-db2`. Generic driver work happens there on topic branches, each offered upstream as a pull request. Core depends on the fork until upstream has merged what Laraplate needs, then moves back to `easi-power/laravel-db2`.
+2. **Fork, then pull requests upstream.** Chosen. The fork lives at `github.com/swolley/laravel-db2` (created on 2026-11-25 from `easi-power/laravel-db2`, default branch `master`). Generic driver work happens there on topic branches, each one ready to be offered upstream as a pull request. Whether and when to open them upstream is the user's decision, still open (2026-11-25). Core depends on the fork until upstream has merged what Laraplate needs, then moves back to `easi-power/laravel-db2`.
 3. **Upstream pull requests only.** Rejected as the plan, kept as the outcome: timing and acceptance depend on one maintainer.
 
 ## Design
@@ -97,6 +97,7 @@ Each item is one branch and one upstream pull request, with unit tests in the pa
 ### Core work
 
 - `Modules/Core/composer.json` requires the fork; Composer reads `repositories` from the root `composer.json` (precedent: the `swolley/license-compliance-checker` VCS entry). The builder verifies whether the merge plugin carries a `repositories` block from Core; if it does not, the VCS entry goes in the root file.
+- Distribution, decided by the user on 2026-11-25: a VCS entry pointing at the fork for now, not Packagist, while the upstream pull request question is open. Limit accepted with it: Composer ignores `repositories` declared by a dependency, so the VCS entry serves installs built from the laraplate repository only. Before Core ships as a standalone Composer package the question comes back: publish the fork on Packagist, wait for upstream, or make the driver an optional dependency (`suggest`).
 - `CoreServiceProvider` registers the package provider when `pdo_odbc` is loaded and the class exists, next to the Oracle block.
 - `config/database.php` gains a `db2` connection for IBM i with `env()` keys in the existing style; `.env.example` and the Core README document them.
 - Driver names: the package reports `db2_ibmi_odbc`, `db2_ibmi_ibm`, `db2_expressc_odbc` as the driver name. Core adds one place that names the Db2 family (constant or helper, builder's call) and every driver branch uses it, so a branch never lists the driver names by hand.
@@ -110,7 +111,7 @@ Each item is one branch and one upstream pull request, with unit tests in the pa
 The claim covers the whole application, so the phase gate covers the vendor query paths Laraplate uses (Filament backoffice, spatie permission and medialibrary, the Scout database engine), not only Laraplate's own code.
 
 - `staudenmeir/laravel-cte` throws `This database is not supported.` for any driver outside its list (`BuildsExpressionQueries::getQueryGrammar`). `Role`, `Taxonomy` and the CMS `Comment` use `HasRecursiveRelationships`, so every query on them throws on Db2, including a plain `find`, and seeding fails. `staudenmeir/laravel-adjacency-list` has the same kind of list for recursive queries.
-- Fix, decided by the user on 2026-11-18: the three hierarchies move to Core's closure table and the `staudenmeir` packages leave the dependencies, see `2026-11-18-closure-table-hierarchies-design.md`. That work is a prerequisite of the Db2 work; no pull requests to `staudenmeir` and no grammar override in Core.
+- Fix, decided by the user on 2026-11-18: the three hierarchies move to Core's closure table and the `staudenmeir` packages leave the dependencies, see `2026-11-18-closure-table-hierarchies-design.md`. That work is a prerequisite of the Db2 work; no pull requests to `staudenmeir` and no grammar override in Core. Shipped on 2026-11-25 (Core v2.0.0, CMS v1.50.0, laraplate v1.16.0): no `staudenmeir` package is left in the dependencies.
 - The first task of the Laraplate work is an audit of `vendor/` for other driver allowlists (`getDriverName()` matches that throw by default) among the packages Laraplate uses. Each one found is fixed in the package that owns it: a generic Db2 change offered upstream as a pull request, with a Core override for the Db2 family only until it is merged.
 
 ### Transactions on IBM i
@@ -125,7 +126,10 @@ Laraplate depends on real transactions (`DB::transaction`, the queue's locking p
 
 - Fork: unit tests on the compiled SQL in the package suite, per pull request.
 - Laraplate, phase 1: a Pest group (name left to the builder) that runs `migrate:fresh --seed` and a chosen set of feature tests against the Db2 connection. It is skipped unless the Db2 environment is configured, and it runs with `ALLOW_REMOTE_TEST_DATABASE=1` in its own invocation. The default suite stays on SQLite.
-- IBM i test system: PUB400 (IBM i 7.5, free, 1 GB, two libraries, limit on connections per IP, no uptime guarantee) is the candidate. Its page calls it a playground and forbids running commercial environments; development testing of an open-source driver is the intended use, but ODBC access from outside is not confirmed. The builder confirms ODBC access with a one-query spike before building on it. If PUB400 does not work, the fallback is a paid IBM i instance, which is the user's decision.
+- IBM i test system: PUB400 (IBM i 7.5, free, 1 GB, two libraries, limit on connections per IP, no uptime guarantee) is the candidate. Its page calls it a playground and forbids running commercial environments; development testing of an open-source driver is the intended use. On 2026-11-26 its host server ports (449, 8471, 8476) answered over TCP from the user's work network; an ODBC login has not been tried. The builder confirms ODBC access with the spike before building on it. If PUB400 does not work, the fallback is a paid IBM i instance, which is the user's decision.
+- Db2 for i has no container: IBM i is an operating system on Power hardware, and the Db2 Community Edition image is LUW only. Phase 1 therefore tests against a remote system, and a local Docker Db2 helps only from phase 2.
+- A machine that runs the Db2 group needs unixODBC, the IBM i Access ODBC driver for Linux (an IBM download behind an IBM ID, installed by the user, never committed) and the PHP `pdo_odbc` extension. The `ibm_db2` extension is not enough: it is not PDO, and Laravel connections are.
+- Day to day the work does not need Db2: fork changes are proven by compiled-SQL unit tests, Laraplate's driver arms by tests on the SQL they build. The remote run is the phase-gate proof, repeated at the end of each stage, not the inner loop.
 - Phase 2: a CI job with the Db2 Community Edition container runs the same Pest group on every pull request.
 
 ### Phase gates for the claim
@@ -134,6 +138,11 @@ Laraplate depends on real transactions (`DB::transaction`, the queue's locking p
 |---|---|---|
 | 1 | `migrate:fresh --seed` and the Db2 group green on Db2 for i | "Runs on IBM Db2 for i" |
 | 2 | Db2 group green in CI on LUW | "Runs on IBM Db2 (for i and LUW), tested in CI" |
+
+## Open decisions
+
+- **When to announce "Runs on IBM Db2 for i".** Db2 for i cannot run in CI, so after phase 1 any commit can break it unnoticed while the claim stays online. (a) announce after phase 1 and repeat the Db2 for i run before every Laraplate release, recording the result; (b) announce nothing until phase 2 runs in CI on LUW. Recommended: (a). The user's call; the phase gates below hold either way.
+- **Upstream pull requests** to `easi-power/laravel-db2`: whether and when, see Approaches.
 
 ## Left to the builder
 
