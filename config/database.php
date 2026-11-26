@@ -177,6 +177,32 @@ return [
             ],
             'sticky' => true,
         ],
+
+        'db2' => [
+            'driver' => env('DB2_DRIVER', 'db2_ibmi_odbc'),
+            'driverName' => env('DB2_ODBC_DRIVER', '{IBM i Access ODBC Driver}'),
+            'host' => env('DB_HOST', ''),
+            'port' => env('DB_PORT', '446'),
+            'database' => env('DB_DATABASE', ''),
+            'username' => env('DB_USERNAME', ''),
+            'password' => env('DB_PASSWORD', ''),
+            'prefix' => env('DB_PREFIX', ''),
+            'schema' => env('DB_SCHEMA', ''),
+            'quote_reserved_words' => true,
+            'date_format' => 'Y-m-d H:i:s',
+            'version' => env('DB2_SERVER_VERSION', '7.5'),
+            'odbc_keywords' => [
+                'CommitMode' => env('DB2_COMMIT_MODE', 2),
+                'Naming' => 0,
+                'CCSID' => 1208,
+                'DateFormat' => 5,
+                'TimeFormat' => 0,
+                'DefaultLibraries' => env('DB_SCHEMA', ''),
+            ],
+            'options' => [
+                PDO::ATTR_CASE => PDO::CASE_LOWER,
+            ],
+        ],
     ],
 
     /*

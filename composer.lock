@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7c8b484be6a1e41874963159397f94ee",
+    "content-hash": "359db63d4b633584e51ecf49f72ebe1e",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -2074,6 +2074,93 @@
             ],
             "time": "2026-10-19T17:53:57+00:00",
             "published-time": "2026-10-19T17:54:31+00:00"
+        },
+        {
+            "name": "easi-power/laravel-db2",
+            "version": "dev-laraplate",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/swolley/laravel-db2.git",
+                "reference": "340c475eb44a977e85c67b64b3194335d090a0c7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/swolley/laravel-db2/zipball/340c475eb44a977e85c67b64b3194335d090a0c7",
+                "reference": "340c475eb44a977e85c67b64b3194335d090a0c7",
+                "shasum": ""
+            },
+            "require": {
+                "ext-iconv": "*",
+                "ext-pdo": "*",
+                "illuminate/database": "^13.0",
+                "illuminate/queue": "^13.0",
+                "illuminate/support": "^13.0",
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "pestphp/pest": "^4.7"
+            },
+            "suggest": {
+                "ext-pdo_ibm": "Required by the db2_ibmi_ibm driver",
+                "ext-pdo_odbc": "Required by the db2_ibmi_odbc, db2_zos_odbc and db2_expressc_odbc drivers"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Easi\\DB2\\DB2ServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Easi\\DB2\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "./vendor/bin/pest --display-warnings"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Maxime Rault",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Mario Aquino",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Levi Vanheel",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Neal Van Meerbeek",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Joppe Kerkhofs",
+                    "role": "Developer"
+                }
+            ],
+            "description": "laravel-db2 is a simple DB2 service provider for Laravel. It provides DB2 Connection by extending the Illuminate Database component of the laravel framework.",
+            "keywords": [
+                "DB2",
+                "Database",
+                "ODBC",
+                "PDO",
+                "laravel"
+            ],
+            "time": "2026-11-26T14:59:44+00:00"
         },
         {
             "name": "egulias/email-validator",
@@ -19255,6 +19342,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "easi-power/laravel-db2": 20,
         "swolley/license-compliance-checker": 20
     },
     "prefer-stable": true,
