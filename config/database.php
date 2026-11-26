@@ -189,6 +189,7 @@ return [
             'prefix' => env('DB_PREFIX', ''),
             'schema' => env('DB_SCHEMA', ''),
             'quote_reserved_words' => true,
+            'schema_transactions' => true,
             'date_format' => 'Y-m-d H:i:s',
             'version' => env('DB2_SERVER_VERSION', '7.5'),
             'odbc_keywords' => [
