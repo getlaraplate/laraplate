@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.19.0] - 2026-11-26
+
+### 🚀 Features
+
+- *(modules)* Bump Core v2.2.0, CMS v1.50.2
+
 ## [1.18.0] - 2026-11-26
 
 ### 🚀 Features
