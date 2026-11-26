@@ -2081,12 +2081,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/swolley/laravel-db2.git",
-                "reference": "1684805a99679de63c22e5a597405d93452dfd7f"
+                "reference": "8bfbd7b5a94b28d50018b1f6493cebf0c4817364"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/swolley/laravel-db2/zipball/1684805a99679de63c22e5a597405d93452dfd7f",
-                "reference": "1684805a99679de63c22e5a597405d93452dfd7f",
+                "url": "https://api.github.com/repos/swolley/laravel-db2/zipball/8bfbd7b5a94b28d50018b1f6493cebf0c4817364",
+                "reference": "8bfbd7b5a94b28d50018b1f6493cebf0c4817364",
                 "shasum": ""
             },
             "require": {
@@ -2160,7 +2160,7 @@
                 "PDO",
                 "laravel"
             ],
-            "time": "2026-11-26T17:04:15+00:00"
+            "time": "2026-11-26T17:58:10+00:00"
         },
         {
             "name": "egulias/email-validator",
