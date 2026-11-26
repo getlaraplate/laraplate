@@ -1,6 +1,6 @@
 # IBM Db2 as a primary database
 
-**Status:** Proposed
+**Status:** Approved by the user on 2026-11-26; implemented by `../plans/2026-11-26-db2-support.md` (phase 1)
 
 **Date:** 2026-11-17
 
