@@ -83,6 +83,11 @@ foreach ($module_pest_files as $module_pest_file) {
 pest()->extend(Tests\TestCase::class)
     ->in(__DIR__ . '/Feature', __DIR__ . '/Unit', __DIR__ . '/Integration');
 
+// The application's Db2 tests stop at once, with the reason, when the db2 connection has no schema.
+pest()->in(__DIR__ . '/Feature/Db2')->beforeEach(function (): void {
+    Tests\Support\Db2TestDatabase::assertSchemaConfigured();
+});
+
 /*
 |--------------------------------------------------------------------------
 | Expectations
