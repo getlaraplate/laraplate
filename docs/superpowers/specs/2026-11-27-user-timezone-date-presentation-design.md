@@ -29,7 +29,7 @@ A reader in Los Angeles and a reader in Rome should each see their own local tim
 ## Non-goals
 
 - No environment variable for the default timezone.
-- No change to `APP_TIMEZONE`, which stays the storage frame.
+- `APP_TIMEZONE` is removed and `app.timezone` is fixed to `UTC` in `config/app.php`. This supersedes the "no per-user time zone" line of `2026-10-20-aggregate-route-and-widget-tool-design.md`.
 - No display in the timezone of the event's location. The formatter accepts an explicit timezone so a later change can add it.
 - No change to how `lang` is chosen. Saving `lang` at first login is not part of this work.
 - No change of the MySQL session timezone. That is tracked separately.
