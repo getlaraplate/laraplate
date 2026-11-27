@@ -26,6 +26,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Modules\Core\Filament\Pages\EditProfile;
 use Modules\Core\Filament\Pages\PhpInfo;
 use Modules\Core\Filament\Pages\Swagger;
 use Modules\Core\Filament\Pages\Welcome;
@@ -124,7 +125,7 @@ final class AdminPanelProvider extends PanelProvider
             ])
             // AUTHENTICATION
             ->login()
-            ->profile()
+            ->profile(EditProfile::class)
             ->passwordReset()
             ->emailVerification()
             ->emailChangeVerification()
