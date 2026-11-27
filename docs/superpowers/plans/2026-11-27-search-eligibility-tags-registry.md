@@ -1,7 +1,7 @@
 ---
 created_on: 2026-11-27
 module: core, cms
-status: open
+status: completed
 ---
 # Search eligibility, searchable tags and the search registry. Implementation Plan
 
@@ -14,6 +14,26 @@ status: open
 **Tech Stack:** PHP 8.5, Laravel 13, Filament 5, Pest, Laravel Scout with the Core engines. No new dependency.
 
 **Spec:** `../specs/2026-11-27-search-variants-and-content-findability-design.md` (decisions 1, 6 to 9, parts P0, P1, P3).
+
+
+## Delivery status (2026-11-27): shipped, registry off pending privacy approval
+
+**Documented in:** `Modules/Core/docs/rag/SEARCH_RETRIEVAL_PIPELINE.md`, `Modules/Core/docs/rag/search-registry-privacy-review.md`, `Modules/CMS/docs/rag/MODULE.md`, `Modules/CMS/docs/CONTENT_EXTENSION.md`.
+
+Tests: the eleven plan test files pass together (78 tests). The full run of the touched Core and CMS folders passes except four failures of this container, not of the code: `AggregateEngineBucketsTest` (two, failing on the base commit too), `ContributorsTableTest` (Imagick missing), `TranslatedRecordFormsTest` (CRM module absent). PHPStan level 9 on the changed files adds no error.
+
+Divergences from the plan:
+- Task 1, Step 5 superseded by the final review: Typesense now skips a null equality instead of failing every Content search. Extended contents are not excluded on Typesense.
+- Task 2: the stub declares `valid_to` filterable through `getSearchMapping()`. After the final review, one shared helper applies the default search filters after the request constraints on every path, so a request filter cannot widen a default; a contradictory request filter can give an empty result on one engine and the defaulted set on another.
+- Task 3: `tags.translations` is not eager loaded, because the Tag `LocaleScope` drops tags without a translation in the active locale. A dedicated unscoped relation, `tagsAcrossLocales`, is preloaded with its translations. After the final review, a change to a tag translation re-indexes the contents carrying the tag through the queued indexing path, chunked.
+- Task 3, Step 5: the Typesense and database translators ignore `locale_properties`, so `tag_names` is not searchable per locale there.
+- Task 4: Slovenian labels were added, since `lang/sl/cms.php` exists and the parity test requires them; they need a native review.
+- Task 5: an untyped tag shows the generic tag icon and the label "No type" (`cms.fields.no_type`); the stored type stays null.
+- Task 7: the recorder call is guarded in `CrudController::search()` and never fails the search; the decision runs before the response, the write after it.
+
+Open, not built here:
+- The search registry stays off until the owner approves `search-registry-privacy-review.md`.
+- Deleting a tag whose pivot rows are already gone does not re-index the contents that carried it.
 
 ## Global Constraints
 
@@ -230,6 +250,6 @@ Applying the filters at the builder rather than as a `FiltersGroup` in `Advanced
 **Files:**
 - Modify: this plan (laraplate)
 
-- [ ] **Step 1:** Run every test file named in this plan in one call and record the result.
-- [ ] **Step 2:** Write `## Delivery status (date): ...` with the Typesense gap of Task 1, the pending privacy approval, any divergence, and `**Documented in:** Modules/Core/docs/rag/SEARCH_RETRIEVAL_PIPELINE.md, Modules/Core/docs/rag/search-registry-privacy-review.md, Modules/CMS/docs/rag/MODULE.md`; set `status: completed`.
-- [ ] **Step 3:** Commit the plan in laraplate, with the submodule pointers of `Modules/Core` and `Modules/CMS` moved to their new commits.
+- [x] **Step 1:** Run every test file named in this plan in one call and record the result.
+- [x] **Step 2:** Write `## Delivery status (date): ...` with the Typesense gap of Task 1, the pending privacy approval, any divergence, and `**Documented in:** Modules/Core/docs/rag/SEARCH_RETRIEVAL_PIPELINE.md, Modules/Core/docs/rag/search-registry-privacy-review.md, Modules/CMS/docs/rag/MODULE.md`; set `status: completed`.
+- [x] **Step 3:** Commit the plan in laraplate, with the submodule pointers of `Modules/Core` and `Modules/CMS` moved to their new commits.
