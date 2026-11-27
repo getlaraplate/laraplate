@@ -49,12 +49,12 @@ status: open
 **Interfaces:**
 - Produces: `ElasticsearchEngine::buildSearchFilters(['field' => null])` returns `[['bool' => ['must_not' => [['exists' => ['field' => 'field']]]]]]`.
 
-- [ ] **Step 1: Write the failing test** `it('filters a null equality as a missing field on Elasticsearch')`: build the engine with `(new ReflectionClass(ElasticsearchEngine::class))->newInstanceWithoutConstructor()` as the tests beside it do; `buildSearchFilters(['extended_type' => null, 'type' => 'news'])` equals `[['bool' => ['must_not' => [['exists' => ['field' => 'extended_type']]]]], ['term' => ['type' => 'news']]]`.
-- [ ] **Step 2: Run it and see it fail:** `php artisan test --compact Modules/Core/tests/Integration/Search/SearchEngineContractTest.php --filter="missing field"`. Expected: FAIL, the first clause is a `term` on `null`.
-- [ ] **Step 3: Implement** the `null` case before the plain `term` fallback.
-- [ ] **Step 4: Run the file again.** Expected: PASS, the other tests of the file still pass.
-- [ ] **Step 5: Typesense.** `TypesenseEngine::buildFilter()` writes `field:=` for `null`. Do not change it in this plan; record "Typesense cannot filter a null equality, extended contents are not excluded there" in the delivery status.
-- [ ] **Step 6: Pint and commit** in `Modules/Core`: `fix(search): express a null equality as a missing field on Elasticsearch`.
+- [x] **Step 1: Write the failing test** `it('filters a null equality as a missing field on Elasticsearch')`: build the engine with `(new ReflectionClass(ElasticsearchEngine::class))->newInstanceWithoutConstructor()` as the tests beside it do; `buildSearchFilters(['extended_type' => null, 'type' => 'news'])` equals `[['bool' => ['must_not' => [['exists' => ['field' => 'extended_type']]]]], ['term' => ['type' => 'news']]]`.
+- [x] **Step 2: Run it and see it fail:** `php artisan test --compact Modules/Core/tests/Integration/Search/SearchEngineContractTest.php --filter="missing field"`. Expected: FAIL, the first clause is a `term` on `null`.
+- [x] **Step 3: Implement** the `null` case before the plain `term` fallback.
+- [x] **Step 4: Run the file again.** Expected: PASS, the other tests of the file still pass.
+- [x] **Step 5: Typesense.** `TypesenseEngine::buildFilter()` writes `field:=` for `null`. Do not change it in this plan; record "Typesense cannot filter a null equality, extended contents are not excluded there" in the delivery status.
+- [x] **Step 6: Pint and commit** in `Modules/Core`: `fix(search): express a null equality as a missing field on Elasticsearch`.
 
 ### Task 2: Default search filters on every search path
 
@@ -70,15 +70,15 @@ status: open
 
 Applying the filters at the builder rather than as a `FiltersGroup` in `AdvancedSearchService` keeps the semantics of `CrudService::searchWithScout()` exactly: AND equality on the engine query, then the request filters.
 
-- [ ] **Step 1: Create the stub** `DefaultFilteredLicenseSearchStub`, modelled on `ScopedLicenseSearchStub`: table `CoreTables::Licenses`, `DatabaseEngine`, `toSearchableArray()` returns `id`, `uuid`, `valid_to`; implements `ProvidesDefaultSearchFilters` with `['valid_to' => null]`.
-- [ ] **Step 2: Write the failing test file.** A helper `eligibility_search(SearchMode $mode, ?FiltersGroup $filters): list<int>` built like `dbscope_search()` in `DatabaseEngineScopeFilterSearchTest.php`, on the new stub. Three licenses whose uuid starts with `aaaaaaaa`: `open` (`valid_to` null), `scheduled` (`valid_from` next week, `valid_to` null), `expired` (`valid_to` yesterday).
+- [x] **Step 1: Create the stub** `DefaultFilteredLicenseSearchStub`, modelled on `ScopedLicenseSearchStub`: table `CoreTables::Licenses`, `DatabaseEngine`, `toSearchableArray()` returns `id`, `uuid`, `valid_to`; implements `ProvidesDefaultSearchFilters` with `['valid_to' => null]`.
+- [x] **Step 2: Write the failing test file.** A helper `eligibility_search(SearchMode $mode, ?FiltersGroup $filters): list<int>` built like `dbscope_search()` in `DatabaseEngineScopeFilterSearchTest.php`, on the new stub. Three licenses whose uuid starts with `aaaaaaaa`: `open` (`valid_to` null), `scheduled` (`valid_from` next week, `valid_to` null), `expired` (`valid_to` yesterday).
   - `it('applies the default search filters on every search path')` with `[SearchMode::Basic, SearchMode::Orchestrated, SearchMode::Auto]`: `eligibility_search($mode, null)` is `[open, scheduled]`.
   - `it('ANDs a request filter on a defaulted field the same way on every path')` with the same dataset: a `Filter('valid_to', <expired valid_to>, FilterOperator::Equals)` returns `[]` and `$result->error` is null.
-- [ ] **Step 3: Run it and see Orchestrated and Auto fail:** `php artisan test --compact Modules/Core/tests/Integration/Search/SearchPathEligibilityTest.php`. Expected: Basic passes, Orchestrated and Auto return the expired license too.
-- [ ] **Step 4: Implement** in `executeScoutSearch()`: when `$model instanceof ProvidesDefaultSearchFilters`, call `$builder->where($field, $value)` for each entry, right after the vector `where` and before `applyRequestedLocale()`.
-- [ ] **Step 5: Run the new file, then the search suites:** `php artisan test --compact Modules/Core/tests/Integration/Search Modules/Core/tests/Integration/Services`. Expected: PASS.
-- [ ] **Step 6: Document** in `SEARCH_RETRIEVAL_PIPELINE.md` a short "Eligibility on every path" section: default filters apply to Basic and to every orchestrated strategy; a null equality is "field missing" on Elasticsearch and `IS NULL` on the database engine; Typesense gap.
-- [ ] **Step 7: Pint and commit** in `Modules/Core`: `fix(search): apply default search filters on every search path`.
+- [x] **Step 3: Run it and see Orchestrated and Auto fail:** `php artisan test --compact Modules/Core/tests/Integration/Search/SearchPathEligibilityTest.php`. Expected: Basic passes, Orchestrated and Auto return the expired license too.
+- [x] **Step 4: Implement** in `executeScoutSearch()`: when `$model instanceof ProvidesDefaultSearchFilters`, call `$builder->where($field, $value)` for each entry, right after the vector `where` and before `applyRequestedLocale()`.
+- [x] **Step 5: Run the new file, then the search suites:** `php artisan test --compact Modules/Core/tests/Integration/Search Modules/Core/tests/Integration/Services`. Expected: PASS.
+- [x] **Step 6: Document** in `SEARCH_RETRIEVAL_PIPELINE.md` a short "Eligibility on every path" section: default filters apply to Basic and to every orchestrated strategy; a null equality is "field missing" on Elasticsearch and `IS NULL` on the database engine; Typesense gap.
+- [x] **Step 7: Pint and commit** in `Modules/Core`: `fix(search): apply default search filters on every search path`.
 
 ### Task 3: Tag names searchable per locale
 
@@ -90,16 +90,16 @@ Applying the filters at the builder rather than as a `FiltersGroup` in `Advanced
 **Interfaces:**
 - Produces: the `Content` search document holds `tag_names`: `array<locale, list<string>>`, one key per locale that has at least one name. The mapping declares `tag_names` as `FieldType::Object` with `[IndexType::Searchable, IndexType::FullText]` and `['locale_properties' => $localeText]`, like the component fields.
 
-- [ ] **Step 1: Write the failing tests** in `ContentSearchableArrayTest.php`, reusing `createBilingualSearchableContent()`:
+- [x] **Step 1: Write the failing tests** in `ContentSearchableArrayTest.php`, reusing `createBilingualSearchableContent()`:
   - `it('indexes tag names per locale from explicit translations only')`: tag `cinema` named `Cinema` in `it` and `en`; tag `bici` named `Bici elettrica` in `it` only (delete its `en` translation after the factory). `toSearchableArray()['tag_names']` is `['it' => ['Cinema', 'Bici elettrica'], 'en' => ['Cinema']]` (order of `$content->tags`).
   - `it('declares tag_names as a locale-keyed text object that the keyword query reaches')`: `getSearchMapping()['mappings']['properties']['tag_names']['properties']` has `it` and `en`; `ElasticsearchLocaleTextFields::fromProperties($properties, ['it'], ['it', 'en'])` contains `tag_names.it` and not `tag_names.en`.
   - `it('keeps tag names out of the embedding header')`: `embedHeader('it')` does not contain `Bici elettrica`.
-- [ ] **Step 2: Run them and see the first two fail:** `php artisan test --compact Modules/CMS/tests/Feature/Search/ContentSearchableArrayTest.php`.
-- [ ] **Step 3: Implement:** eager load `tags.translations` instead of `tags`; in the locale loop of `toSearchableArray()` collect, for each tag, `$tag->getTranslation($locale, false)?->name` when non-empty; add the mapping field.
-- [ ] **Step 4: Run the file, then the CMS search folder:** `php artisan test --compact Modules/CMS/tests/Feature/Search`. Expected: PASS.
-- [ ] **Step 5: Other engines.** Read how `TypesenseTranslator` and `DatabaseTranslator` map an object with `locale_properties`. Change nothing in them in this plan; record in the delivery status whether `tag_names` is searchable there.
-- [ ] **Step 6: Document** in `MODULE.md`, where the search document is described: `tag_names` per locale, explicit translations only, keyword search only, an index rebuild is required (the mapping comparator flags it). Correct the outdated sentence there that speaks of a Typesense schema with flat `title_{locale}` keys.
-- [ ] **Step 7: Pint and commit** in `Modules/CMS`: `feat(search): index tag names per locale`.
+- [x] **Step 2: Run them and see the first two fail:** `php artisan test --compact Modules/CMS/tests/Feature/Search/ContentSearchableArrayTest.php`.
+- [x] **Step 3: Implement:** eager load `tags.translations` instead of `tags`; in the locale loop of `toSearchableArray()` collect, for each tag, `$tag->getTranslation($locale, false)?->name` when non-empty; add the mapping field.
+- [x] **Step 4: Run the file, then the CMS search folder:** `php artisan test --compact Modules/CMS/tests/Feature/Search`. Expected: PASS.
+- [x] **Step 5: Other engines.** Read how `TypesenseTranslator` and `DatabaseTranslator` map an object with `locale_properties`. Change nothing in them in this plan; record in the delivery status whether `tag_names` is searchable there.
+- [x] **Step 6: Document** in `MODULE.md`, where the search document is described: `tag_names` per locale, explicit translations only, keyword search only, an index rebuild is required (the mapping comparator flags it). Correct the outdated sentence there that speaks of a Typesense schema with flat `title_{locale}` keys.
+- [x] **Step 7: Pint and commit** in `Modules/CMS`: `feat(search): index tag names per locale`.
 
 ### Task 4: Tag type registry and its read route
 
@@ -119,16 +119,16 @@ Applying the filters at the builder rather than as a `FiltersGroup` in `Advanced
   - Route `GET cms/tag-types`, middleware `auth`, name `cms.tag-types.index`, response through `ResponseBuilder` with `data`: list of `{type, label, heroicon, lucide}`, `label` translated in the request locale.
   - Lang keys `cms.tag_types.<type>`. Labels: en Search, People, Locations, Organizations, Topics, Events; it Ricerca, Persone, Luoghi, Organizzazioni, Argomenti, Eventi; de Suche, Personen, Orte, Organisationen, Themen, Ereignisse; es Búsqueda, Personas, Lugares, Organizaciones, Temas, Eventos.
 
-- [ ] **Step 1: Write the failing unit tests** in `TagTypeRegistryTest.php`:
+- [x] **Step 1: Write the failing unit tests** in `TagTypeRegistryTest.php`:
   - `it('registers the six CMS types in order')`: `app(TagTypeRegistry::class)->all()` maps to `['search', 'people', 'locations', 'organizations', 'topics', 'events']`.
   - `it('lets a module register its own type and replace one')`: registering `brands` adds it last; registering `topics` again with another icon replaces it in place.
   - `it('resolves icons and letters')`: `heroiconFor('Search')` is `heroicon-o-magnifying-glass`; `heroiconFor(null)` is `heroicon-o-tag`; `heroiconFor('musical-instrument')` is null; `letterFor('musical-instrument')` is `M`; `letterFor('people')` and `letterFor(null)` are null.
-- [ ] **Step 2: Write the failing feature tests** in `TagTypesControllerTest.php`, modelled on `InsightsControllerTest.php`: an authenticated request with locale `it` returns six items, the first `{type: 'search', label: 'Ricerca', heroicon: 'heroicon-o-magnifying-glass', lucide: 'Search'}`; a guest gets 401.
-- [ ] **Step 3: Run both and see them fail:** `php artisan test --compact Modules/CMS/tests/Unit/Services/TagTypeRegistryTest.php Modules/CMS/tests/Feature/Controllers/TagTypesControllerTest.php`.
-- [ ] **Step 4: Implement** the definition, the registry, the provider wiring, the lang keys, the controller and the route.
-- [ ] **Step 5: Run both again.** Expected: PASS. Run `php artisan test --compact --filter=LangKeyParity` if the Core parity test covers module lang files. Expected: PASS.
-- [ ] **Step 6: Document** in `MODULE.md` a "Tag types" section: the registry, the six CMS types and their icons, how a module registers one, the read route, `null` keeps its meaning, `people`/`locations` tags versus `Contributor`/`Location` records, `search` tags are search aids returned by the API with their type and filtered by the site if it does not want them.
-- [ ] **Step 7: Pint and commit** in `Modules/CMS`: `feat(tags): add an extensible registry of tag types with icons`.
+- [x] **Step 2: Write the failing feature tests** in `TagTypesControllerTest.php`, modelled on `InsightsControllerTest.php`: an authenticated request with locale `it` returns six items, the first `{type: 'search', label: 'Ricerca', heroicon: 'heroicon-o-magnifying-glass', lucide: 'Search'}`; a guest gets 401.
+- [x] **Step 3: Run both and see them fail:** `php artisan test --compact Modules/CMS/tests/Unit/Services/TagTypeRegistryTest.php Modules/CMS/tests/Feature/Controllers/TagTypesControllerTest.php`.
+- [x] **Step 4: Implement** the definition, the registry, the provider wiring, the lang keys, the controller and the route.
+- [x] **Step 5: Run both again.** Expected: PASS. Run `php artisan test --compact --filter=LangKeyParity` if the Core parity test covers module lang files. Expected: PASS.
+- [x] **Step 6: Document** in `MODULE.md` a "Tag types" section: the registry, the six CMS types and their icons, how a module registers one, the read route, `null` keeps its meaning, `people`/`locations` tags versus `Contributor`/`Location` records, `search` tags are search aids returned by the API with their type and filtered by the site if it does not want them.
+- [x] **Step 7: Pint and commit** in `Modules/CMS`: `feat(tags): add an extensible registry of tag types with icons`.
 
 ### Task 5: Filament shows and offers the tag types
 
@@ -142,16 +142,16 @@ Applying the filters at the builder rather than as a `FiltersGroup` in `Advanced
 - Consumes: `TagTypeRegistry::all()`, `heroiconFor()`, `letterFor()` (Task 4); `Tag::getTypes()`, `Tag::normalizeType()`.
 - Produces: `final class TagTypeOptions { public static function all(): array<string, string>; public static function search(string $search): array<string, string> }`. `all()`: the types in use and every registered type, no duplicates, registered types first in registry order, then the other types in use sorted. `search()`: the same list filtered by `str_contains` on the normalized search, then the normalized search itself when it is not already there; an empty normalized search returns `all()`.
 
-- [ ] **Step 1: Write the failing tests** in `TagTypeOptionsTest.php`:
+- [x] **Step 1: Write the failing tests** in `TagTypeOptionsTest.php`:
   - with one tag of type `genre` in use: `all()` keys are `['search', 'people', 'locations', 'organizations', 'topics', 'events', 'genre']`;
   - `search('pe')` keys are `['people', 'pe']`;
   - `search('People')` keys are `['people']`;
   - `search('Musical Instrument')` keys end with `musical-instrument`.
-- [ ] **Step 2: Run and see them fail:** `php artisan test --compact Modules/CMS/tests/Unit/Filament/TagTypeOptionsTest.php`.
-- [ ] **Step 3: Implement** `TagTypeOptions` and switch `TagForm` to it.
-- [ ] **Step 4: Change the `type` column** of `TagsTable`: icon from `heroiconFor($state)`; for a type with no icon, the state is shown prefixed by `letterFor($state)`. Add a Livewire table test in the Filament test folder: the list of tags renders the `type` column for a `people` tag, a `genre` tag and an untyped tag without error.
-- [ ] **Step 5: Run the Filament folder:** `php artisan test --compact Modules/CMS/tests/Feature/Filament Modules/CMS/tests/Unit/Filament`. Expected: PASS.
-- [ ] **Step 6: Pint and commit** in `Modules/CMS`: `feat(filament): show tag type icons and offer the standard types`.
+- [x] **Step 2: Run and see them fail:** `php artisan test --compact Modules/CMS/tests/Unit/Filament/TagTypeOptionsTest.php`.
+- [x] **Step 3: Implement** `TagTypeOptions` and switch `TagForm` to it.
+- [x] **Step 4: Change the `type` column** of `TagsTable`: icon from `heroiconFor($state)`; for a type with no icon, the state is shown prefixed by `letterFor($state)`. Add a Livewire table test in the Filament test folder: the list of tags renders the `type` column for a `people` tag, a `genre` tag and an untyped tag without error.
+- [x] **Step 5: Run the Filament folder:** `php artisan test --compact Modules/CMS/tests/Feature/Filament Modules/CMS/tests/Unit/Filament`. Expected: PASS.
+- [x] **Step 6: Pint and commit** in `Modules/CMS`: `feat(filament): show tag type icons and offer the standard types`.
 
 ### Task 6: Search registry storage and recorder (Core)
 
@@ -172,15 +172,15 @@ Applying the filters at the builder rather than as a `FiltersGroup` in `Advanced
     - `record(string $model, string $query, string $locale, int $hits, CarbonImmutable $day): void`: adds one search to the row of the day, creating it at zero first; `low_result_searches` grows when `$hits < low_results_threshold`; `result_sum` grows by `$hits`. Use `incrementEach()` on the row so concurrent searches add up.
   - Settings, group `search`: `search.registry.enabled` false (Boolean), `search.registry.retention_days` 90 (Integer), `search.registry.low_results_threshold` 5 (Integer, the `SearchQualityEvaluator::MIN_RESULTS` value). Read as `config('core.search.registry.*')` like `search.deep_per_minute`.
 
-- [ ] **Step 1: Write the failing tests:**
+- [x] **Step 1: Write the failing tests:**
   - `normalize('  Bici   Elettrica ', 'it')` is `bici elettrica`; `normalize('articoli su bici elettrica', 'it')` is `bici elettrica`;
   - `normalize('mario rossi mario@example.com', 'it')`, `normalize('ordine 12345', 'it')`, `normalize('ABC-123', 'it')` and a UUID are `null`;
   - `normalize('NATO vertice', 'it')` is `nato vertice` (an acronym is not a protected token here);
   - two `record()` calls on the same day, with 2 and 8 hits and threshold 5, leave one row with `searches` 2, `low_result_searches` 1, `result_sum` 10; a call on the next day creates a second row.
-- [ ] **Step 2: Run and see them fail:** `php artisan test --compact Modules/Core/tests/Integration/Search/SearchQueryRegistryTest.php`.
-- [ ] **Step 3: Implement** the enum case, the migration, the model, the service and the seeded settings.
-- [ ] **Step 4: Run again.** Expected: PASS.
-- [ ] **Step 5: Pint and commit** in `Modules/Core`: `feat(search): add the search registry storage`.
+- [x] **Step 2: Run and see them fail:** `php artisan test --compact Modules/Core/tests/Integration/Search/SearchQueryRegistryTest.php`.
+- [x] **Step 3: Implement** the enum case, the migration, the model, the service and the seeded settings.
+- [x] **Step 4: Run again.** Expected: PASS.
+- [x] **Step 5: Pint and commit** in `Modules/Core`: `feat(search): add the search registry storage`.
 
 ### Task 7: Record from the search route, guests and readers only (Core)
 
@@ -197,12 +197,12 @@ Applying the filters at the builder rather than as a `FiltersGroup` in `Advanced
   - `final readonly class SearchQueryRecorder`: `shouldRecord(?User $user, Model $model): bool` (false when `core.search.registry.enabled` is off; true for a guest; false when the user holds the update permission of the model; true otherwise). `recordAfterResponse(SearchRequestData $data, CrudResult $result): void`: when `shouldRecord()` and `$result->error === null` and `normalize()` gives a query, dispatches `RecordSearchQueryJob::dispatchAfterResponse()` with the model table, the normalized query, `LocaleContext::get()`, `$result->meta->totalRecords` and today.
   - `CrudController::search()` calls `recordAfterResponse()` with the result of `CrudService::search()`. No other caller records: not `CrudService`, not the assistant, not the analysis.
 
-- [ ] **Step 1: Write the failing recorder tests:** with the setting on, a guest and a user without the update permission are recorded, a user holding it is not; with the setting off nobody is; an errored result and a query that normalizes to `null` dispatch nothing (`Bus::fake()`, `Bus::assertDispatchedAfterResponse()` / `assertNotDispatched()`).
-- [ ] **Step 2: Write the failing controller test:** bind a `CrudService` mock that returns a successful `CrudResult` with `totalRecords` 3, and a spy `SearchQueryRecorder`; a guest request to the search route of `/api/v1` and one to `/app` both reach `recordAfterResponse()` once. Use the route setup of `ScoutSearchScopeFilterTest.php` (`CrudApiExposure::enable()`).
-- [ ] **Step 3: Run both and see them fail:** `php artisan test --compact Modules/Core/tests/Integration/Search/SearchQueryRecorderTest.php Modules/Core/tests/Feature/Controllers/CrudSearchRecordingTest.php`.
-- [ ] **Step 4: Implement** the job, the recorder and the controller call.
-- [ ] **Step 5: Run both, then the controller and search suites:** `php artisan test --compact Modules/Core/tests/Feature/Controllers Modules/Core/tests/Integration/Search`. Expected: PASS.
-- [ ] **Step 6: Pint and commit** in `Modules/Core`: `feat(search): record searches of guests and readers after the response`.
+- [x] **Step 1: Write the failing recorder tests:** with the setting on, a guest and a user without the update permission are recorded, a user holding it is not; with the setting off nobody is; an errored result and a query that normalizes to `null` dispatch nothing (`Bus::fake()`, `Bus::assertDispatchedAfterResponse()` / `assertNotDispatched()`).
+- [x] **Step 2: Write the failing controller test:** bind a `CrudService` mock that returns a successful `CrudResult` with `totalRecords` 3, and a spy `SearchQueryRecorder`; a guest request to the search route of `/api/v1` and one to `/app` both reach `recordAfterResponse()` once. Use the route setup of `ScoutSearchScopeFilterTest.php` (`CrudApiExposure::enable()`).
+- [x] **Step 3: Run both and see them fail:** `php artisan test --compact Modules/Core/tests/Integration/Search/SearchQueryRecorderTest.php Modules/Core/tests/Feature/Controllers/CrudSearchRecordingTest.php`.
+- [x] **Step 4: Implement** the job, the recorder and the controller call.
+- [x] **Step 5: Run both, then the controller and search suites:** `php artisan test --compact Modules/Core/tests/Feature/Controllers Modules/Core/tests/Integration/Search`. Expected: PASS.
+- [x] **Step 6: Pint and commit** in `Modules/Core`: `feat(search): record searches of guests and readers after the response`.
 
 ### Task 8: Retention, privacy review and documentation (Core)
 
@@ -217,13 +217,13 @@ Applying the filters at the builder rather than as a `FiltersGroup` in `Advanced
 - Consumes: `SearchQueryStat` (Task 6), `core.search.registry.retention_days`.
 - Produces: command `search:prune-registry`, scheduled `->daily()->onOneServer()` beside `PruneMediaDraftsCommand`; deletes rows whose `day` is older than today minus `retention_days`.
 
-- [ ] **Step 1: Write the failing test:** with retention 90 and today fixed, rows of day −91 are deleted, rows of day −90 and today stay; the command exits successfully with the setting off too (pruning old rows is always allowed).
-- [ ] **Step 2: Run and see it fail:** `php artisan test --compact Modules/Core/tests/Feature/Console/PruneSearchQueryStatsCommandTest.php`.
-- [ ] **Step 3: Implement** the command and the schedule.
-- [ ] **Step 4: Run again.** Expected: PASS.
-- [ ] **Step 5: Write the privacy review** on the model of `Modules/AI/docs/rag/query-analytics-privacy-review.md`: the field set of Task 6, what is never stored, who is recorded and why, the three settings with their defaults, retention, no per-person erasure needed since no person is stored. Status line: "Pending owner approval. The registry stays off until approved."
-- [ ] **Step 6: Document** the registry in `SEARCH_RETRIEVAL_PIPELINE.md`: purpose, who is recorded, normalization and exclusions, settings, retention, a link to the privacy review.
-- [ ] **Step 7: Pint and commit** in `Modules/Core`: `feat(search): prune the search registry and document it`.
+- [x] **Step 1: Write the failing test:** with retention 90 and today fixed, rows of day −91 are deleted, rows of day −90 and today stay; the command exits successfully with the setting off too (pruning old rows is always allowed).
+- [x] **Step 2: Run and see it fail:** `php artisan test --compact Modules/Core/tests/Feature/Console/PruneSearchQueryStatsCommandTest.php`.
+- [x] **Step 3: Implement** the command and the schedule.
+- [x] **Step 4: Run again.** Expected: PASS.
+- [x] **Step 5: Write the privacy review** on the model of `Modules/AI/docs/rag/query-analytics-privacy-review.md`: the field set of Task 6, what is never stored, who is recorded and why, the three settings with their defaults, retention, no per-person erasure needed since no person is stored. Status line: "Pending owner approval. The registry stays off until approved."
+- [x] **Step 6: Document** the registry in `SEARCH_RETRIEVAL_PIPELINE.md`: purpose, who is recorded, normalization and exclusions, settings, retention, a link to the privacy review.
+- [x] **Step 7: Pint and commit** in `Modules/Core`: `feat(search): prune the search registry and document it`.
 
 ### Task 9: Close the plan
 
