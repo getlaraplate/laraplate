@@ -207,13 +207,13 @@ module: core, ai
 **Interfaces:**
 - Produces: `MembershipConflictException(string $relation, list<int> $expected, list<int> $current)`; the comparison is on the related ids the writer can read, the set `syncTarget()` already computes, order ignored.
 
-- [ ] **Step 1: Failing tests (D40):** an update whose `expected_relations.tags` equals the current readable tags syncs; one that differs answers 409 and writes nothing, the record's columns included; a tag added by somebody else does not block an update that sends `expected_relations` only for `categories`; a relation in `relations` without an entry in `expected_relations` syncs as today; an attached tag the writer cannot read does not count in the comparison.
-- [ ] **Step 2–4:** run and fail, implement, run.
-- [ ] **Step 5:** Commit (`feat(crud): refuse a relation sync when the membership the form loaded changed (D40)`).
+- [x] **Step 1: Failing tests (D40):** an update whose `expected_relations.tags` equals the current readable tags syncs; one that differs answers 409 and writes nothing, the record's columns included; a tag added by somebody else does not block an update that sends `expected_relations` only for `categories`; a relation in `relations` without an entry in `expected_relations` syncs as today; an attached tag the writer cannot read does not count in the comparison.
+- [x] **Step 2–4:** run and fail, implement, run.
+- [x] **Step 5:** Commit (`feat(crud): refuse a relation sync when the membership the form loaded changed (D40)`). Core `22e44a16`. As built: the test is in `tests/Integration/Services/Crud/RelationSyncConflictTest.php`, built on the fixtures of the existing sync tests; an expected list of a relation the update does not sync is ignored. Not run here: run in the host app.
 
 ### Part D closing and slice closing
 
-- [ ] **Documentation:** `Modules/Core/docs/CRUD_SYSTEM.md`, "Relation sync on update" (`expected_relations` and the 409); the spec and review status lines; the parent plan (tick Slice 6). The Vue form sending `lock_version` and `expected_relations` stays UI work (D40), named in the delivery status.
+- [ ] **Documentation:** `Modules/Core/docs/CRUD_SYSTEM.md`, "Relation sync on update" (`expected_relations` and the 409); the spec and review status lines; the parent plan (tick Slice 6). The Vue form sending `lock_version` and `expected_relations` stays UI work (D40), named in the delivery status. CRUD documentation done (Core `d7ef4e16`), spec and review status lines updated; the parent plan is ticked with the delivery status, once the regression is green.
 - [ ] **Regression** per suite, recorded in the delivery status.
 - [ ] **Commit** in Core, AI and `laraplate/`; PRs.
 
