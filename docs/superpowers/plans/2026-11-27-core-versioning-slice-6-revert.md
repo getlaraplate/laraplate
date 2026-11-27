@@ -1,4 +1,5 @@
 ---
+status: completed
 module: core, ai
 ---
 # Core Versioning Rebuild, Slice 6 — Revert
@@ -127,7 +128,7 @@ module: core, ai
 
 ### Part A closing
 
-- [ ] Regression per suite (Core per folder, CMS, ERP, MES, Shop); `VERSIONING_DEVELOPER.md` of Core: "Restore a model to an earlier version" rewritten for the two entry points, the modes, the report and the refusals; `MODULE.md` of Core, the versioning flow. Documentation done 2026-11-27, Core `docs(versioning): reverting to a revision`: `MODULE.md` *Reverting to a revision*, `VERSIONING_DEVELOPER.md`, `RECORD_LOCKING_DEVELOPER.md`. Regression waits for the host app.
+- [x] Regression per suite (Core per folder, CMS, ERP, MES, Shop); `VERSIONING_DEVELOPER.md` of Core: "Restore a model to an earlier version" rewritten for the two entry points, the modes, the report and the refusals; `MODULE.md` of Core, the versioning flow. Documentation done 2026-11-27, Core `docs(versioning): reverting to a revision`: `MODULE.md` *Reverting to a revision*, `VERSIONING_DEVELOPER.md`, `RECORD_LOCKING_DEVELOPER.md`. Regression run by the user on 2026-11-27, see the delivery status.
 
 ---
 
@@ -159,7 +160,7 @@ module: core, ai
 
 ### Part B closing
 
-- [ ] Regression per suite, AI included; `MODULE.md` of Core (the revert and approvals, the revert context); `Modules/AI/docs/rag/MODULE.md` where automatic translation is described. Documentation done 2026-11-27: Core `c15ea8a8` (`MODULE.md`, approvals and the revert context); AI `efaf899` in `docs/rag/MODERATION_AND_SEARCH.md` and `docs/SEARCH_AND_TRANSLATION.md`, where the listener is described (its `MODULE.md` does not describe it). Regression waits for the host app.
+- [x] Regression per suite, AI included; `MODULE.md` of Core (the revert and approvals, the revert context); `Modules/AI/docs/rag/MODULE.md` where automatic translation is described. Documentation done 2026-11-27: Core `c15ea8a8` (`MODULE.md`, approvals and the revert context); AI `efaf899` in `docs/rag/MODERATION_AND_SEARCH.md` and `docs/SEARCH_AND_TRANSLATION.md`, where the listener is described (its `MODULE.md` does not describe it). Regression run by the user on 2026-11-27, see the delivery status.
 
 ---
 
@@ -191,7 +192,7 @@ module: core, ai
 
 ### Part C closing
 
-- [ ] Regression per suite; `Modules/Core/docs/CRUD_SYSTEM.md` (the revert route, the history permission), `Modules/Core/docs/rag/API_ACCESS_CONTROL.md` (the two verbs, `revert` implies reading the history, the operator note for roles that read the history through `update`), `VERSIONING_DEVELOPER.md` ("Read the history over HTTP"). Documentation done 2026-11-27, Core `c7822038`. Regression waits for the host app.
+- [x] Regression per suite; `Modules/Core/docs/CRUD_SYSTEM.md` (the revert route, the history permission), `Modules/Core/docs/rag/API_ACCESS_CONTROL.md` (the two verbs, `revert` implies reading the history, the operator note for roles that read the history through `update`), `VERSIONING_DEVELOPER.md` ("Read the history over HTTP"). Documentation done 2026-11-27, Core `c7822038`. Regression run by the user on 2026-11-27, see the delivery status.
 
 ---
 
@@ -213,8 +214,31 @@ module: core, ai
 
 ### Part D closing and slice closing
 
-- [ ] **Documentation:** `Modules/Core/docs/CRUD_SYSTEM.md`, "Relation sync on update" (`expected_relations` and the 409); the spec and review status lines; the parent plan (tick Slice 6). The Vue form sending `lock_version` and `expected_relations` stays UI work (D40), named in the delivery status. CRUD documentation done (Core `d7ef4e16`), spec and review status lines updated; the parent plan is ticked with the delivery status, once the regression is green.
-- [ ] **Regression** per suite, recorded in the delivery status.
-- [ ] **Commit** in Core, AI and `laraplate/`; PRs. Final review by a fresh reviewer on 2026-11-27: two critical and eight important findings fixed in Core `6d0f5467` (code) and `47962ad4` (docs): a record in the bin on Core's soft deletes could not be reverted; the owned-part test hit a stale lock; the save of a revert asked `update`, now `revert`; a revert request is made only when the revert could run; a pending deletion blocks a revert; a model whose approval operations name updates only asks approval of a revert (amends B2: `[Create]` reverts at once, `[Update]` asks); an approved revert finds a record in the bin; the approvals preview skips a revert request; the history route loads pending modifications only for who may see them; the replay from a baseline image is tested. Twelve minor findings deferred, listed in the delivery status at closing.
+- [x] **Documentation:** `Modules/Core/docs/CRUD_SYSTEM.md`, "Relation sync on update" (`expected_relations` and the 409); the spec and review status lines; the parent plan (tick Slice 6). The Vue form sending `lock_version` and `expected_relations` stays UI work (D40), named in the delivery status. CRUD documentation done (Core `d7ef4e16`), spec and review status lines updated; the parent plan is ticked with the delivery status.
+- [x] **Regression** per suite, recorded in the delivery status.
+- [x] **Commit** in Core, AI and `laraplate/`; PRs. Final review by a fresh reviewer on 2026-11-27: two critical and eight important findings fixed in Core `6d0f5467` (code) and `47962ad4` (docs): a record in the bin on Core's soft deletes could not be reverted; the owned-part test hit a stale lock; the save of a revert asked `update`, now `revert`; a revert request is made only when the revert could run; a pending deletion blocks a revert; a model whose approval operations name updates only asks approval of a revert (amends B2: `[Create]` reverts at once, `[Update]` asks); an approved revert finds a record in the bin; the approvals preview skips a revert request; the history route loads pending modifications only for who may see them; the replay from a baseline image is tested. Twelve minor findings deferred, listed in the delivery status at closing.
 
-**Documented in (when the plan closes):** `Modules/Core/docs/rag/MODULE.md`, `Modules/Core/docs/rag/VERSIONING_DEVELOPER.md`, `Modules/Core/docs/CRUD_SYSTEM.md`.
+## Delivery status (2026-11-27): delivered
+
+All four parts are done, tests first. Commits: Core getlaraplate/laracore#85 (`f0b7c087` A1 and A2, `b39a2d8e` A3, `0999c11e` A4, `d60f0149` B1, `86b3520a` B2, `45e36a29` C1, `9b063285` C2, `22e44a16` D1, documentation `bd094d15`, `c15ea8a8`, `c7822038`, `d7ef4e16`, `47962ad4`; the fixes of the final review `6d0f5467` and `13042752`); AI getlaraplate/laraai#40 (`a5f109f`, `efaf899`); this repository getlaraplate/laraplate#101 (the plan, D62 in the review log, the status lines) and this closing.
+
+Decided with the user while planning, recorded as D62: a revert that needs approval is one request; the revert has a CRUD route.
+
+Divergences from the plan, each recorded under its task:
+
+- A1 and A2 are one commit: `RevisionReverter` and the removal of `restoreToRevision()` span both.
+- The revision's ownership is checked before the revert set opens, since what a set belongs to never changes; the other checks run inside it.
+- The membership and the translations are replayed from the anchor's image (in a baseline set, the rows from `baseline_from_sequence`), and `replaceMembership()` compares with the live pivot rows; the replay lives in the reverter, so A2's `membershipAsOf()` was not produced.
+- The complete revert is tested on columns and links; no stub has translations and links together, and A3 covers the translations.
+- B1 is proven at the event (`TranslatedModelSaved::ofCurrentSave()`) and at the AI listener: no revert path of the stubs emits the event at all.
+- One revert request per record and revert asked (revision, expected revision, mode, force), not one per operation like deletions.
+- The route answers in `data.record` and `data.revert`; it is tested on `users`, so the 202 and a missing reference are proven at the model.
+- The expected relations of D40 are tested in `tests/Integration/Services/Crud/RelationSyncConflictTest.php`.
+
+**Final review** by a fresh reviewer: two critical and eight important findings, all fixed in `6d0f5467`. A record in the bin on Core's soft deletes could not be reverted. The save of a revert asked `update`, now `revert`. A revert request is made only when the revert could run. A pending deletion blocks a revert. A model whose approval operations name updates only asks approval of a revert (B2 amended). An approved revert finds a record in the bin. The approvals preview skips a revert request. The history route loads pending modifications only for who may see them. The owned-part test hit a stale lock. The replay from a baseline image had no test. At the user's request seven of the twelve minor findings were fixed too (`13042752`): the reason code in the 422, a missing anchor as 422, the process switch, the revert request keyed by everything it asks, the forced approval flag reset, the author-credit report, import order.
+
+**Deferred, not built:** the Filament vote action does not catch the revert exceptions (the vote rolls back, the approver sees a generic error); `completeRevertBlockers()` may insert an epoch row; the revert route returns the record without asking `select`, as the update does. Not verified here: the CMS moderation adapters receiving a revert request, and PHPStan on `Modification::$modifications` typed as a diff. Left to the UI repository (D40): the Vue form sending `lock_version` and `expected_relations`.
+
+Regression on 2026-11-27, run by the user in the host app: green, but `PermissionsRefreshCommandTest`, whose helper mocked the final `PermissionManifest` and failed where BypassFinals does not strip `final` in the local environment; the helper now builds a real manifest (getlaraplate/laracore#86). The same local condition makes `AclRehydrationUserStub`, a stub that extends the final `App\Models\User`, fail to load; it is not this slice's.
+
+**Documented in:** `Modules/Core/docs/rag/MODULE.md`, `Modules/Core/docs/rag/VERSIONING_DEVELOPER.md`, `Modules/Core/docs/CRUD_SYSTEM.md`, `Modules/Core/docs/rag/API_ACCESS_CONTROL.md`, `Modules/Core/docs/rag/RECORD_LOCKING_DEVELOPER.md`, `Modules/AI/docs/rag/MODERATION_AND_SEARCH.md`.
