@@ -30,6 +30,7 @@ use Modules\Core\Filament\Pages\EditProfile;
 use Modules\Core\Filament\Pages\PhpInfo;
 use Modules\Core\Filament\Pages\Swagger;
 use Modules\Core\Filament\Pages\Welcome;
+use Modules\Core\Filament\Plugins\BrowserTimezonePlugin;
 use Modules\Core\Filament\Plugins\ContentLanguageSwitchPlugin;
 use Modules\Core\Filament\Plugins\EnvironmentIndicatorPlugin;
 use Modules\Core\Filament\Plugins\LanguageSwitchPlugin;
@@ -120,6 +121,7 @@ final class AdminPanelProvider extends PanelProvider
             ->plugins([
                 ModulesPlugin::make(),
                 EnvironmentIndicatorPlugin::make(),
+                BrowserTimezonePlugin::make(),
                 LanguageSwitchPlugin::make(),
                 ContentLanguageSwitchPlugin::make(),
             ])
