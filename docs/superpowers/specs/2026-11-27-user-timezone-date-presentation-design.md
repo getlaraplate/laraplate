@@ -18,7 +18,7 @@ A reader in Los Angeles and a reader in Rome should each see their own local tim
 
 ## Goals
 
-1. One contract for dates outside the database. API and webhooks carry ISO 8601 in UTC with `Z`. Display uses the reader's timezone.
+1. One contract for dates outside the database. Every HTTP route and webhook speaks UTC in both directions. Responses carry ISO 8601 in UTC with `Z`. Request bodies and query filters carrying an instant are normalized to UTC before they reach a service: a value with an offset is converted, a value without an offset is read as UTC. Display on human surfaces uses the reader's timezone.
 2. One Core formatter used by Filament, Blade, notifications, mail and exports. No surface formats a date by itself.
 3. A reader's timezone is an IANA identifier, for example `America/New_York`. It is never an offset and never derived from a country or from `lang`.
 4. Guests are supported. Their timezone comes from the browser and is kept in a cookie, not in the database.
@@ -65,7 +65,7 @@ The result is held in a request-scoped `TimezoneContext`, the same pattern as `L
 
 **HTML output.** Server-rendered dates are written as `<time datetime="...Z">` with fallback text. The script upgrades them to the reader's timezone, which covers the first visit of a guest before the cookie exists.
 
-**API.** Resources return the wire form. Clients convert. The profile resource exposes `timezone` so clients can start from it.
+**API.** Resources return the wire form. Clients convert. The profile resource exposes `timezone` so clients can start from it. Incoming instants, in bodies and in query filters such as a range on `created_at`, pass through one normalizer that converts to UTC. Date-only values, such as a birthday or a daily period start, are not instants: they are neither converted nor given a time. An architecture test forbids formatting dates by hand in API resources.
 
 **Setting and column.** A migration adds nullable `users.timezone`. The `core.default_timezone` setting follows the existing `core.default_language` registration, validated against the IANA list.
 
@@ -87,6 +87,7 @@ Browser-only without a profile column was also considered. It cannot serve mail,
 
 - Verify in the installed Laravel 13 source that Eloquent date serialization already produces UTC with `Z`, and add a test that pins it.
 - Find in Filament 5 the supported global timezone and date configuration. Do not assume names from older versions.
+- Check how `CrudController` and the filter layer parse date values today, and keep existing clients that send a value without an offset working.
 - Decide the exact class names and the cookie name, following sibling files.
 - Decide the display formats per language and per style: date, date and time, relative.
 - Decide where the browser script is shipped, given there is no Blade frontend in this repository.
