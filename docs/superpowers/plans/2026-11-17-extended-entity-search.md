@@ -1,0 +1,243 @@
+---
+created_on: 2026-11-17
+module: core, cms, shop
+status: completed
+---
+# Extended entity search and list. Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax; tick each one when it finishes, in the same work block.
+
+**Goal:** `/search` and `/select` of an extended entity (`shop/products`) work through the index of its host under the extender's own permissions; `with_extended=true` on `/search` and `/select` of a host (`cms/contents`) adds the extended rows the user may read, each upcast and checked against its own ACL; the generic parts of `Content` (host side of the seam, indexed relations, Editor plain text) live in Core.
+
+**Architecture:** Two Core contracts, host and extender. A Core trait implements the host side of the content-extension seam for any host (hiding scope, `withExtended()`, a registry per host, the batched upcast, the `extension` document and mapping). `CrudService` recognises an extender and searches its host index, translating filters and ACL by one rule; on a host it replaces the exclusion of extended rows with the type condition of the mixed flows when `with_extended` is set. CMS `Content` uses the trait; Shop registers in the Core registry and seeds the guest ACL of its products.
+
+**Tech Stack:** PHP 8.5, Laravel 13, Scout, Pest. No new dependency.
+
+**Spec:** `../specs/2026-11-17-extended-entity-search-design.md` (decisions XS1 to XS17).
+
+## Prerequisites
+
+All merged on 2026-11-17:
+
+- getlaraplate/laracore#43: default search filters on every search path, locale on the basic path, typed sub-fields of an Elasticsearch `object` (needed by `extension.*` filters).
+- getlaraplate/laracms#22.
+- getlaraplate/larashop#4: shared primary key of `Product` (XS7). The flows of Task 9 reload products by the hit ids.
+- getlaraplate/laracore#44: a pending deletion under the `Hide` strategy is hidden from an anonymous HTTP visitor. Not required by the plan; it was found while verifying XS9.
+
+## Global Constraints
+
+- Branch `feat/extended-entity-search` in `Modules/Core`, `Modules/CMS` and `Modules/Shop`; the spec and this plan are in the root `laraplate` repo. One PR per repo, merged in the order Core, CMS, Shop; submodule pointers are bumped by the owner, never by an agent.
+- Core never names CMS or Shop: every Core class reaches a host or an extender through the contracts of Task 5.
+- No migration. No change to the `contents` index beyond `extension.company_id` (Task 7); the owner rebuilds the index after the Shop PR.
+- Refactors (Tasks 2, 4, 6) do not change output: the search document, the mapping, reading statistics and evidence excerpts of `Content` are compared before and after.
+- No test is deleted. A test of a CMS class that moves to Core moves with it and keeps its cases; removing the old file needs the owner's approval in the PR.
+- Tests that declare classes use the module's `tests/Stubs/`, never the test file.
+- Run `php artisan test --compact <path>` on narrow paths while working; each module suite passes before its PR. Pint from the root with an explicit file list. `config:clear` first if `bootstrap/cache/config.php` exists.
+- Every decision enforced in code (XS16, XS17) names the decision and the spec in the docblock of its check, and its error message says which rule broke and how to fix it (spec §8).
+
+## Review Focus
+
+1. **Fail-closed ACL.** An extender ACL condition that cannot be translated to the host index is applied at reload, never dropped (XS10). A mixed list never shows an extended row the user's ACL on its own entity excludes (XS5).
+2. **Replaced, not joined.** With `with_extended`, the exclusion `extended_type IS NULL` is replaced by the type condition; joined, the two select nothing (XS11).
+3. **No leak through the type.** An alias whose table the user may not `select` is absent from the mixed list, silently (XS4).
+4. **Core stays generic.** No `Modules\CMS` or `Modules\Shop` reference in Core.
+5. **Unchanged output of the refactors.** Same document keys, same mapping, same plain text.
+
+---
+
+### Task 1: Editor plain text in Core (XS15)
+
+**Files:**
+- Create: `Modules/Core/app/Support/EditorPlainText.php`.
+- Test: `Modules/Core/tests/Unit/Support/EditorPlainTextTest.php`.
+
+- [x] **Step 1: Test first.** An Editor.js document (array or object with `blocks`) yields the same plain text as `Modules\CMS\Casts\ReadingStatistics::plainText()` does today for the same blocks (paragraph, header, list, nested `items`, HTML tags and entities, find marks); a plain string passes through without control characters; anything else is returned as it is.
+- [x] **Step 2: Implement** a `final readonly` class with static methods, no I/O. The block walking and HTML stripping move from `ReadingStatistics` (`normalizeBlocksList()`, `collectMetricSegments()`, `stripFindMarksFromHtmlString()`), next to `FieldType::Editor`.
+- [x] **Step 3:** tests PASS, Pint, commit: `feat(core): plain text of an Editor field`. Committed on `feat/extended-entity-search` in `Modules/Core`. Pest and Pint were not run in the authoring environment (PHP 8.3, no host app): every case of the test, and parity with `ReadingStatistics::plainText()` on the same blocks, ran through a standalone script. Run both in the host app before the Core PR merges.
+
+---
+
+### Task 2: CMS readers of Editor content use the Core service (XS15)
+
+**Files:**
+- Modify: `Modules/CMS/app/Casts/ReadingStatistics.php`, `Modules/CMS/app/Models/Content.php` (`searchableComponentValue()`), `Modules/CMS/app/ApplicationContent/CmsContentEvidenceProjector.php`.
+- Test: the existing reading statistics, content search data and evidence projector tests; a new case per reader if none covers an Editor document.
+
+- [x] **Step 1:** pin the current output of each reader on an Editor document with nested blocks (tests that pass before the change).
+- [x] **Step 2:** `ReadingStatistics::plainText()` and `Content::searchableComponentValue()` delegate to `EditorPlainText`. The evidence projector uses it where its output is the same; where it must differ (its excerpt keeps a structure of its own), it keeps its own step on top of the service. Record which in the delivery status. Done: `ReadingStatistics` reads blocks, segments and find marks through `EditorPlainText` (its `plainText()` and `stripFindMarksFromHtmlString()` delegate); `Content` calls `EditorPlainText::fromValue()` and drops `searchableComponentValue()`. `CmsContentEvidenceProjector` keeps its own walk, unchanged: `collectText()` is a generic walk over any component shape (it reads `title`, `label`, `description`, `value` and skips string list items and table cells, and `strip_tags()` leaves no space at tag boundaries), so the Editor reader would change its excerpts. Converging it is a behaviour change with its own test, not part of this refactor.
+- [x] **Step 3:** the pinned tests still PASS, Pint, commit: `refactor(cms): Editor plain text from Core`. Committed on `feat/extended-entity-search` in `Modules/CMS`; pinned in `tests/Feature/Models/ContentTest.php` (Editor component in the reranker text and the search document). Pest and Pint not run in the authoring environment: the plain text, the reading metrics and the find-mark stripping of `ReadingStatistics` were compared before and after through a standalone script, identical. Run both in the host app.
+
+---
+
+### Task 3: Indexed relation helper in Core (XS14)
+
+**Files:**
+- Create: `Modules/Core/app/Search/Schema/IndexedRelation.php`.
+- Test: `Modules/Core/tests/Unit/Search/IndexedRelationTest.php`.
+
+- [x] **Step 1: Test first.** A declaration with a relation name and the default shape yields a `FieldDefinition` of type `Array` with `relation` set and properties `name` (text), `id` (integer, filterable), `slug` and `path` (keyword, filterable); extra properties add to the shape and can override it; the document entry of a collection of related models holds exactly the declared keys for each model, in order; field and document are built from the same declaration, so their keys match.
+- [x] **Step 2: Implement** a `final readonly` value object: constructor (relation, field name, extra properties, index types), `field(): FieldDefinition`, `document(iterable $related): array`.
+- [x] **Step 3:** tests PASS, Pint, commit: `feat(core): declare an indexed relation once for document and mapping`. Committed on `feat/extended-entity-search` in `Modules/Core`, with the stub `tests/Stubs/Search/IndexedRelationStubModel.php`. The document lists the properties in the declaration order (`name`, `id`, `slug`, `path`, then extras), so Task 4 compares document entries by key and value, not by key order. Pest and Pint not run in the authoring environment: every case ran through a standalone script. Run both in the host app.
+
+---
+
+### Task 4: `Content` declares its indexed relations with the helper (XS14)
+
+**Files:**
+- Modify: `Modules/CMS/app/Models/Content.php` (`toSearchableArray()`, `getSearchMapping()`).
+- Test: `Modules/CMS/tests/Feature/ContentExtension/ContentExtensionMappingTest.php`, `ContentExtensionSearchDataTest.php`, or a new `ContentSearchDocumentTest.php`.
+
+- [x] **Step 1:** pin the current mapping of `contributors`, `categories`, `tags`, `locations` and their document entries (tests that pass before the change).
+- [x] **Step 2:** replace the four `only([...])` calls and the four `FieldDefinition` blocks with four `IndexedRelation` declarations (the `locations` one adds the address properties, `tags.name` is a keyword).
+- [x] **Step 3:** the pinned tests still PASS, Pint, commit: `refactor(cms): indexed relations of Content through the Core helper`. Committed on `feat/extended-entity-search` in `Modules/CMS`; pins in `tests/Feature/Search/ContentSearchableArrayTest.php` (mapping against the literal declarations before the helper, translated for Elasticsearch; document entries against `only()` on the old keys, compared by key and value). `Content::indexedRelations()` holds the four declarations. Pest and Pint not run in the authoring environment: a standalone script found the four field definitions identical (order included) and their Elasticsearch, Typesense and database translations identical. Run both in the host app.
+
+---
+
+### Task 5: Host and extender contracts, and the generic host trait (XS11, XS13, XS16)
+
+**Files:**
+- Create: `Modules/Core/app/Contracts/IExtendableModel.php` (host), `Modules/Core/app/Contracts/IExtendsModel.php` (extender), `Modules/Core/app/Models/Concerns/HasExtensions.php` (host trait), `Modules/Core/app/Search/Extensions/ExtensionRegistry.php`, `Modules/Core/app/Search/Extensions/ExtensionResolver.php`, `Modules/Core/app/Search/Extensions/HidesExtendedRows.php` (global scope), `Modules/Core/app/Search/Extensions/ExtensionFieldConflict.php` (exception).
+- Test: `Modules/Core/tests/Feature/Extensions/` with stubs in `Modules/Core/tests/Stubs/Extensions/` (a host on its own table, two extenders).
+
+- [x] **Step 1: Test first.** Host: its type column; extended rows hidden by default and returned by `withExtended()`; the registry is keyed by host class (an alias registered for one host is unknown to another); the upcast of a page swaps extended rows for their extenders, re-attaches the host, keeps the order and costs one query per alias; the bulk import query includes extended rows; the `extension` document holds `type` and the extender's `searchableExtension()`; the composed mapping unions the extenders' fields. XS16: two extenders declaring a field with the same type and flags compose into one entry; different definitions throw `ExtensionFieldConflict` naming the field and both aliases.
+- [x] **Step 2: Implement.** The extender contract: host class, alias, host key, host relation, own columns, `searchableExtension()`, `searchableExtensionMapping()`. The host contract: type column, extenders, `withExtended()`, upcast. The trait registers the hiding scope and implements the contract from the registry and resolver. The scope, registry, resolver and composition are generalised from `Modules/CMS/app/Scopes/HidesExtendedContent.php`, `Services/ContentExtenderRegistry.php`, `Services/ContentExtensionResolver.php` and `Content::extensionSearchDocument()` / `composeExtensionMapping()`.
+- [x] **Step 3:** the exclusion comes from the host contract: `DefaultSearchFilters::merge()` (or its caller) adds `<type column> IS NULL` for a host, alongside any `ProvidesDefaultSearchFilters` filters. Test: a stub host with no `defaultSearchFilters()` is still excluded on Basic, Orchestrated and Auto.
+- [x] **Step 4:** tests PASS, Pint, commit: `feat(core): host and extender contracts with a generic host implementation`. Committed on `feat/extended-entity-search` in `Modules/Core`. As built:
+  - Host contract `IExtendableModel`: `extensionTypeColumn()`, `extenders()`, `queryWithExtensions()`, `upcastExtensions()`, `extensionSearchDocument()`, `extensionSearchMapping()`; `HasExtensions` implements all but the type column, plus the `withExtended()` scope.
+  - Extender contract `IExtendsModel`: `extendedModel()`, `extensionAlias()`, `extensionHostKey()`, `extensionHostRelation()`, `extensionOwnColumns()`, `searchableExtension()`, `searchableExtensionMapping()`.
+  - `ExtensionRegistry::register()` refuses a class that does not implement `IExtendsModel`; the registry is a singleton of `SearchServiceProvider`.
+  - The exclusion is `DefaultSearchFilters::of()` (declared defaults plus the host's type column `IS NULL`), used by `merge()` and by the basic path of `CrudService::searchWithScout()`, which no longer reads `ProvidesDefaultSearchFilters` itself.
+  - The bulk import includes extended rows in the `Searchable` trait itself (`makeAllSearchableUsing()` drops `HidesExtendedRows`, a no-op for a model without it), not per host.
+  - Tests: `tests/Unit/Search/ExtensionRegistryTest.php`, `tests/Feature/Extensions/HostExtensionsTest.php`, stubs in `tests/Stubs/Extensions/`, fixture `tests/Support/ExtensionFixture.php`; `DefaultFilteredSearchFixture::search()` takes the model to search.
+  - Pest and Pint not run in the authoring environment: the registry and the XS16 conflict message ran through a standalone script; the Eloquent parts (scope, upcast, document, mapping, search exclusion) need the host app.
+
+---
+
+### Task 6: `Content` and `ExtendsContentTrait` on the Core contracts (XS11, XS13)
+
+**Files:**
+- Modify: `Modules/CMS/app/Models/Content.php`, `Modules/CMS/app/Contracts/ExtendsContent.php` (extends `IExtendsModel`), `Modules/CMS/app/Models/Concerns/ExtendsContentTrait.php`, `Modules/CMS/app/Observers/ContentExtensionObserver.php`, `Modules/CMS/app/Observers/ContentReferenceObserver.php`, `Modules/CMS/app/Providers/CMSServiceProvider.php`.
+- Remove (replaced by Task 5): `Modules/CMS/app/Scopes/HidesExtendedContent.php`, `Modules/CMS/app/Services/ContentExtenderRegistry.php`, `Modules/CMS/app/Services/ContentExtensionResolver.php`.
+- Test: `Modules/CMS/tests/Unit/ContentExtension/ContentExtenderRegistryTest.php` and `Modules/CMS/tests/Feature/ContentExtension/*`, adapted to the Core classes; `Modules/CMS/tests/Stubs/ContentExtension/FakeContentExtender.php`.
+
+- [x] **Step 1:** `Content` uses `HasExtensions`, declares `extended_type`, and drops `withExtended()`, `extensionSearchDocument()`, `composeExtensionMapping()`, the registration of `HidesExtendedContent` in `booted()` and its exclusion in `makeAllSearchableUsing()`. `defaultSearchFilters()` loses `extended_type => null`; if nothing is left, `Content` stops implementing `ProvidesDefaultSearchFilters`.
+- [x] **Step 2:** `ExtendsContent` extends `IExtendsModel`; `ExtendsContentTrait` implements the new methods (host `Content`, host key `content_id`, relation `content`, own columns from the model) and reads the registry and the upcast from Core. The lifecycle cascade (`ContentExtensionCascade`) does not change.
+- [x] **Step 3:** the seam tests pass against the Core classes; the generic content search still excludes extended contents; `withExtended()` still opens them; `ContentExtensionMappingTest` and `ContentExtensionSearchDataTest` give the same mapping and document. A CMS test composes the `extension` mapping in the full application with every registered extender (XS16).
+- [x] **Step 4:** tests PASS, Pint, commit: `refactor(cms): Content is a host of the Core extension contracts`. Committed on `feat/extended-entity-search` in `Modules/CMS`. Divergence from the file list: `ContentExtenderRegistry` and `ContentExtensionResolver` are not removed yet. Shop registers through the first (`ShopServiceProvider`) and a Shop test uses the second, so removing them in the CMS PR would break Shop between the two merges. They stay as `@deprecated` delegates over Core (the container binds the registry over the Core singleton, `new ContentExtenderRegistry()` is still an isolated empty registry), and their tests keep passing unchanged; Task 7 Step 5 removes them. `HidesExtendedContent` is removed (CMS-only). `Content` no longer implements `ProvidesDefaultSearchFilters` (its only entry was the exclusion), its `makeAllSearchableUsing()` override is gone (the Core trait does it), and `extensionOwnColumns()` defaults to the extender's table columns. Tests adapted, none deleted: `ContentExtensionSearchFilterTest` asserts the exclusion through `DefaultSearchFilters::of()`; `ContentExtensionMappingTest` isolates the Core registry and gains the XS16 composition with every registered extender; `FakeContentExtender` implements the new contract methods. Pest and Pint not run in the authoring environment (lint only): run both in the host app.
+
+---
+
+### Task 7: Shop on the Core registry, and its indexed ACL fields (XS13, XS17, §5 Shop)
+
+**Files:**
+- Modify: `Modules/Shop/app/Providers/ShopServiceProvider.php`, `Modules/Shop/app/Models/Product.php` (`searchableExtension()`, `searchableExtensionMapping()`).
+- Test: `Modules/Shop/tests/Feature/ProductExtensionTest.php`, a new `Modules/Shop/tests/Feature/ProductColumnNamesTest.php`.
+
+- [x] **Step 1:** `shop.product` is registered in the Core registry for `Content` (both the resolving and the already-resolved paths of today's provider).
+- [x] **Step 2:** `extension` gains `company_id` (integer, filterable) next to `is_published_in_shop`.
+- [x] **Step 3: XS17 test.** The own columns of `Product`, less `id`, timestamps and soft-delete columns, share no name with the columns of `cms_contents` nor the fields of `ContentTranslation`. The failure message names the colliding names and XS17.
+- [x] **Step 4:** tests PASS, Pint, commit: `feat(shop): products in the Core extension registry, with company and publication indexed`. Committed on `feat/extended-entity-search` in `Modules/Shop`. `Product::extensionOwnColumns()` returns `OWN_COLUMNS`; `ProductColumnNamesTest` checks them against the columns of `cms_contents` and `Content::getTranslatableFields()`, and that every column of `shop_products` is in the list. `ProductExtensionTest` gains the registration and the `company_id` cases, and its upcast case uses `Content::upcastExtensions()`, so Shop no longer touches the deprecated CMS delegates. The `contents` mapping gains `extension.company_id`: the owner rebuilds the index after the merge. Pest and Pint not run in the authoring environment (lint only): run both in the host app.
+- [x] **Step 5 (done in a follow-up, after the Shop PR merged; the test deletions approved by the owner, getlaraplate/laracms#24 and getlaraplate/laracore#47):** once the Shop PR is merged, remove the deprecated CMS delegates `Modules/CMS/app/Services/ContentExtenderRegistry.php` and `Modules/CMS/app/Services/ContentExtensionResolver.php` in a CMS follow-up: move `ContentExtenderRegistryTest` and `ContentExtensionResolverTest` onto the Core registry and resolver, and the CMS tests that register through the CMS registry onto the Core one; deleting the old test files needs the owner's approval in that PR.
+
+---
+
+### Task 8: A preset field never shadows an extender column (XS17)
+
+**Files:**
+- Modify: `Modules/Core/app/Models/Pivot/Fieldable.php` (attach), `Modules/Core/app/Models/Field.php` (rename), the extender contract of Task 5 (the entity its host rows use).
+- Test: `Modules/Core/tests/Feature/Extensions/PresetFieldShadowingTest.php`.
+
+- [x] **Step 1: Test first.** Attaching a field named like an own column of an extender to a preset of that extender's entity is refused with a validation error naming the field, the extender and XS17; renaming a field attached to such a preset to such a name is refused; other names, and presets of other entities, are accepted.
+- [x] **Step 2: Implement** the check through the registry: which extender owns the preset's entity, and its own columns. Docblock and message per the Global Constraints.
+- [x] **Step 3:** tests PASS, Pint, commit: `feat(core): refuse a preset field that would shadow an extender column`. Committed on `feat/extended-entity-search` in Core, CMS and Shop. As built: the extender contract gains `extensionEntityType(): ?string` (the type of the entity whose presets shape its host rows); `ExtenderColumnGuard` reads the preset's entity type and refuses a field named like any own column of an extender of that type, native keys included (a dynamic field named `id` would be shadowed too), with a `ValidationException` naming the field, the entity, the extender and XS17; `FieldableObserver::saving` runs it when `field_id` or `preset_id` changes, `FieldObserver::updating` when an attached field is renamed; `ExtensionRegistry::all()` lists every extender. CMS `ExtendsContentTrait` returns null by default, Shop `Product` returns `products`, and `ProductColumnNamesTest` tries a `featured` field on the product preset. Tests: `Modules/Core/tests/Feature/Extensions/PresetFieldShadowingTest.php`. Pest and Pint not run in the authoring environment (lint only): run both in the host app.
+
+---
+
+### Task 9: Search and list of an extender through its host (XS1, XS2, XS10)
+
+**Files:**
+- Modify: `Modules/Core/app/Services/Crud/CrudService.php` (`search()`), `Modules/Core/app/Search/Services/AdvancedSearchService.php` (the host exclusion replaced by the alias condition).
+- Create: `Modules/Core/app/Search/Extensions/ExtenderFilterTranslator.php`.
+- Test: `Modules/Core/tests/Integration/Search/ExtenderSearchTest.php` with the Task 5 stubs on the database engine.
+
+- [x] **Step 1: Test first.** `/search` of an extender: permission and ACL of the extender; the engine runs on the host index with `<type column> = <alias>` in place of the exclusion; hits reload as extenders by key under the extender ACL, in engine order; a filter on a mounted attribute reaches the host field, on an indexed own column `extension.<column>`, on a non-indexed own column answers 400; an ACL condition that cannot be translated still holds at reload. Basic, Orchestrated and Auto agree. `/select` of an extender is unchanged.
+- [x] **Step 2: Implement.** `CrudService::search()` branches on `IExtendsModel` before the `Searchable` check; the translator maps filters and ACL by XS10.
+- [x] **Step 3:** tests PASS, Pint, commit: `feat(core): search an extender through the index of its host`. Committed on `feat/extended-entity-search` in `Modules/Core`. As built: `ExtenderFilterTranslator` builds an `ExtenderSearch` (host, translated filters and sort, the alias condition, the hit key column); a field translates only when the host index filters on it, so an ACL condition on a mounted attribute the host does not index is also left to the reload; a request relation or scope filter is kept for the reload; a sort on an own column answers 400. `DefaultSearchFilters::merge()` and `AdvancedSearchService::search()` take `$hostRows`, the condition that replaces the host exclusion; `DefaultSearchFilters::of()` can leave the type column out for the basic path. Hits reload by the extender's host key column (`whereIn`), so the same code serves XS7 and XS8. Divergence: the reload of a model that mounts related attributes (`IMountsRelatedAttributes`) applies its ACL through the CRUD query builder, as a list does, because `AuthorizationService::applyAclFiltersToQuery()` knows no mounted attribute and a product ACL on `valid_from` would fail there. Follow-up (same day, `fix(core): extension filters and extended rows on every engine`): a filter on `extension.<field>` is found from the extenders that declare it filterable, on every engine, and the database reads it as an EXISTS on their tables by the host key (`!=` as NOT EXISTS); `extension.type` reads the type column. When the filters of a host search ask for an alias, the builder's query callback removes the hiding scope, so the engine query and the hydration of the hits keep the selected extended rows: without it the hydration dropped every hit of an extender search on `Content`. Core registers its own collection engine, since Scout's ignores `newScoutQuery()` and the query callback. `ExtensionDocumentCheck` lists where an extender's `searchableExtension()` and `searchableExtensionMapping()` disagree, run over every extender of `Content` by a CMS test; Shop casts `company_id` to integer. `/select` of an extender is untouched. Test: `Modules/Core/tests/Integration/Search/ExtenderSearchTest.php`. Pest and Pint not run in the authoring environment (lint only): run both in the host app.
+
+---
+
+### Task 10: `with_extended` on `/select` and `/search` of a host (XS3 to XS6, XS12)
+
+**Files:**
+- Modify: `Modules/Core/app/Http/Requests/ListRequest.php` (rule `with_extended` boolean), `Modules/Core/app/Casts/ListRequestData.php` (property), `Modules/Core/app/Services/Crud/CrudService.php` (`list()`, `search()`), `Modules/Core/app/Services/Authorization/AuthorizationService.php` if the per-alias ACL needs a helper.
+- Test: `Modules/Core/tests/Integration/Search/MixedHostListTest.php` with the Task 5 stubs.
+
+- [x] **Step 1: Test first.** On a host, `with_extended=true` adds the rows of the aliases whose table the user may `select`, and none other; an extended row also passes the ACL of its own entity (a user restricted on the extender sees only those rows); rows are upcast and carry `extended_type`; requested columns and relations apply where the row's model has them; the exclusion is replaced, not joined. The flag is ignored on a model that is not a host and on an extender. Same rows for `/select` (SQL) and `/search` (engine), on Basic, Orchestrated and Auto.
+- [x] **Step 2: Implement.** `/select`: `withExtended()` plus `type IS NULL OR (type = alias AND EXISTS extender row under its ACL)` per allowed alias, the host ACL on every row, then the upcast. `/search`: the same type condition as an engine filter, each alias branch carrying the translated extender ACL (Task 9), reload under both ACLs, then the upcast.
+- [x] **Step 3:** extend `Modules/Core/tests/Integration/Search/SearchPathEligibilityContractTest.php` with a host and an extender: no path returns a row another path excludes.
+- [x] **Step 4:** tests PASS, Pint, commit: `feat(core): with_extended opens a host list to the extended rows the user may read`. Committed on `feat/extended-entity-search` in `Modules/Core`. As built: `ReadableExtenders` holds the aliases whose table the user may `select`, each with the user's resolved ACL on it; `constrain()` gives the SQL condition (`withoutGlobalScope(HidesExtendedRows)`, then `type IS NULL OR (type = alias AND EXISTS extender row under its ACL)`, the ACL applied by the CRUD query builder so mounted attributes resolve), `hostRows()` the engine condition (an OR group whose alias branches carry the translatable part of the extender ACL). `/select` and the reload of `/search` use `constrain()`, the engine uses `hostRows()` through `$hostRows` (Task 9); the host ACL stays on every row; rows are upcast after computed methods, with the type column added to an explicit select. No `AuthorizationService` helper was needed. Requested columns and relations apply to the host row, which the upcast attaches to its extender; the extender row is read whole. `with_extended` is also accepted, and ignored, by `/facets` and `/aggregate`, which extend `ListRequest`. Before this task, in the same work block: `fix(search): filter on a null value on Elasticsearch and Typesense` (`= null` became a `term` on null, which Elasticsearch refuses, and an empty `filter_by` value on Typesense; Elasticsearch now uses `must_not exists`, Typesense indexes a null top-level string as `TypesenseEngine::NULL_PLACEHOLDER` and filters on it, so Typesense collections need a reindex). Tests: `Modules/Core/tests/Integration/Search/MixedHostListTest.php`, `SearchPathEligibilityContractTest.php`, `SearchEngineContractTest.php`. Pest and Pint not run in the authoring environment (lint only): run both in the host app.
+
+---
+
+### Task 11: Public product visibility (XS9)
+
+**Files:**
+- Modify: `Modules/Shop/database/seeders/ShopDatabaseSeeder.php` (guest role grant and ACL on `shop_products`, following the guest grants of `Modules/CMS/database/seeders/CMSDatabaseSeeder.php`).
+- Test: `Modules/Shop/tests/Feature/ProductPublicVisibilityTest.php`.
+
+- [x] **Step 1: Test first.** As the anonymous account: `/select` and `/search` of `shop/products`, and `cms/contents?with_extended=true`, return a product only when its content is in its validity window and `is_published_in_shop` is true; a draft, scheduled or expired content hides it whatever the flag, and `false` hides it whatever the content. A user restricted to one company sees only that company's products, in the product routes and in the mixed list.
+- [x] **Step 2: Implement** the grant and the ACL as column conditions (`valid_from`, `valid_to`, `is_published_in_shop`), never the `valid` scope. No approval condition (verified in the spec, XS9).
+- [x] **Step 3:** tests PASS, Pint, commit: `feat(shop): the public sees online products only`. Committed on `feat/extended-entity-search` in `Modules/Shop`. As built: `ShopDatabaseSeeder::onlineProductFilters()` (`valid_from <= @now`, `valid_to >= @now OR valid_to IS NULL`, `is_published_in_shop = true`, bare names: the first two are mounted from the content) on the `guest` role of the api guard, created only when the role has no ACL on the permission. The test seeds Core, CMS and Shop, writes the content window on the row, and reads `/api/v1` as the anonymous account and `/app` as a user restricted by `company_id`, on the four reads. Known limit: on Typesense a null date has no placeholder (only top-level strings get one), so `valid_to IS NULL` finds nothing there; the CMS guest ACL on contents shares it. Pest and Pint not run in the authoring environment (lint only): run both in the host app.
+
+---
+
+### Task 12: Documentation (spec §8)
+
+**Files:**
+- Modify: `Modules/CMS/docs/CONTENT_EXTENSION.md` ("Becoming a consumer", "Search", "Generic search excludes extended contents"), `Modules/Shop/docs/rag/MODULE.md` (search and list of products, `with_extended`, the XS17 test, the guest ACL), `Modules/Core/docs/rag/MODULE.md` (host and extender contracts, preset field refusal), `Modules/Core/docs/rag/SEARCH_RETRIEVAL_PIPELINE.md` (constraints table: the host exclusion and `with_extended`), `Modules/Core/docs/CRUD_SYSTEM.md` or its RAG counterpart (the `with_extended` parameter).
+
+- [x] **Step 1:** document XS16 and XS17 with their reasons where they are enforced, per spec §8.
+- [x] **Step 2:** document the request parameter, the mixed list (`extended_type` per row, columns applied where present) and the extender search.
+- [x] **Step 3:** commit per repo: `docs(<module>): extended entity search and list`. Committed on `feat/extended-entity-search` in Core, CMS and Shop.
+- [x] **Step 4: Close.** A `## Delivery status (date)` section with its `**Documented in:**` line naming the module docs of Steps 1 and 2, every box resolved (`- [x]`, or `- [-]` with its reason), `status: completed` in the front matter.
+
+## Delivery status (2026-11-18): built, pending review and merge
+
+Built on `feat/extended-entity-search` in `Modules/Core`, `Modules/CMS` and `Modules/Shop`, to be merged in the order
+Core, CMS, Shop. Pest and Pint were not run in the authoring environment (PHP 8.3, no host app): every file was
+linted, and the suites run in the host app before the PRs merge. After the Shop merge the owner rebuilds the
+`contents` index (new `extension.company_id`) and every Typesense collection (null placeholder).
+
+**Documented in:** `Modules/CMS/docs/CONTENT_EXTENSION.md` (host and extender split, the two naming rules XS16 and
+XS17 with their reasons, searching and listing extenders), `Modules/Shop/docs/rag/MODULE.md` (search and list of
+products, the public ACL, the column-name test), `Modules/Core/docs/rag/MODULE.md` (host and extender contracts,
+the preset field refusal, null and `extension.*` filters on every engine),
+`Modules/Core/docs/rag/SEARCH_RETRIEVAL_PIPELINE.md` (the constraints table with the host exclusion, the extender
+search and `with_extended`), `Modules/Core/docs/CRUD_SYSTEM.md` (the `with_extended` parameter).
+
+Divergences from the plan, each recorded in its task:
+
+- Task 6: the CMS `ContentExtenderRegistry` and `ContentExtensionResolver` stayed as deprecated delegates over Core,
+  so Shop kept working between merges; Task 7 Step 5 removed them after the Shop merge (getlaraplate/laracms#24): the
+  resolver tests moved to `ContentExtensionUpcastTest`, the registry cases to Core (getlaraplate/laracore#47),
+  `ContentExtenderRegistryTest` and `FakeContentExtender` were deleted with the owner's approval.
+- Task 8: the extender contract gained `extensionEntityType()`; native keys are refused as preset field names too.
+- Task 9: the reload of a model that mounts related attributes applies its ACL through the CRUD query builder.
+  Same-day follow-ups: `extension.*` filters on every engine (EXISTS on the extender tables for the database and
+  collection engines), the hiding scope removed from the engine queries and hydration of a search that asks for an
+  alias (without it an extender search on `Content` came back empty), Core's own collection engine,
+  `ExtensionDocumentCheck`, `company_id` cast to integer.
+- Before Task 10: equality on null fixed on Elasticsearch (`must_not exists`) and Typesense (an indexed placeholder
+  for null top-level strings).
+- After the merge, `scout:rebuild` against an Elasticsearch 8 cluster with `ELASTIC_COMPATIBLE_WITH=8` failed: the
+  Scout driver built its own clients without the compatibility header. Fixed in getlaraplate/laracore#48
+  (`ElasticClientBuilder`), unrelated to this plan's code but found while rebuilding its indexes.
+- Known limit: on Typesense a null date has no placeholder, so `valid_to IS NULL` in the public ACLs of contents and
+  products finds nothing there.
+- Note (2026-11-19): the known limit above was misread. Dates were Typesense strings, so a null date already got the
+  string placeholder; the real defect was wider: Typesense filters ranges on numbers only, so every date range
+  (`valid_from <= now` in the public ACLs) was refused, `@now` was written empty, and a null in the wheres of a
+  keyword search threw in Scout's filter. Fixed in getlaraplate/laracore#57 (top-level dates indexed as `int64`
+  timestamps, a null date as `TypesenseEngine::NULL_TIMESTAMP` kept out of every range, the wheres written by Core);
+  the module docs dropped the limit in getlaraplate/laracms#26 and getlaraplate/larashop#7. Not yet verified on a live
+  Typesense cluster. The Task 11 note on the same limit is superseded by this one.

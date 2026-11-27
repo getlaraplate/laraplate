@@ -2,6 +2,1094 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.19.1] - 2026-11-27
+
+### 📚 Documentation
+
+- *(spec)* Db2 fork created, VCS distribution for now, closure prerequisite shipped
+- *(spec)* Db2 test environment, PUB400 reachable, no IBM i container
+- *(plan)* Db2 for i implementation plan, spec approved
+- *(plan)* Suggest the PDO extensions in the fork
+
+### ⚙️ Miscellaneous Tasks
+
+- *(modules)* Bump Core v2.2.1, CMS v1.50.3
+
+## [1.19.0] - 2026-11-26
+
+### 🚀 Features
+
+- *(modules)* Bump Core v2.2.0, CMS v1.50.2
+
+## [1.18.0] - 2026-11-26
+
+### 🚀 Features
+
+- *(modules)* Bump Core v2.1.0
+
+## [1.17.0] - 2026-11-25
+
+### 🚀 Features
+
+- *(modules)* Bump Core v2.0.1, AI v3.3.0, CMS v1.50.1, CRM v1.1.2, ERP v2.2.0, MES v1.4.0, SAO v1.6.2, Shop v0.1.2
+
+### 🧪 Testing
+
+- *(models)* Every model declares its columns, and no tag names nothing
+- *(models)* Accept the attributes a model reads from another model
+
+### ⚙️ Miscellaneous Tasks
+
+- *(phpstan)* Check column names against the declared columns again
+
+## [1.16.0] - 2026-11-25
+
+### 🚀 Features
+
+- *(console)* Models:declare-columns writes each model's column tags
+- *(modules)* [**breaking**] Bump Core v2.0.0, CMS v2.0.0, Shop v0.1.1
+- *(modules)* Bump CMS v1.50.0
+
+### 🐛 Bug Fixes
+
+- *(console)* Decimal casts are numeric strings, and a model without columns stays untouched
+
+### 💼 Other
+
+- Update subproject commits for AI, CMS, Core, and Shop modules
+- Update dependencies in composer.lock and package-lock.json; bump versions for aws-sdk-php, guzzlehttp/promises, guzzlehttp/psr7, open-telemetry/api, openspout, and source-map-js. Update subproject commits for Core and ERP modules.
+- Update subproject commits for AI, CMS, Core, CRM, ERP, MES, SAO, and Shop modules; mark initial steps completed in the PHPStan typed model columns plan.
+
+### 📚 Documentation
+
+- *(cache)* Spec and plan for cache membership labels
+- *(plans)* Tick cache labels tasks 1-3
+- *(plans)* Tick cache labels tasks 4-5
+- *(plans)* Tick cache labels task 6
+- *(plans)* Tick cache labels task 7
+- *(plans)* Tick cache labels task 8
+- *(plans)* Tick cache labels task 9
+- *(plans)* Tick cache labels task 10
+- *(plans)* Tick cache labels task 11
+- *(plans)* Tick cache labels task 12
+- *(plans)* Close the cache membership labels plan
+- *(specs)* English fallback for the user documentation, spec and plan
+- *(plans)* Close the documentation locale fallback plan
+- *(plans)* Extended entity search, task 7 step 5 done in a follow-up
+- *(plans)* Close the CrudService bulk paging note, the skip is not reachable
+- *(plans)* Extended entity search, note on the Typesense date fix
+- *(sao)* Close the ingest correlation and census plan
+- *(plans)* Versioning slice 5, task C1 done
+- *(plans)* Versioning slice 5, task C2 done
+- *(plans)* Slice 5 Part C documentation, spec and review status lines
+- *(rules)* Make strong typing and coverage a gate, with what it costs to get wrong
+- *(rules)* Keep the type coverage gate, drop the 100% line coverage rule
+- *(plan)* The column command lives in Core; Tasks 2 and 3 ticked
+- Closure table hierarchies design and plan; Db2 design points to it
+- *(plans)* Baseline numbers of the closure table hierarchies plan
+- *(plans)* Tick task 2 of the closure table plan
+- *(plans)* Note the deferred server run of task 2
+- *(plans)* Tick task 3 of the closure table plan
+- *(plans)* Tick task 4 of the closure table plan
+- *(plans)* Tick task 5 of the closure table plan
+- *(plans)* Tick task 6 of the closure table plan
+- *(plans)* Tick task 7 of the closure table plan
+- *(plans)* After-benchmark numbers of the closure table plan
+- *(plans)* Keep the benchmark step open until the server run
+- *(plans)* A/B benchmark with Xdebug off
+- *(plans)* A/B with category paths through the search indexer
+- *(plans)* A/B on SQLite and MySQL after the MySQL round
+- *(plans)* A/B without hierarchy paths
+- *(plans)* Close the closure-table hierarchies plan
+- *(plans)* Record deleted tests and the upgrade path; drop a stale phpstan baseline entry
+- *(plans)* The closure-table pull requests are open
+
+### 🧪 Testing
+
+- Keep the suite off the database server and Redis of .env
+- Say which process the forced hosts bind
+- *(suite)* Run the composer test commands in parallel
+- *(suite)* Reuse config and routes between tests
+- *(models)* Every model with translations declares the contract
+- *(contracts)* Versioned and searchable models implement their contracts
+
+### ⚙️ Miscellaneous Tasks
+
+- *(deps)* Update dependencies to latest versions
+- *(modules)* Update submodule commits for AI, CMS, CRM, Core, ERP, MES, and SAO
+- *(ide)* Drop removed cache repository methods
+- *(composer)* Update test commands to disable XDEBUG_MODE for improved performance
+- *(composer)* Update command paths in composer.json for consistency
+- *(phpstan)* Stop checking column names against model properties
+- *(phpstan)* Name the trigger DDL and the trait guards
+- *(phpstan)* Name the Scout and CRUD raw SQL rules, record Task 6 progress
+- Lock without the staudenmeir packages
+- Keep the ext-oci8 platform override in the lock
+- *(phpstan)* Drop baseline entries of the removed TreeCollection paths
+- *(modules)* Point Core and CMS at the closure-table branches
+
+## [1.15.0] - 2026-11-18
+
+### 🚀 Features
+
+- *(scripts)* Host plan-status here and discover repositories instead of declaring them
+- *(scripts)* Add composer check:debt to count what the baseline holds
+- *(sao)* Affected version & version-maturity census — bump SAO + close plan
+- Adaptive driver-agnostic bulk indexing for scout:import
+- Sidebar opens only the active page's group
+- AI model selection per feature and setting actions
+- Horizon supervisor for embedding switch index chunks; plan and spec for chunked index writes
+- *(stock-reservation)* Deliver ERP/MES stock reservation plan + bump submodule pointers
+- *(stock-reservation)* Amendment supersedes the source order (Task 9)
+- *(ai)* Carry out the owner's decisions on the AI module review
+- One authentication and one switch for every api route
+- *(plan-status)* Leave reference specs out of the "no plan" list
+- Public CMS categories on the api by default (bump CMS, spec amendment)
+- Bump Core for the scope filter guard (scope filters task 1)
+- Bump Core for the filter scope declarations (scope filters task 6)
+- Bump Core for scope filter storage and ACL validation (scope filters task 2)
+- Bump Core and CMS for scope filter application (scope filters task 3)
+- Bump Core for client scope filter requests (scope filters task 4)
+- Backoffice content language in the admin panel; bump Core and CMS
+- Add CRM module as a submodule and update related documentation
+- *(versioning)* Slice 1 of the Core rebuild, library absorbed
+- *(admin)* Laraplate brand icon as the Filament logo and favicon
+- *(crm,erp)* Contact role, person names, intercompany (D27 to D29), plan closed
+- *(crm)* Lead conversion (D30), section 11 reviewed
+- *(versioning)* Slice 2 of the Core rebuild, reconstruction and anchors
+- *(versioning)* Slice 3 of the Core rebuild, the version-set manager
+- *(versioning)* Slice 4 Part A, the save scope and the translation history
+- *(plan-status)* Show when each plan and spec last changed
+- *(plans)* A finished plan declares itself in front matter and delivery status together
+- *(plan-status)* Report the modules of every plan
+- *(plan-status)* Add --git-dates for when a plan started and finished
+- *(ai)* Implement documentation permission patterns with short-form requirements
+- *(tests)* Add performance timings for AI module tests
+- *(modules)* Bump Core v1.80.0, AI v3.2.0, CMS v1.48.0, ERP v2.1.1, SAO v1.6.1, Shop v0.1.0
+
+### 🐛 Bug Fixes
+
+- Bump AI to avoid double-index on the bulk embedding path
+- Bump AI for documentation stub embedDocumentsBatch
+- Bump AI for RepairEmbeddingsTest embedDocumentsBatch mock
+- Bump SAO for TicketEmbeddableTest embedDocumentsBatch mock
+- *(scripts)* Plan-status ends a task at any top-level section
+- *(scripts)* Plan-status flags a task as probably done only if it creates files
+- *(scripts)* Plan-status reports only real code markers
+- Send an invalidated admin session back to the panel login
+- Horizon supervisor for the embedding model switch queue; spec records the fix wave and two open points
+- *(stock-reservation)* Amend releases the source hold on amendment confirm (Task 8)
+- *(stock-reservation)* Amended-status integrity (Task 10)
+- *(stock-reservation)* MES reservation hardening (Task 11)
+- API access control final review fixes (bump Core and CMS, plan and spec)
+- API access control follow-up fixes (bump Core, CMS, ERP, plan and spec)
+- Parts hydrate with their own select or their owner's (bump Core, CMS, ERP, plan and spec)
+- Parts hydrate with the select of any model along their chain (bump Core, CMS, Shop, plan and spec)
+- CMS reference re-index as a system read (bump Core, CMS)
+- Bump Core and CMS for the scope filters task 2 review fixes
+- Bump Core for the scope filters task 3 review fixes
+- Bump Core and AI for the scope filters task 4 review fixes
+- Bump Core and CMS for the scope filters task 5 review (facets ACL leak)
+- Bump Core for the scope filters final review, record its follow-ups
+- Named rate limiters stay off Redis under the test runner; bump MES (generic CRUD writes refused on machine messages)
+- App.default_locale for the translation fallback; bump Core, CMS, AI and SAO
+- Update favicon URL in .env.example to correct path
+- *(admin)* Blueprint icon set for the favicon, update Core
+- *(plan-status)* Harden git dates and module lists
+- *(plan-status)* Ignore module paths that are not plain directory names
+- *(tests)* Stop BypassFinals from leaking memory on every boot
+- *(http)* Use PreventRequestForgery everywhere the CSRF middleware is named
+
+### 💼 Other
+
+- Add media AI analysis and search design spec
+
+Design for making media (image/audio/video/document) searchable: deterministic
+embedded-metadata extraction in Core plus async AI enrichment through the
+existing ModelRequiresIndexing pre-processing pipeline. Media indexed standalone
+and as single-owner enrichment (analysis on claim, cascade via media->model).
+Core display metadata rides Spatie custom_properties (no new media columns); AI
+owns an extension table keyed by content_hash to dedup analysis and embedding
+compute across duplicated files, contributing to the search document via a Core
+seam so Core stays AI-agnostic. No sentiment. Phase 2 (additive) adds a
+timestamped chunk store and keyframe vision; a true shared-asset DAM is left as
+a non-precluded future.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+- Record open questions in media AI analysis spec
+
+Split section 13 into open design decisions (ACL/security, locale/multilingual,
+media lifecycle beyond claim, contributor-seam choice, phase-1 media-type scope,
+DAM) and implementation details to confirm. Update the status line to point at
+them. Nothing resolved yet; this makes the undecided surface explicit before
+planning.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+- Update subproject commits for AI, ERP, and MES modules
+- Decide ACL, locale and master switch in media analysis spec
+
+- M16: unified result set; media inherits owner ACL, re-authorized at
+  rehydration via a Core registry keyed by owner morph type; switchable through
+  the core.media.search_visibility setting (owner default vs open agnostic
+  gallery).
+- M17: raw tracks (transcript/OCR) stay in the source language; the surrogate is
+  translated to supported locales via the existing pipeline; media belongs to
+  the base article, not to translations (accepted for now, to evolve).
+- M18: a runtime Settings master switch enables/disables the whole media LLM
+  subsystem; off leaves the deterministic layer + fallback indexing only.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+- Decide media lifecycle after claim (M19)
+
+Owner fixed at claim (no owner-move). Metadata-only edit re-embeds and reindexes
+media + owner without LLM; a file replacement (hash change) re-analyzes; soft
+-delete removes from index and reindexes owner (analysis kept); force-delete
+removes from index, drops embeddings and reindexes owner. The hash-keyed shared
+analysis is refcounted and deleted only when the last media for that hash is
+force-deleted. Re-analysis fires only on hash change.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+- Decide media search contributor seam (M4a)
+
+A single generic Core "searchable contributor" seam that any Core searchable
+model exposes; AI registers as a contributor for Media. No duplication and no
+reuse of CMS's content-specific registry. The content extension seam's search
+-contribution should build on this same Core seam; content ownership machinery
+stays in CMS. Cross-spec coordination flagged.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+- Decide phase-1 media-type scope and frame phase-2 visual track (M20)
+
+Phase 1 handles image (caption+OCR), audio (transcription), document/PDF
+(text+OCR) and video (audio transcription only); every other type is
+deterministic-only and still searchable by name/type, with expansion left as an
+additive future. Reframe section 11 as the phase-2 visual "what is seen" track
+(keyframe vision for video, optional deeper image visual), the deep tier behind
+the master switch.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+- Mark media spec design decisions closed
+
+All section 13a design decisions are settled (M1-M20); only a true DAM stays a
+non-precluded future and section 13b implementation details remain for the plan.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+- Add config-driven analysis model registry (M21)
+
+Analysis models are a registry per capability (vision, transcription) with an
+active default operators can switch/extend from config, mirroring the embeddings
+registry; defaults claude-sonnet-5 (vision) and self-hosted Whisper
+(transcription), reusing neuron-ai's ProviderFactory. Folds the transcription
+vendor choice into the registry. Update section 13b residuals: neuron-ai
+multimodal confirmation, the Whisper service, and PHP library approvals.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+- Approve PHP metadata/PDF dependencies for media analysis
+
+getid3 (audio/video tags) and smalot/pdfparser (PDF text) approved as new
+composer deps; images use native exif/iptcparse. OCR-for-scans approach still to
+confirm during implementation.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+- Add media AI analysis & search implementation plan (Phase 1)
+
+14-task TDD plan derived from the media spec (M1-M21): config + model registry,
+content_hash + deterministic extraction, AI-owned ai_media_analysis table,
+generic Core searchable-contributor seam, Media Searchable/IEmbeddable, event +
+listener + fallback, AnalyzeMediaJob, transcription backend, embedding dedup,
+owner-inherited ACL registry, single-owner enrichment cascade, lifecycle,
+Filament surface, docs. Phase 2 and DAM out of scope.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+- Refactor code structure for improved readability and maintainability
+- Media analysis Task 1: config, model registry, master switch
+
+Bump Modules/AI to the Task 1 commit and tick Task 1 in the plan.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+- Media analysis Task 2: deterministic metadata extraction
+
+Bump Modules/Core to the Task 2 commit, lock getid3 + smalot/pdfparser, and tick
+Task 2 in the plan.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+- Media analysis Task 3: AI-owned analysis table
+
+Bump Modules/AI to the Task 3 commit and tick Task 3 in the plan.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+- Media analysis Task 4: generic searchable-contributor seam
+
+Bump Modules/Core to the Task 4 commit and tick Task 4 in the plan.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+- Media analysis Task 5: Media searchable + embeddable
+
+Bump Modules/Core to the Task 5 commit and tick Task 5 in the plan.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+- Media analysis Task 6: pipeline wiring + fallback
+
+Bump Modules/AI to the Task 6 commit and tick Task 6 in the plan.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+- Media analysis Task 7: analysis job + search contribution
+
+Bump Modules/AI to the Task 7 commit and tick Task 7 in the plan.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+- Media analysis Task 8: Whisper transcription backend
+
+Bump Modules/AI to the Task 8 commit and tick Task 8 in the plan.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+- Media analysis Task 8: document Whisper service (not vendored)
+
+Bump Modules/AI to the Whisper docs commit and update Task 8 in the plan.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+- Media analysis: Whisper on port 8001, docs point at canonical repo
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+- Check domain action permission coverage at application level
+
+Moved from Core: the check spans the domain actions of every installed
+module, SAO ticket alias included.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_016bQ9UWLJjnRQA6sGEYNGPL
+- Update subproject commit references for AI, CMS, and Core modules
+- Fix echo statement and streamline update process in update_app.sh
+- Update subproject commits for AI, CMS, and Core modules
+- Update package-lock.json to version 4.3.4 for @tailwindcss/node and @tailwindcss/oxide modules, along with their dependencies. Also, update subproject commits for AI, CMS, and Core modules.
+- Update subproject commits for AI, Core, MES, SAO, and Shop modules.
+- Update subproject commits for AI, CMS, CRM, and ERP modules.
+
+### 📚 Documentation
+
+- *(plans)* Close the release tooling plan
+- *(superpowers)* Adopt ES multilingual + multi-model embeddings spec/plan
+- *(specs)* Settle MCP authorization, rate limiting and audit
+- *(superpowers)* Spec + plan for content translation search_text column
+- *(ai)* Spec persistent user memory (cross-session)
+- *(ai)* Plan persistent user memory + spec accuracy fixes
+- *(specs)* Record the MCP token lifecycle
+- *(superpowers)* Spec + plan for search modes and strategy resolution
+- *(superpowers)* Spec + plan for in-app assistant tools
+- *(ai)* Memory design — relevance, subject supersession, conversation memory
+- *(specs)* MCP ships read-only in phase 1
+- Refresh the spec and plan indexes, correct the end-user retrieval path
+- *(superpowers)* Index the unlisted plans/specs; close the ES index-enablement plan
+- *(superpowers)* Correct the ES full-mapping 400 root cause (meta/index on object/nested)
+- *(superpowers)* Plan the in-place Laravel 13 upgrade
+- Relocate backend plans into laraplate and add ecommerce design specs
+- *(ai)* Reconcile RAG retrieval-strategy plan and add query-analytics spec+plan
+- Record ES translator-400 cutover blocker + fix in 2026-09-12 spec/plan
+- *(search)* Record that IntelligentSearchAction is already broken
+- *(plans)* Tick what ran today, and record what the reruns found
+- Mark ES translator-400 cutover blocker resolved; bump Core submodule
+- *(ai)* Record the developer documentation evaluation path
+- *(ai)* Record the developer RAG baseline finding (hybrid justified)
+- *(ai)* Record the e5 cutover result on the RAG retrieval plan
+- *(ai)* Resolve the query-prefix gap; hybrid deferred
+- *(ai)* Record the min-similarity abstention on the RAG plan
+- Refine content-extension seam (lifecycle, search, registry)
+- Content-extender registry is dedicated, not the global morph map
+- Clarify ecommerce Product vs ERP Item and composition phasing
+- Ecommerce variant-item pivot from v1, mandatory content, symmetric lifecycle
+- Record ecommerce open questions (SAO support boundary et al.)
+- Product comments come free from CMS content comments
+- Reviews reuse shipped CMS comment+rating, drop standalone entity
+- Review media via HasMultimedia on CMS Comment (E10a)
+- Move comment media-attachments decision to the CMS comments spec
+- *(ai)* Record the e5 cutover progress (service switched, multi-model)
+- Transparent content merge on Product; close single-extender and visibility
+- Cite the real Contributor-User merge pattern in E2a
+- E2a spells out the magic getAttribute/setAttribute merge
+- No ERP-owned or ERP-derived data in the search index
+- Add CRUD facet counters implementation plan and update index
+- *(plans)* Close the module testing strategy
+- *(plans)* Tick the last two commit steps
+- Shop customer = Core user + ERP customer; browsing reuses presets + facets
+- Entity is a Core abstraction; product attribute sets are presets per category
+- E21 browse-only price/stock snapshot (bounded exception to no-ERP-in-index)
+- *(rag)* Reconcile developer hybrid finding — not justified on e5
+- Record the build-native-not-Magento decision (section 1a)
+- *(sao)* Plan+spec for affected version & version-maturity census
+- Spec review — fix registry contradiction, decision order, add open questions
+- Close the three seam-blocking questions (C16-C18)
+- Implementation plan for the CMS content-extension seam
+- *(plan)* Tick seam Task 1 (extended_type column) done
+- *(search)* Spec adaptive driver-agnostic bulk indexing
+- *(plan)* Tick seam Task 2 (registry + contract) done
+- *(plan)* Tick seam Task 4 (default-hide scope + withExtended) done
+- *(plan)* Tick seam Task 3 (extender trait + stub) done; Task 4 back-relation verified
+- *(plan)* Tick seam Task 5 (batched upcast) done
+- *(plan)* Tick seam Task 6 (both-direction lifecycle + guard) done
+- *(plan)* Tick seam T7 (search data) + T8 (mapping); point 4 (search filter) open
+- *(plan)* Close seam plan — T9 done, delivery status with point-4 deferral
+- Mark adaptive bulk indexing spec implemented
+- *(plan)* Point 4 (generic-search filter) built; delivery status updated
+- Record bulk-indexing N+1 work and the open accessor residual
+- Spec the Core approvals subsystem covering deletes and restores
+- Plan the Core approvals subsystem
+- Approvals spec settles Hide on the decide permission and Content drafts
+- Settle six open points in the Core approvals plan and spec
+- Record the trait checks Task 2 must move, and the wip tests now closed
+- The approvals plan records the measured test baseline
+- Record the rule to run Pint from the root on explicit files
+- Spec and plan for deferred import search indexing
+- Approvals cover deletes and restores
+- *(ecommerce)* Lock attribute, tenancy and active-vendor decisions
+- *(ai)* Spec and plan for per-feature model selection and setting actions
+- Media analysis Tasks 9-12 documented, bump Core and AI
+- Media analysis Task 13 design (M22 Filament surface) in spec and plan
+- Tick media analysis Task 13a (Core schema seam)
+- Tick media analysis Task 13c (read-only media gallery)
+- Tick media analysis Task 13d (AI analysis panel + re-analyze action)
+- Tick media analysis Task 13b (owner media curation relation manager)
+- Close media analysis plan (Task 14 delivery status + documented-in)
+- *(ecommerce)* Decide tax display (E25) and record ERP prerequisites
+- Correct the approvals plan on who reaches Modifications
+- *(shop)* Rename Ecommerce->Shop across the design record; digital products in v1 (E26)
+- *(shop)* Decide cart -> ERP order handoff (E27)
+- *(shop)* Decide order timing vs payment (E28)
+- *(plans)* Reconcile ERP hardening spec1 and phase2a with the code
+- *(plans)* Reconcile ERP phase3-remaining release gates
+- *(plans)* Reconcile nine plans with the code
+- *(plans)* AI moderation votes as the system user
+- *(plans)* MES decisions D9 and D11, and the BOM lock cancelled
+- Record the rule to check plan status before resuming work
+- Close the graph plan, Phase 5 measured and cancelled
+- Close the portable search plan, its last step was a parked note
+- Close the content provenance plan
+- Close the model connection affinity plan
+- Close the SAO phase 0, 1a and 1b plans
+- Record the rule that Filament is the backoffice and user workflows belong to laraplate-ui
+- Close the content extension seam and media analysis plans
+- Reconcile six stale plans against the code
+- Close SAO phase 3b, narrow the comments moderation plan to the API decision
+- Close the comments moderation plan
+- Close the two performance plans, with the FIFO and RAG reindex regressions fixed
+- MES plan progress, only decisions left open
+- Close the measured retrieval tuning L1 plan
+- Retrieval tuning overfitting safeguards in spec, plan and explainer
+- Refine project rules and remove deprecated Livewire skill
+- Tuner noise margin and the profile's cited report
+- Plan delivery status for private datasets, evaluation locale and report context
+- Plan delivery status for the language restriction; update Core and AI references
+- Plan note for the ACL reload of search hits; update the Core reference
+- Plan note for the reranker report; update the AI and Core references
+- Follow the cross-encoder url rename in the model selection spec
+- The cross-encoder has no default address; reword the Whisper port note in the model selection spec
+- Add adaptive assistance API contract spec and plan
+- Plan note for the empty reranker text and its first real measure; update the Core and CMS references
+- Plan notes for the first tuning run (no winner) and reranker.model; update the Core and AI references
+- Spec for changing the embedding model from Settings
+- Implementation plan for the embedding model switch; spec follows provider:model and deletes the previous model's vectors at activation
+- Embedding model switch implemented for Tasks 1-10 and 12; record the divergences and open points
+- Embedding model switch Task 13 delivered; R17 confirmed, features.embeddings.active removed
+- Index the stack-root spec for MES machine data acquisition
+- Embedding model switch delivered; update the AI and Core references
+- Embedding switch review fixes and RAG chunks; plan, spec, Horizon comments
+- Point the MES plan's open decisions at the machine data acquisition spec
+- *(ai)* Automatic conversation title in the assistance contract
+- Close Task 2 of the adaptive assistance contract
+- Close Task 3 of the adaptive assistance contract
+- Close Task 4 of the adaptive assistance contract
+- *(erp)* Design native stock reservation / ATP (R1-R8)
+- *(shop)* Record E29 (availability/reservation) referencing the ERP reservation design
+- Close Task 5 of the adaptive assistance contract
+- *(erp)* Add stock reservation / ATP implementation plan
+- *(shop)* Decide PSP driver contract (E30)
+- Close Task 6 of the adaptive assistance contract
+- *(shop)* Decide v1 currency and variant_items.role (E31)
+- *(shop)* Add catalog foundation implementation plan (plan #1)
+- Close the MES implementation plan
+- Close the adaptive assistance contract plan
+- Plan for the review of the AI module (Neuron usage, duplication, dead code)
+- *(erp,shop)* Reservation at confirm is best-effort, not blocking (make-to-order)
+- *(shop)* Record make-to-order item typing as an ERP-3 refinement over best-effort reservation
+- Task 1 of the AI module review done
+- Task 2 of the AI module review done
+- Task 3 of the AI module review done
+- Task 4 of the AI module review done
+- Task 5 of the AI module review done
+- Close the MES machine data foundation plan
+- Task 6 of the AI module review done
+- Plan for the MES machine data MQTT bridge (step 2)
+- Task 7 of the AI module review done
+- Governed writes for the in-app assistant (spec and plan), supersede the ActionRequest tools plan
+- Task 8 of the AI module review done
+- Governed writes plan, task 1 done
+- Governed writes plan, task 2 done
+- Governed writes plan, tasks 3 and 4 done
+- Governed writes, confirmation outside the model (the assistant is stateless)
+- Task 9 of the AI module review done
+- Task 10 of the AI module review done; IntelligentSearchAction retired
+- Governed writes plan, tasks 5 and 6 done
+- Close the MES machine data MQTT bridge plan
+- Governed writes plan, task 7 done
+- Task 12 of the AI module review (suites, delivery status); Task 11 waits for the owner
+- Governed writes plan, tasks 8 and 9 done
+- Close the governed assistant writes plan and spec
+- Plan for the MES machine data states and downtime step (step 3)
+- Assistant API contract, writes and actions
+- Close the MES machine states and downtime plan (step 3)
+- Plan for the MES machine counts and OEE performance and quality step (step 4)
+- Close the assistant governed writes plan
+- AI module review, guardrails decided (delete the dead path)
+- AI module review, memory kept and env switches moved to settings
+- Close the AI module review plans; AI_SEARCH_ORCHESTRATION_ENABLED stays env
+- Close the MES machine counts and OEE plan (step 4)
+- Plan for the MES probe measurements step (step 5)
+- Close the MES probe measurements plan (step 5)
+- Spec for API access control (guards, default roles, tokens)
+- API access control spec covers related records, media and references
+- Implementation plan for API access control; spec approved
+- Spec and plan for login methods (passkeys, social registration guard, per-method 2FA)
+- Reconcile the RAG retrieval strategy plan with the code (Tasks 1 and 2 shipped, 3 to 6 annotated)
+- Cancel the retrieval factory steps of the RAG retrieval strategy plan
+- Defer hybrid, reranking and graph in the RAG retrieval strategy plan
+- Close the RAG retrieval strategy plan (chunk metadata shipped, factory cancelled, hybrid, reranking and graph deferred)
+- RAG query analytics privacy review signed off
+- Search modes plan, Task 0 Step 1 done (per-stage search timings)
+- Close the RAG query analytics plan; update AI subproject commit reference
+- Plan for the MES process values step (step 6)
+- Link ERP phase 3 external API tasks to the API access control plan
+- Close the MES process values plan (step 6)
+- API access control plan, tasks 1 and 2 done
+- API access control plan, task 3 done
+- API access control plan, task 4 done
+- API access control plan, task 5 done
+- SAO phase 8 input note on typed decision models
+- *(search)* Measurements, balanced mode, Tasks 1 and 2 ticked
+- *(plans)* Retroactive plan for adaptive bulk indexing, mark the spec implemented
+- *(versioning)* Decision log for the revision-centric history and the design spec aligned with it
+- *(versioning)* Design the hook for translation changes (D28)
+- Bump Core and AI for the search modes documentation; tick Task 6 Step 2
+- API access control plan, task 6 done
+- API access control plan, task 7 done
+- API access control plan, task 8 done
+- API access control plan, task 9 done
+- API access control
+- *(plans)* AI module plan for CI evaluation gate, run observability, MCP server and provider hygiene
+- *(plans)* Split MCP into its own Core plan built on the 2026-09-12 spec
+- *(plans)* Record owner decisions on laravel/mcp and the MCP_ENABLED env exception
+- *(plans)* MCP gate is a seeded Core setting like expose_api, not an env variable
+- *(specs)* Right to erasure for contents and media
+- *(specs)* Amend the MCP spec with the owner's decisions and the phase 2 catalogue
+- *(specs)* Revise right to erasure, add content reports
+- *(specs)* Direct exclude action on every surface, exclusions table as history
+- *(specs)* Exclude governed by forceDelete, actions in Filament and the Vue UI
+- *(specs)* Reports can request deletion through approvals, Hide and Block kept
+- *(specs)* Erasure by purpose, force delete writes exclusions, sources cited
+- *(specs)* Record the owner's decisions of 2026-10-13
+- *(plans)* Right to erasure implementation plan
+- *(plans)* Content reports implementation plan, open points decided
+- *(specs)* Report reason labels in every available locale
+- *(specs)* MCP refuses requests without a valid token with 401
+- *(versioning)* Hard-delete coordinator, owner updated_at, registered relations (D29 to D31)
+- Neuron AI 4 upgrade spec and plan
+- *(versioning)* The schema epoch and the core_versions_* naming (D32, D33)
+- *(search)* Close the search modes plan
+- Verbatim AGPL-3.0 licence text, copyright in the README (bump modules)
+- *(search)* The degraded_reason gap is closed; bump Core and AI
+- Scope filters spec and plan
+- *(versioning)* Conditions of the save wrapper and expiry of the hard-delete snapshots (D34, D35)
+- *(versioning)* Revert context and the touch of updated_at by relation changes (D36, D37)
+- *(crud)* Spec and plan for stored property filters
+- *(crud)* Stored property filters task 2, locale rule without fallback
+- *(crud)* Close the stored property filters plan
+- Close the scope filters plan, bump Core and CMS docs
+- Correct the scope filters delivery status, bump Core
+- *(shop)* Spec and plan for the extender attribute overlay, task 1 done
+- *(shop)* Close the extender attribute overlay plan; bump CMS and Core
+- Scope filters plan, two follow-ups from the final review
+- The Neuron 4 upgrade changes only the AI constraint in Composer
+- Neuron 4 upgrade baseline
+- MES backend for the edge agent, plan
+- CRM module extraction spec and document template binding idea
+- Neuron 4 upgrade, Tasks 1 and 2 done
+- Neuron 4 upgrade delivery status; AI review fixes and static analysis; Laravel 13 plan drops its Neuron constraint
+- Close the neuron 4 upgrade plan and spec
+- *(versioning)* D38 versions:compact refuses, D39 revert on a locked record; bump Core
+- *(versioning)* D40 relations in forms, D41 pivot state; no open points left
+- *(versioning)* D42 to D51 answer the independent recheck; bump Core and CMS
+- *(versioning)* D49 keeps the modifications, closing the pending ones; bump Core and CMS
+- *(shop)* Design spec for the product admin write-surface (plan #2)
+- CRM module spec approved (D1-D26), bump CRM and Shop
+- CRM extraction implementation plan, fix D7 aggregate flags
+- *(shop)* Implementation plan for the product admin write-surface (plan #2)
+- *(versioning)* Supersede milestone-1 plan by D1-D51, confirm D20
+- Update the revision-centric aggregate history review
+- *(versioning)* Approve the design with D52-D59 and plan the rebuild
+- *(shop)* No cross-module references, the call requests the relations it needs
+- *(versioning)* D60, reconcile the rebuild plan with D52-D59
+- *(specs)* Add the client side of the self-hosted AI services readiness
+- State the dual licensing and the AGPL commitment in the README
+- *(plans)* Add the client phase 1 plan of the self-hosted AI services
+- *(readme)* Translate the environment section to English and fix typos
+- *(plans)* Close ERP hardening phase 3 plan, drop 3-03 as redundant
+- *(versioning)* Plan Slice 2 of the Core rebuild, add D61
+- *(specs)* Aggregate route and widget tool, backend half of the widget contract
+- *(plans)* Aggregate route and widget tool plan, spec corrections for relation groups
+- Point the links to the getlaraplate organization
+- Fix a typo in the work in progress notice
+- Use the Laraplate brand logo in the README
+- *(core)* Spec and plan for the apps in the user data, update Core
+- CRM extraction delivered, bump CRM and ERP
+- *(shop)* Close the product admin write-surface plan
+- CRM minors fixed, bump CRM and ERP
+- CRUD sort by relation and mounted attributes, CRM migration fix, bump Core CRM ERP
+- Sales pipeline report moved to the CRM, bump CRM and ERP
+- *(crm)* Close D14, quotation stays in the ERP and the CRM Quote is a future step
+- *(specs)* Link the sibling specs on master
+- *(specs)* Use the getlaraplate/lara* package names in the scaffolding spec
+- Close the client phase 1 plan
+- *(specs)* Record the maintainer identity defect of the module generator
+- *(specs)* Prefill the author prompts from git config in the scaffolding spec
+- *(specs)* Drop the environment variables of the module generator
+- *(specs)* Start the module changelog with an Initial scaffold entry
+- *(specs)* Default the module licence to the application licence
+- *(specs)* Extend the module colour palette with five named colours
+- Record the review minors of the client phase 1 plan
+- *(plans)* Add the module scaffolding generator plan
+- Close the palette documentation search plan, one measurement pending
+- Plan delivery status corrections for the palette documentation search
+- Palette documentation search follow-ups (POST, per-user embedding cache)
+- Palette documentation search spec states GET and POST
+- Core version actor resolution spec and blocked plan
+- *(specs)* AI module on standard servers, replacing the two custom services
+- *(plans)* AI module on standard servers implementation plan
+- *(versioning)* Plan Slice 3 of the Core rebuild, the version-set manager
+- *(specs)* Core command to align the .env with .env.example
+- *(specs)* Env:fill covers only the Laraplate-specific variables
+- *(specs)* Env:fill leaves out variables the AI plan removes
+- *(plans)* Core env:fill command implementation plan
+- *(shop)* Reopen VAT, the rate to apply to a sale is still to be decided
+- *(shop)* Auction design spec
+- *(shop)* Auction slice 1 plan, spec corrections from planning
+- *(versioning)* Plan Slice 4 of the Core rebuild, the capture wrappers
+- Close the AI standard servers plan
+- Close the env:fill plan
+- Plan for plan-status git dates and plan modules
+- *(rules)* Keep closed superpowers plans instead of deleting them
+- *(plans)* Reconcile every plan and spec with the code
+- Align the plan-status plan with updated and the bash test harness
+- Point the plan-status plan at the website repository
+- Tick Task 1 of the plan-status plan
+- Tick Task 2 of the plan-status plan
+- Plan-status modules and git dates delivered
+- Spec for moving runtime tunables from env to settings
+- Drop the migration note for removed env variables from the settings spec
+- Plan for moving runtime tunables from env to settings
+- Tick Tasks 1 to 4 and record the off-meaning rulings in the settings spec and plan
+- Close the settings over env plan, drop the moved names from .env.example
+- Record the decision to keep ERP_STOCK_RESERVATION_SOFT_TTL
+- Record the Infinity verification and the minors fixed afterwards
+- *(versioning)* Close Slice 4 Part B
+- *(versioning)* Close Part B of Slice 4
+- Record the verification of TEI
+- Record the TEI reranker and the nginx setup in the verification
+- *(sao)* Spec ingest correlation rules, reprocessing, recurrence and deploy containment
+- *(sao)* Implementation plan for ingest correlation and census; spec corrections from planning
+- *(sao)* Tick plan task 1
+- *(sao)* Tick plan task 2
+- *(sao)* Tick plan task 3
+- *(sao)* Tick plan task 4
+- *(sao)* Tick plan task 5
+- *(sao)* Tick plan task 6
+- *(sao)* Tick plan task 7
+- *(sao)* Tick plan task 8
+- *(sao)* Tick plan task 9
+- *(sao)* Tick plan task 10
+- *(sao)* Tick plan task 11
+- *(sao)* Tick plan task 12
+- *(sao)* Tick plan task 13
+- *(sao)* Tick plan task 14
+- *(sao)* Tick plan task 15
+- *(versioning)* Close Slice 4 with Part C, the hard delete
+- *(plans)* Reconcile the Laravel 13 upgrade plan with the current repository
+- Update plans index to include Pest 5 toolchain upgrade and clarify Laravel 13 upgrade details
+- *(swagger)* Drop the / redirect from the App document
+- Follow the test: prefix of benchmark commands
+- *(specs)* Vector search owned by the AI module
+- Name the serving model setting features.embeddings.serving_model
+- *(specs)* CMS imports, one record across several sources
+- *(plans)* CMS imports, one tag across several sources
+- *(plans)* Core versioning Slice 5, epochs and baselines
+- *(plans)* Tick Task 1 of vector search owned by AI
+- *(plans)* Tick Task 2 of vector search owned by AI
+- *(plans)* Tick Task 3 of vector search owned by AI
+- *(plans)* Tick Task 4 of vector search owned by AI
+- *(plans)* Tick Task 5 of vector search owned by AI
+- *(plans)* Word the owner-gated step as covered by migrate:fresh
+- *(plans)* Add the extension-point task and the measured suite constraint
+- *(plans)* Close the cross-source tag identity plan
+- Spec and plan for AI retrieval improvements
+- *(plans)* Tick Task 1 of AI retrieval improvements
+- *(plans)* Tick Task 2 of AI retrieval improvements
+- *(plans)* Task 2 comparison step left to the owner
+- *(plans)* Tick Task 3 of AI retrieval improvements
+- *(plans)* Tick Task 4 of AI retrieval improvements
+- *(plans)* Tick Task 5 of AI retrieval improvements
+- *(plans)* Task 5 comparison step left to the owner
+- *(plans)* Tick Task 6 of AI retrieval improvements
+- *(plans)* Tick Task 7 of AI retrieval improvements
+- *(plans)* Task 7 comparison left to the owner, repair note corrected
+- *(plans)* Tick Task 8 of AI retrieval improvements
+- *(plans)* Tick Task 9 of AI retrieval improvements
+- *(plans)* Tick Task 10 of AI retrieval improvements
+- *(plans)* Slice 5 Part A delivered
+- *(plans)* Slice 5 Part A review outcome
+- *(plans)* Slice 5 Part A, atomic baselines agreed after review
+- *(plans)* Slice 5 Part B tasks done, divergences recorded
+- *(plans)* Close Part B of versioning slice 5
+- *(plans)* Documentation reader route for the reference reader
+- *(plans)* Close the aggregate route and widget tool plan
+- *(plans)* Documentation reader route Task 1 settled
+- *(plans)* Documentation reader route Task 2 done
+- *(plans)* Documentation reader route Task 3 done
+- *(plans)* Documentation reader route Task 4 done
+- *(plans)* Documentation reader route Task 5 done
+- *(plans)* Documentation reader route Task 6 done
+- *(plans)* Documentation reader route delivered
+- *(plans)* Branch lazily, one repository at a time
+- Add search and retrieval architecture overview
+- *(plans)* Work on master, and tick Tasks 1 to 4
+- Record Laravel 13 in the stack line, badges and requirements
+- *(plans)* Add the test impact analysis task to the Pest 5 plan
+- The structure is Laravel 13, not Laravel 10
+- *(skills)* Regenerate the Boost skills for Laravel 13
+- *(plans)* Tick the tasks the Laravel 13 upgrade already delivered
+- Record the Laravel 13 upgrade
+- *(plans)* Tick the closing steps of the Laravel 13 upgrade
+- *(plans)* Record Task 1 of the Pest 5 upgrade
+- *(plans)* Close the documentation permission patterns plan
+- *(specs)* Search and list of extended entities
+- *(specs)* Host and extender contracts for extended entity search
+- *(specs)* Extract the generic parts of Content
+- *(specs)* Extension field conflicts and extender column names
+- *(specs)* Record why same-type names are shared only in extension
+- *(specs)* Approval needs no condition in the guest product ACL
+- *(plans)* Extended entity search and list
+- *(plans)* Prerequisites of extended entity search are merged
+- *(plans)* Extended entity search, task 1 done
+- *(plans)* Extended entity search, task 2 done
+- *(plans)* Extended entity search, task 3 done
+- *(plans)* Extended entity search, task 4 done
+- *(plans)* Extended entity search, task 5 done
+- *(plans)* Extended entity search, task 6 done
+- *(plans)* Extended entity search, task 7 steps 1 to 4 done
+- *(plans)* Extended entity search, task 8 done
+- *(plans)* Extended entity search, task 9 done
+- *(plans)* Extended entity search, task 9 follow-up
+- *(plans)* Extended entity search, task 10 done
+- *(plans)* Extended entity search, task 11 done
+- *(plans)* Close the extended entity search plan
+- *(rules)* Point the versioning rule at the stack release law
+
+### ⚡ Performance
+
+- Bump Core and AI for bulk indexing eager-loads
+- Bump Core to honor toSearchableWith on bulk indexing
+- Bump CMS for category-ancestor eager-load in the search document
+
+### 🎨 Styling
+
+- *(admin)* Use the brand green as the panel primary colour
+
+### 🧪 Testing
+
+- Stop the suite from calling real embedding services, and hide Pest from PHPStan
+- Don't treat a fenced 'Delivery status' example as a closed plan
+- Run the SAO application content baseline gate at application level
+- Run the CMS application content baseline gate at application level
+- Check the AI system user may vote on CMS comments at application level
+- Guard the test bootstrap against cached config and remote databases
+- Fail on foreign key actions that ForeignKeyDefinition does not declare
+- No CSRF check in tests; close Task 1 of the adaptive assistance contract
+- Order navigation groups by module, in each module's own process order
+- The suite never reaches the Elasticsearch of .env
+
+### ⚙️ Miscellaneous Tasks
+
+- *(modules)* Record the module release documentation
+- *(modules)* Bump AI for Sentence Transformers install docs
+- *(modules)* Bump Core and AI
+- *(migrations)* Bump Core/ERP/MES/SAO submodules to consolidated migrations
+- Rimuove docblock ide-helper generati dai model
+- *(migrations)* Bump submodules to FK/scoping index pass
+- Rimuove ignoreErrors @mixin IdeHelper ora inutile
+- Update submodule and composer.lock for dependency versions
+- *(ai)* Bump AI submodule for configurable embeddings timeout/batch
+- *(composer)* Increase memory limits for PHPStan and Pest commands
+- *(tooling)* Stop generating the mixins, stop hiding the seams, narrow PHPStan
+- *(modules)* Bump Core, CMS, SAO and AI for the soft-delete and search contracts
+- *(tooling)* Decide which rules may change code, and write down why
+- *(phpstan)* Freeze the debt in a baseline so new errors fail the run
+- *(phpstan)* Regenerate the baseline after narrowing findOrFail
+- *(phpstan)* Regenerate the baseline after narrowing the widened types
+- *(core)* Bump for the ISoftDeletableModel regression fix
+- *(modules)* Bump Core and AI for embedding skip-if-fresh
+- *(modules)* Bump Core for search index mapping structure check + sync
+- *(modules)* Bump Core for richer scout:check-index diagnostics
+- *(modules)* Bump Core for geo_point lat_lon fix
+- *(ai)* Bump AI submodule for the prefix-agnostic test stub fix
+- *(phpstan)* Shrink the frozen debt from 9.739 to 8.517
+- *(phpstan)* Shrink the frozen debt from 8.517 to 8.150
+- *(phpstan)* Shrink the frozen debt from 8.150 to 7.993
+- *(phpstan)* Name the Builder scopes instead of keeping 1.272 baseline entries
+- *(phpstan)* Add expiring to the named Builder scopes
+- *(phpstan)* Shrink the Builder scope rule from fourteen names to four
+- *(core)* Bump submodule for the expiredAt fix
+- *(phpstan)* Shrink the frozen debt from 6.643 to 6.043
+- *(phpstan)* Shrink the frozen debt from 6.043 to 5.419
+- *(phpstan)* Shrink the frozen debt from 5.419 to 4.297
+- *(phpstan)* Shrink the frozen debt from 4.297 to 4.251
+- *(phpstan)* Shrink the frozen debt from 4.251 to 4.159
+- *(phpstan)* Shrink the frozen debt from 4.159 to 4.075
+- *(phpstan)* Shrink the frozen debt from 4.075 to 4.035, and record the method
+- *(modules)* Bump Core for Elasticsearch version assertion
+- Make embeddings queue rate limit configurable (env + Core bump)
+- *(modules)* Bump Core and AI for adaptive embedding batching
+- *(ai)* Bump AI for ModelEmbeddingSynchronizer extraction
+- *(ai)* Bump AI for cross-model embedding batching
+- Update subproject commits for CMS and Shop modules
+- Drop env vars moved to runtime settings
+- Bump Core, CMS, AI and MES for dashboard widgets and settings cleanup
+- Bump modules for module-prefixed setting keys and AI moderation switches
+- Bump modules for module-less setting names
+- Core navigation group after Documentation; bump modules for domain-first setting names
+- Bump Core for third-party code attribution
+- *(dependencies)* Update file permissions for chart.js components to executable
+- Bump CMS and ERP for the preset module scope fix
+- *(dependencies)* Update license-compliance-checker reference and timestamp
+- Bump Core, CMS and ERP
+- Bump Core (settings approval work in progress)
+- Bump Core for the approvals attribution and module-owned is_internal
+- Bump Core for Task 1 of the approvals plan, and record what it absorbed
+- Bump Core and CMS for Task 2, and catalogue the pre-existing failures
+- Bump Core for Task 3, the settings approval wip is closed
+- Bump Core, CMS, AI and SAO for Task 4 of the approvals plan
+- Align Shop submodule config and bump CMS, MES and Shop
+- Bump Core and CMS for Task 5 of the approvals plan
+- Bump Core and CMS for Task 6 of the approvals plan
+- Bump Core for Task 7 of the approvals plan
+- Bump modules for table toolbar buttons and the Close form button
+- Bump Core and CMS for Task 8 of the approvals plan
+- Bump Core, AI, CMS and ERP for deferred import search indexing
+- Bump Core and AI for Tasks 10 and 11 of the approvals plan
+- Bump Core and CMS for Task 12 of the approvals plan
+- Drop stephenlake/laravel-approval, now part of Core
+- Bump Core for Task 13 of the approvals plan
+- Bump Core and CMS for Task 9 of the approvals plan
+- Bump Core for the API vote fix
+- Update subproject commits for Core and Shop modules
+- Media analysis Task 9 (embedding vector reuse), bump Core and AI
+- Media analysis Task 10 (owner-inherited media visibility), bump Core, CMS, SAO
+- Media analysis Task 11 (owner enrichment and reindex cascade), bump Core and AI
+- Media analysis Task 12 (media lifecycle), bump Core and AI
+- Update subproject commits for AI, CMS, Core, ERP, MES, SAO, and Shop modules; update README with badges
+- Queued import search flushes, per-run preset provisioning, Editor.js search text; bump Core and CMS
+- Opt-in emulated pgsql prepares, presettable reuse in imports; bump Core and CMS
+- Bump Core for the setting value validation
+- Bump Core for the pending-approvals list
+- Update subproject commits for AI, CMS, ERP, MES, and SAO modules
+- Bump SAO, Core and MES for the documentation fixes
+- Tiered module priorities, 10 per dependency level
+- Drop the phpstan exclusion of the deleted SentenceTransformers generator
+- Update AI subproject commit reference
+- Update Core and AI subproject commit references
+- Lock AWS SDK and Google auth required by the AI module
+- Update Core, AI, CMS, SAO, ERP and MES subproject commit references
+- Update the AI reference (cross-encoder client posts to {url}/score)
+- Update the AI reference (the cross-encoder service has a default model)
+- Update the Core and AI references (reranker off by default)
+- Update the AI reference (cross-encoder connect timeout)
+- Bump Modules/AI to the chunked embedding switch index writes
+- Bump Modules/AI to the embedding switch review fixes and RAG chunks
+- Bump Core, CMS, MES, SAO and ERP to the translated interface labels
+- Bump Core (benchmark output to the console only)
+- Bump Core and CMS (facet only_full_group_by fix, publisher ACLs)
+- Bump Core and CMS (update validation excludes the record from its own unique checks)
+- Clean up middleware removal list in app bootstrap
+- Bump Core (two test fixes)
+- Require php-mqtt/client for the MES machine bridge
+- Update the AI and Core submodules (governed assistant writes, detail tool fix)
+- Update the MES submodule
+- Update dependencies and submodules
+- *(stock-reservation)* Apply reviewer-flagged minor polish (ERP + MES)
+- Bump AI and Core (review plans closed)
+- *(shop)* Bump to e017d5e — catalog foundation Task 1
+- *(shop)* Bump to 074c094 — catalog Task 2 (Product seam consumer)
+- *(shop)* Bump to 996af87 — catalog Task 3 (product variants)
+- *(shop)* Bump to 487442a — catalog Task 4 (variant-item composition)
+- *(shop)* Bump to 2625b87 — catalog foundation complete (Task 5 + polish)
+- Remove the nwidart scaffold from the modules and guard the API version prefix
+- Update ERP submodule to latest commit and refine update prompt message in script
+- Update Core submodule (permissions per guard)
+- Update Core submodule (repair permissions per guard)
+- Update Core, CMS, ERP, MES and SAO submodules (self-authenticated api routes, 403 for authenticated denials)
+- Update Core submodule (failures-only bearer throttle)
+- Update Core submodule (bearer claim detection)
+- Update ERP subproject commit reference
+- Update CMS, Core, and MES subproject commit references
+- Add Shop module status to modules_statuses.json
+- *(shop)* Enable the Shop module
+- *(shop)* Bump to e0857af + baseline 4 irreducible Shop factory/seeder false-positives
+- *(MES)* Update subproject commit to 32d25fc
+- Update SAO subproject commit reference
+- *(core)* Bump to 1da419f0 (relation filters in ACLs)
+- *(core)* Bump to relation filter fail-closed fix
+- *(core)* Bump to filters cast fail-closed fix
+- *(core)* Bump to filters cast round 2 fix
+- *(core)* Bump to filters cast round 3 fix
+- Bump modules to related records obeying their own permission and ACL
+- Bump modules to the read-request method guard and typed relations
+- Bump Core and CMS to Task 4 review fix round 1
+- Bump Core and CMS to Task 4 review fix round 2
+- Bump Core to the scoped relation sync
+- Bump Core and AI to the search strategy resolver; tick Task 3
+- Bump Core and AI for search retries; tick Task 4
+- Bump Core and CMS for the default roles and public ACLs
+- Bump Core and CMS for the hidden attributes and the media projection
+- Bump Core and CMS for the cover preload
+- Bump Core and CMS for the history access fix
+- Bump Core for personal API tokens and service accounts
+- Bump Core for the token expiry and guest identity fixes
+- Bump CMS for the content references in the search document
+- Bump CMS to the tags kept across a soft delete
+- Bump Core, CMS and SAO to the stale-record guard on the edit pages
+- Bump Core, CMS and SAO to the Filament forms that write what they edit
+- Bump Core, AI and MES for the two failing Core tests
+- Bump Core to the cron jobs with parameters, placeholders and scheduler flags
+- Bump CMS to the content position edited only once the content exists
+- Bump Core and CMS (stored property filters, plan task 1)
+- Bump Core and CMS (stored property filters, plan task 2)
+- Bump Core, plan tasks 3 and 4 of stored property filters
+- Bump Shop (product title filter test)
+- Bump Core and CMS, plan task 5 of scope filters (search)
+- Bump Core, tick Task 7 of scope filters (Filament)
+- Bump CMS, tick Task 8 of scope filters (CMS defaults)
+- Bump Shop (extender attribute overlay, plan task 1)
+- Bump Core and Shop, extender attribute overlay plan task 2
+- Bump Shop (variant relation overlay test)
+- Bump Core and CMS (taxonomy positions in forms and imports, no is_deleted toggles)
+- Bump ERP and Shop (detail labels, composition test)
+- Bump Core (nested list and relation filter groups), record the scope filters follow-ups
+- Bump Core (translation locale on the base query)
+- Bump Core (language switch in the user menu), register it on the admin panel
+- Bump Core, CMS, ERP, MES and SAO (translation keys named like the database)
+- Bump Core (auth:reset-password command, valid backoffice reset link)
+- Bump Core (auth:reset-password saves a locked user)
+- Bump MES (machine sources on service accounts), tick Task 1 of the edge agent backend plan
+- Bump Core (attribute labels from the module lang files)
+- Bump MES (operator guide and resolver fix for Task 1)
+- Bump Core, CMS, ERP, MES and SAO (translated resource names and navigation groups)
+- Bump MES (ingest on the CRUD route through the service account) and Core (ingest no longer self-authenticated), tick Task 2 of the edge agent backend plan
+- Bump MES (seeder depends on the permission refresh), clarify the test-runner limiter comment
+- Bump Core (backoffice strings from the app lang file)
+- Bump CMS, Core, ERP, MES, and SAO to latest subproject commits
+- Bump Core, CMS, AI, ERP, MES and SAO (backoffice strings from the module lang files)
+- Bump Core (lang:check-translations writes Pint-formatted files)
+- Bump MES (loss markers as data_dropped incidents); tick Task 3 of the MES edge agent backend plan
+- Bump MES (configuration delivery to the edge agent); tick Task 4 of the MES edge agent backend plan
+- Bump MES (Task 4 fix round 1: faithful documents, version counter, delete transaction, config throttle); plan status line
+- Bump MES (agent configuration section on the source page); tick Task 5 of the MES edge agent backend plan
+- Bump MES (edge agent backend documentation); close the MES edge agent backend plan
+- Bump MES (agent ACL requires an active source, Activate error handling, docs wording); plan follow-ups M2 and fixes M1, M3
+- Bump MES (agent configuration doc wording, active-source ACL in the RAG doc)
+- Bump Core (default_language setting sets the default locale)
+- Lock neuron-ai 4.1.12; update AI subproject commit reference
+- Install the Neuron 4 agent skills
+- Bump AI (HTTP client layer, Neuron 4 guide 2); tick Task 3 of the neuron 4 upgrade plan
+- Bump AI (CallbackTool, Neuron 4 guide 3); tick Task 4 of the neuron 4 upgrade plan
+- Bump AI (ToolCall value object, Neuron 4 guide 4); tick Task 5 of the neuron 4 upgrade plan
+- Bump AI (lenient tool property cast, Neuron 4 guide 5); tick Task 6 Steps 1-2
+- Bump AI (workflow ids, Neuron 4 guide 13); tick Task 7 of the neuron 4 upgrade plan
+- Bump AI (tool argument errors, Neuron 4 guide 5); tick Task 6 of the neuron 4 upgrade plan
+- Bump AI (structured output sections not required); add Step 5 to Task 7 of the neuron 4 upgrade plan
+- Bump AI (workflow executor reflection removed, Neuron 4 guide 17); tick Task 8 of the neuron 4 upgrade plan
+- Bump AI (Elasticsearch RAG store contract, Neuron 4 guide 19); tick Task 9 of the neuron 4 upgrade plan
+- Bump AI (Document accessors, Neuron 4 guide 20); tick Task 10 of the neuron 4 upgrade plan
+- Bump AI (system message instructions, Neuron 4 guides 24 and 25); tick Task 11 of the neuron 4 upgrade plan
+- Bump AI (provider responses and fakes, Neuron 4 guides 41 and 56); tick Task 12 of the neuron 4 upgrade plan
+- Bump AI (the review's minor findings); update the neuron 4 upgrade delivery status
+- Bump MES (clock_skew on agent resends); plan 2026-10-19-mes-clock-skew-resends closed
+- Update AI subproject to commit a5c411a6e41b664937eb9d6d2b3832e23513b808
+- Bump Modules/Core (core_modules table)
+- Update the Core and MES submodule references
+- Bump Core and CMS for the owner's updated_at (D30, D37, D51)
+- *(scripts)* Initialise submodules added upstream in update_app.sh
+- *(deps)* Drop the stale pnpm lockfile, the backend installs with npm
+- Point submodules and links to the getlaraplate organization
+- Rename the Composer package to the getlaraplate vendor
+- Align the package description with the repository description
+- Call the organization CLA workflow
+- *(modules)* Update subproject commits for AI, CMS, Core, CRM, ERP, MES, SAO, and Shop modules
+- *(scripts)* Skip the oci8 platform requirement in update_app.sh
+- Rename the repository and package from laraplate-<name> to lara<name>
+- Update the module references after the rename and logo commits
+- *(shop)* Bump to 446e582 — product admin Task 1 (write actions)
+- *(shop)* Bump to 33b838a — product admin Task 2 (resource + create wizard)
+- *(shop)* Bump to d47b2bd — product admin Task 3 (edit, table, permissions)
+- Update the Core reference
+- Bump CRM and ERP after the contact role, person names, intercompany and lead conversion work
+- *(phpstan)* Drop three baseline entries EnsembleSearchService no longer raises
+- Update subproject references for AI, CMS, Core, CRM, ERP, MES, and SAO modules
+- Bump AI (the in-app assistant has its own switch, apart from the documentation)
+- Update AI subproject reference to latest commit
+- Bump AI module (palette documentation search, query embedding cache, heading breadcrumb fix)
+- *(phpstan)* Drop 16 search baseline entries that no longer match an error
+- *(phpstan)* Record the translations eager load of Searchable, drop stale entries
+- Bump AI module (switch harness answers the verify smoke embed)
+- *(CRM)* Update subproject commit reference to 3dc7319
+- List the AI server variables in .env.example
+- List every Laraplate variable in .env.example and keep it complete
+- Update subproject commits and enhance CMS documentation
+- *(ci)* Added run optimize prompt un app update
+- Update environment example and composer dependencies
+- Harden the env example guard test and separate the module headers
+- Update subproject commits for various modules
+- *(env)* Drop the AI_EMBEDDINGS_MINILM variables from .env.example
+- Add stress output file and update subproject commits for AI, Core, and MES modules
+- Update subproject commits for AI, CMS, Core, ERP, MES, and SAO modules to their latest versions
+- Update AI subproject commit to latest version 824f9fe
+- Update subproject commits for AI and Core modules to latest versions
+- *(env)* SAO probe schedule names
+- Update subproject commits for CMS, Core, MES, and SAO modules
+- Update dependencies to latest versions
+- *(composer)* Remove published-time entries from composer.lock
+- *(pakages)* Updated composer and npm packages and linked subrepos to the latest commits
+- Update submodule references for AI and Core modules
+- Run the license checker as a script
+- Install the license checker with Composer again
+- Update subproject commits for AI, Core, and ERP modules
+- *(deps)* Require Laravel 13, Tinker 3 and laravel-modules 13
+- Update subproject commits for all modules
+- *(modules)* Reference the Laravel 13 fixes in CMS and Core
+- Delete the dead app/Http/Kernel.php
+- *(modules)* Reference the Scout 11 fixes and the Laravel 13 README updates
+- *(modules)* Bump all modules to their Laravel 13 upgrade
+- *(deps)* Upgrade the test runner to Pest 5 and PHPUnit 13
+- *(modules)* Update Core submodule to latest commit
+- *(modules)* Update submodules to latest commits
+- *(composer)* Drop the module list from the package description
+- *(modules)* Update Core submodule to latest commit 761b52d
+- *(modules)* Update Core submodule to latest commit c624dcd
+- *(modules)* Update Core and CMS submodules to latest commits 515f14a and 214415f
+- *(modules)* Update AI submodule to latest commit 49ac855
+- *(modules)* Update AI and Core submodules to latest commits ff4af49 and 1aab65d
+- *(modules)* Update Core submodule to latest commit 517aff4
+- *(modules)* Update submodules for AI, CMS, Core, and Shop
+- *(modules)* Update submodule commits for AI, CMS, Core, and Shop modules
+- *(modules)* Update submodule commits for Core and Shop modules
+- *(modules)* Update submodules for CMS, Core, and Shop
+- *(modules)* Update submodule commits for CMS, CRM, Core, MES, and SAO
+- *(modules)* Update submodule commits for AI and Core
+
 ## [1.14.1] - 2026-09-15
 
 ### 🚀 Features

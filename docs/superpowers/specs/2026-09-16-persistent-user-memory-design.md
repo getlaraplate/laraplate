@@ -1,10 +1,33 @@
 # Persistent user memory (cross-session)
 
-**Status:** draft for review
+**Status:** decided on 2026-11-27, see *Decision (2026-11-27)* below: memory of the user across conversations is **not planned at present**; conversation memory (recent turns) is delivered in the AI module, switched off by default.
 
 **Date:** 2026-09-16
 
 **Module:** AI. Adjacent to the RAG assistant program (R-track), but a separate concern: this is *conversational memory of the user*, not document/data retrieval. Inspired by patterns in supermemory (fact profile, contradiction handling, temporal decay), rebuilt inside Laraplate's auth model.
+
+## Decision (2026-11-27)
+
+The owner decided, on 2026-11-27, to split this design in two.
+
+**Conversation memory: delivered, off by default.** The recent turns of the same conversation reach the model as data in the authorized context, as *Conversation memory, alongside user memory* describes, with these deliberate differences:
+
+- **Turns, not messages.** A turn is a question and the answers that follow it (the answer, and the follow-up written after a decision on a write). The setting is `features.chat.history.turns`, seeded 6, at most 20; `features.chat.history.enabled` is seeded `false`. Each text is cut at `ai.features.chat.history.max_chars` (2000). The keys `ai.features.memory.recent_turns*` were not created.
+- **`speaker`, not `role`.** A turn is `{speaker: person|assistant, content}`: `AssistantControlPlaneData::assertPromptSafe()` refuses `role` as control-plane data, rightly, and the capability `conversation_memory` lists `speaker` in its fields.
+- **No summary.** The conversation summary is not injected and the summarize hook is not wired: the window of recent turns is the whole memory. `MemoryService` stays dormant.
+- **Stricter filtering.** A turn whose answer was refused, or with any text that the instruction classifier flags, is left out whole, rather than carried as data.
+- **Per conversation.** `memory_enabled` turns it off for one conversation (`POST /app/crud/update/ai/conversations/{conversation}/memory`); `GET /app/ai/capabilities` returns `features.history`.
+
+The threat model, the controls and the decision requested of the security review are in `Modules/AI/docs/rag/ASSISTANT_HISTORY_SECURITY_REVIEW.md`; the feature stays off until that review is accepted.
+
+**Memory of the user across conversations: not planned at present.** Nothing of *Data model*, *Extraction and write*, *Retrieval and injection* (user facts), *Control, erasure and trust* or the user-facts half of *Integration* is built, and nothing is prepared for it. The reasons:
+
+- **Personal data that outlives the conversation.** It needs consent, a place where the person sees and deletes what is remembered, retention per kind of fact and an erasure path before the first fact is written; the end-user screen belongs to another repository.
+- **Memory poisoning.** One wrong or injected fact acts in every later conversation, about every subject, for as long as it lives: the opposite of the bounded window of recent turns.
+- **The identity of the speaker.** Guest and impersonated sessions must never write or read facts, and the session that tells an impersonation apart does not exist in a queue worker, where extraction would run: a mistake fails open silently.
+- **Truth and cost.** Facts need deduplication, supersession and expiry to stay true, and extraction costs model calls on every long conversation.
+
+The design above stays as the starting point if a concrete need appears; it will then need its own security review. The module documentation says that memory across conversations is not provided (`Modules/AI/docs/rag/MODULE.md`, `Modules/AI/docs/ARCHITECTURE.md`, the user guide `Modules/AI/docs/rag/ASSISTANT_PROPOSALS_USER.md`).
 
 ## Problem
 
