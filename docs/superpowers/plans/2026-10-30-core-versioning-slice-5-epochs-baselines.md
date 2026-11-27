@@ -1,3 +1,6 @@
+---
+status: completed
+---
 # Core Versioning Rebuild, Slice 5 — Epochs and Baselines
 
 > **For agentic workers:** execute task by task. Steps use checkbox (`- [ ]`) syntax; tick each step when it is done, in the same work block (`.ai/rules/plans.md`). A step deliberately not done is `- [-]` with its reason.
@@ -178,8 +181,16 @@
 
 ### Part C closing and slice closing
 
-- [x] **Documentation:** `MODULE.md` of Core (switching versioning off and on, what is kept); `docs/rag` operator note if the settings documentation lists the versioning settings; the spec and review status lines; the parent plan (tick Slice 5). Done 2026-11-19, Core `9e66f81c`: *Switching versioning off and on* in `MODULE.md` (also the empty value read as off and the boolean choices of a `json` setting), *Turn versioning off for a table* in `VERSIONING_DEVELOPER.md`, the operator note in `SETTING_ACTIONS_USER.md` and the registered confirmation in `SETTING_ACTIONS_DEVELOPER.md`; spec and review status lines updated. The parent plan is ticked with the delivery status, once the regression is green.
-- [ ] **Regression** per suite, recorded in the delivery status.
-- [ ] **Commit** in Core and in `laraplate/`; PRs.
+- [x] **Documentation:** `MODULE.md` of Core (switching versioning off and on, what is kept); `docs/rag` operator note if the settings documentation lists the versioning settings; the spec and review status lines; the parent plan (tick Slice 5). Done 2026-11-19, Core `9e66f81c`: *Switching versioning off and on* in `MODULE.md` (also the empty value read as off and the boolean choices of a `json` setting), *Turn versioning off for a table* in `VERSIONING_DEVELOPER.md`, the operator note in `SETTING_ACTIONS_USER.md` and the registered confirmation in `SETTING_ACTIONS_DEVELOPER.md`; spec and review status lines updated. The parent plan is ticked with the delivery status.
+- [x] **Regression** per suite, recorded in the delivery status.
+- [x] **Commit** in Core and in `laraplate/`; PRs. Core getlaraplate/laracore#58 and getlaraplate/laracore#59 (the boolean choice of the settings form), `laraplate` getlaraplate/laraplate#77 and this closing.
 
-**Documented in (when the plan closes):** `Modules/Core/docs/rag/MODULE.md`.
+## Delivery status (2026-11-27): delivered
+
+All three parts are done. Part C commits in Core: `ea12f932` (C1: the purger, the queued job, the confirmation, the observer dispatch), `48d347e9` (an empty versioning setting reads as off, `VersionStrategy::fromSetting()`), `299b2791` (C2 tests), `9e66f81c` (documentation), `81bfa9be` (the settings form shows a stored `false` as its choice). Parts A and B are recorded under their closing sections.
+
+Divergences from the plan, each recorded under its task: C2 tests the locales and the links in two records, since no stub has both; outside the plan, the settings form keys a boolean choice of a `json` setting as `true` or `false` (a `false` keyed by the empty string was refused by the required select, and Filament's option state cast turned a stored `false` into no selection, fixed by `Filament\Utils\JsonChoiceStateCast`), and an empty `versioning.strategy.*` value reads as off instead of failing in `HasVersions`.
+
+Regression on 2026-11-27, per suite, run by the user on Core master after both Core PRs: green but three Core failures that are not this slice's and come from Core work merged the same week: `Feature/Console/HandleLicensesCommandTest` (the unassigned-license test added by `54c860b4`), `Feature/Seeding/CoreSettingsReconciliationTest` (picks the first non-Core model, which may declare its own `$versionStrategy` and so has no setting row) and `Integration/Rules/AclScopeFiltersTest` (`CoreTables::SearchQueryStats` undefined, a local checkout or autoload out of step with `154e3423`).
+
+**Documented in:** `Modules/Core/docs/rag/MODULE.md`, `Modules/Core/docs/rag/VERSIONING_DEVELOPER.md`, `Modules/Core/docs/rag/SETTING_ACTIONS_USER.md`, `Modules/Core/docs/rag/SETTING_ACTIONS_DEVELOPER.md`.
