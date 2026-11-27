@@ -171,9 +171,9 @@ module: core, ai
 - Modify: `Modules/Core/app/Casts/ActionEnum.php` (`case History = 'history'; case Revert = 'revert';`), `Modules/Core/app/Console/PermissionsRefreshCommand.php` (generated when the model is versioned in code: `HasVersions` and not `NeverVersionedModels::includes()`; the runtime setting is not read, as for locking), `Modules/Core/app/Authorization/PermissionEnforcement.php` (both inert while `versioning.strategy.{table}` is off), `Modules/Core/app/Services/Crud/RelationAuthorizer.php` (`mayReadHistory(Request, Model): bool`, true with `history` or `revert`), `Modules/Core/app/Services/Crud/CrudService.php` (`history()` and `authorizeCachedRead()` use it)
 - Test: `Modules/Core/tests/Feature/Console/PermissionsRefreshCommandTest.php`, `Modules/Core/tests/Feature/Controllers/CrudHistoryTest.php`, `Modules/Core/tests/Integration/Services/Crud/RelationAuthorizationTest.php`, `Modules/Core/tests/Feature/Crud/CrudResponseCacheTest.php` (the history cases of each move from `update` to `history`)
 
-- [ ] **Step 1: Failing tests:** `permissions:refresh` creates both verbs for a versioned model on both guards and none for a translation model, a comment or `Version`; `select` with `history` reads the history, `select` with `revert` too, `update` alone no longer does (403); without `select` the history is refused whatever else is held; the history of a record outside the caller's ACL answers like a missing record; a cached history response is refused once `history` is revoked.
-- [ ] **Step 2–4:** run and fail, implement, run.
-- [ ] **Step 5:** Commit (`feat(versioning): the history and revert permissions (D26, D27)`).
+- [x] **Step 1: Failing tests:** `permissions:refresh` creates both verbs for a versioned model on both guards and none for a translation model, a comment or `Version`; `select` with `history` reads the history, `select` with `revert` too, `update` alone no longer does (403); without `select` the history is refused whatever else is held; the history of a record outside the caller's ACL answers like a missing record; a cached history response is refused once `history` is revoked.
+- [x] **Step 2–4:** run and fail, implement, run.
+- [x] **Step 5:** Commit (`feat(versioning): the history and revert permissions (D26, D27)`). Core `45e36a29`. As built: the inert note has its text in the five languages; fixture `PermissionsRefreshNeverVersionedModel`; the existing "history to an editor" test now grants `history`. Not run here: run in the host app.
 
 ### Task C2: `POST /revert/{module}/{entity}`
 
@@ -185,13 +185,13 @@ module: core, ai
 **Interfaces:**
 - Produces: request body `{ id, revision: int, expected_revision: int, mode?: 'scalar'|'link'|'owned_part'|'complete' (default complete), force?: bool }`; answer 200 with the record and `meta.revert` (`revision`, `mode`, `partial`, `skipped_columns`, `skipped_subjects`), 202 with the pending request like a captured update.
 
-- [ ] **Step 1: Failing tests:** `revert` and the record's ACL are required (403 without, a record outside the ACL answers like a missing one); a stale `expected_revision` answers 409; a refused complete revert answers 422 with its reason; a missing reference answers 422, and with `force` 200 and `partial: true`; a writer needing approval gets 202 and a pending request; a record in the bin is found and stays there; the response cache of the entity is flushed by the revert.
-- [ ] **Step 2–4:** run and fail, implement, run.
-- [ ] **Step 5:** Commit (`feat(crud): the revert route`).
+- [x] **Step 1: Failing tests:** `revert` and the record's ACL are required (403 without, a record outside the ACL answers like a missing one); a stale `expected_revision` answers 409; a refused complete revert answers 422 with its reason; a missing reference answers 422, and with `force` 200 and `partial: true`; a writer needing approval gets 202 and a pending request; a record in the bin is found and stays there; the response cache of the entity is flushed by the revert.
+- [x] **Step 2–4:** run and fail, implement, run.
+- [x] **Step 5:** Commit (`feat(crud): the revert route`). Core `9b063285`. As built: the answer is `data.record` and `data.revert` (the CRUD meta is a typed object with no room for it); the record is looked up with the bin opened as `newQueryWithTrashed()` does; a locked record answers 423 through the existing mapping. The route test runs on `users`, which has neither approvals nor relations: the 202 and the missing reference are proven at the model (B2, A2). Not run here: run in the host app.
 
 ### Part C closing
 
-- [ ] Regression per suite; `Modules/Core/docs/CRUD_SYSTEM.md` (the revert route, the history permission), `Modules/Core/docs/rag/API_ACCESS_CONTROL.md` (the two verbs, `revert` implies reading the history, the operator note for roles that read the history through `update`), `VERSIONING_DEVELOPER.md` ("Read the history over HTTP").
+- [ ] Regression per suite; `Modules/Core/docs/CRUD_SYSTEM.md` (the revert route, the history permission), `Modules/Core/docs/rag/API_ACCESS_CONTROL.md` (the two verbs, `revert` implies reading the history, the operator note for roles that read the history through `update`), `VERSIONING_DEVELOPER.md` ("Read the history over HTTP"). Documentation done 2026-11-27, Core `c7822038`. Regression waits for the host app.
 
 ---
 
