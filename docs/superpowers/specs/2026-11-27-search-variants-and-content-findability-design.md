@@ -86,7 +86,8 @@ Purpose: know what people search, in which language, and how much they find.
 - **What is recorded:** one row per `(normalized query, locale, model, day)`: number of searches, number of searches that returned fewer than `low_results_threshold` hits, sum of hit counts. No user, no IP, no session.
 - **Normalization:** lowercase, trimmed, spaces collapsed, the request words of the locale removed (`SearchQueryAnalyzer::withoutRequestWords()`).
 - **What is never recorded:** a query holding a protected token as classified by `SearchQueryAnalyzer` (email, UUID, structured identifier, number).
-- **Who records:** the `/search` route only, after the response, off the request path. Queries written by the assistant or by the analysis pipeline are not recorded.
+- **Who records:** the `/search` route only, on `/app` and `/api/v1` alike, after the response, off the request path. Queries written by the assistant or by the analysis pipeline are not recorded.
+- **Whose searches:** guests and users without write permission on the searched model. Searches by a user who may write that model, the editors, are not recorded, so "searches that do not find" reflects the people looking for contents, not the people writing them. The criterion is the person, not the route, because a custom public frontend may use `/app` as well as `/api/v1`. Decided by the owner on 2026-11-27.
 - **Retention:** daily rows older than `retention_days` are deleted by a scheduled job.
 - **Settings:** `search.registry.enabled` (false), `search.registry.retention_days`, `search.registry.low_results_threshold`.
 - **Privacy review:** like the documentation RAG log, the field set is recorded in a privacy review document approved by the owner before the registry is turned on anywhere.
@@ -141,7 +142,10 @@ Purpose: know what people search, in which language, and how much they find.
 - Existing tags first, matched by slug in that locale; then new terms, marked new. Each suggestion names its sources.
 - **Saving from the content form** (calls made in this draft, section 11): the generic relation sync of Core stays as it is, ids only. The client keeps the new terms the editor picked; on save it first creates each missing tag through the existing tag write route, with the name in the form locale and the type, then saves the content with the ids. A tag is left unattached only if the content save fails after it, and it is then an ordinary shared tag.
 - Creation goes through the shared tag lookup (D5) with the name in **that** locale. The builder makes sure creation in a non-default locale respects the `(locale, slug)` identity.
-- Core contract `IWebSearchProvider` with a null implementation; AI provides drivers for official search APIs only, configured as settings with keys stored like the other AI provider keys. Which providers is left to the plan (section 9).
+- Core contract `IWebSearchProvider` with a null implementation; AI provides the drivers.
+- **Providers are data, drivers are code.** A provider is a row editable in Filament: name, driver, settings (endpoint, key stored like the other AI provider keys), enabled flag, monthly request cap. Providers can be created, edited, enabled, disabled and deleted. The tag suggestions and the variant job query every enabled provider and stop using one when its monthly cap is reached.
+- **First drivers:** Brave Search API (official, keyed) and SearXNG (a self-hosted metasearch instance, JSON format enabled). One provider of each is seeded, disabled, until a key or an address is entered. Other drivers are added as code when needed.
+- Bing, Google and DuckDuckGo are not direct drivers: the Bing Search APIs were retired on 2025-08-11, the Google Custom Search JSON API is closed to new customers and ends on 2027-01-01, and DuckDuckGo offers no web results API. They are reachable through a SearXNG instance, which queries them on behalf of the installation: the documentation states that compliance with their terms is the responsibility of whoever configures it. Decided by the owner on 2026-11-27.
 - **Settings:** `cms.tag_suggestions.enabled` (false), providers, rate limit per person.
 
 **Isolated contents.**
@@ -178,6 +182,7 @@ The job is CMS code that consumes Core contracts (registry, variants, scorer); C
 - **Plan:** the model picks or proposes perspectives (decision 5) and writes two or three queries per perspective, naming the people, places, organizations and events it relates to the request. When perspectives are configured, the first selection may be done with embeddings of their descriptions; the model is the fallback.
 - **Retrieve:** per perspective, the queries run as variants through P2 against the provider, with a cap per perspective instead of the global cap of 50. Extended contents are excluded (P0).
 - **Coverage:** a perspective with fewer than `min_per_perspective` articles gets one more round, with queries built from the entities of the articles already found. The fresh facts are in the corpus, not in the model.
+- **Anchoring in the analysis:** a hit must pass a high threshold against the perspective query that found it **and** a lower floor against the original request. Lateral angles pass (oil prices for "war in Iran"); what has nothing to do with the request stays out. Both thresholds are settings. Decided by the owner on 2026-11-27.
 - **Relevance:** before the answer, the candidates of each perspective may be filtered by the cross-encoder. Off by default and turned on only after an on/off comparison, since the cross-encoder gave no gain as a reranker.
 - **Answer:** a summary per perspective, citing only retrieved articles, then a comparison across perspectives, then the coverage summary (articles per perspective, proposed perspectives marked).
 - **Settings:** `features.analysis.enabled` (false), queries per perspective, cap per perspective, `min_per_perspective`, maximum rounds.
@@ -210,8 +215,9 @@ The job is CMS code that consumes Core contracts (registry, variants, scorer); C
 
 ## 9. Open points
 
-1. Which web search providers to support first, with their cost and terms. Official APIs only; the owner decides at plan time.
+1. Resolved: providers in P4 (Brave and SearXNG drivers, providers as editable data).
 2. The privacy review of P1 needs the owner's approval before the registry is turned on.
+3. Resolved: build order of the plans is P0, then P3 with P1 in parallel, then P2, P4, P6, P5 (owner, 2026-11-27). P3 is where keywords become tags and tags start helping text search; P1 starts early so data accumulates.
 
 ## 10. Left to the builder
 
