@@ -67,7 +67,7 @@ module: core, ai
 - Produces: `HasVersions::currentRevision(): ?int` (unchanged body), `HasVersions::revertToRevision(int $revision, int $expectedRevision, RevertMode $mode = RevertMode::Complete, bool $force = false): RevertReport`, `HasVersions::revertToVersion(int|string $versionId, int $expectedRevision): RevertReport`.
 - Produces: `RevisionReverter::revert(Model $root, int $revision, int $expectedRevision, RevertMode $mode, bool $force): RevertReport`, the only implementation, bound as a singleton.
 
-- [ ] **Step 1: Failing tests** in `RevertToRevisionTest.php`:
+- [x] **Step 1: Failing tests** in `RevertToRevisionTest.php`:
   - a scalar revert to an earlier revision restores the columns, writes one `Revert` set pointing at it, and returns its id in `revision`;
   - a stale expected revision throws `RevisionConflictException` with nothing written, on both entry points;
   - a write committed after the caller read the revision and before the revert makes it fail with a conflict (the check runs under the lock: read the revision, write through another instance, then revert);
@@ -78,10 +78,10 @@ module: core, ai
   - a revert to the current revision writes no set and returns `revision === null`;
   - with versioning off for the table, a revert throws `NOT_VERSIONED` before any write;
   - a column dropped from the table after the revision is skipped and listed in `skippedColumns`, the others are restored, and no query error escapes (schema drift, spec "Complete revert").
-- [ ] **Step 2:** Run, expect failures.
-- [ ] **Step 3: Implement.** `RevisionReverter::revert()` opens the `Revert` set through `VersionSetManagerInterface::run()` and, inside it, in this order: the lock check of D39; `currentRevision()` against `$expectedRevision`; the target set belongs to the root (`root_type`, `root_id`, `root_table_ref`); the mode's preflight (A2 to A4); only then the writes. The scalar write rebuilds `stateAsOf()` from the latest own row at or before the target, drops the keys that are not columns of the table any more (listed once per call from the schema builder), and saves with `setForcedApprovalUpdate(true)` when the model uses `HasApprovals` (B2 decides whether to get here). `revertToVersion()` resolves the row, refuses a non-null `relation_path`, and calls `revertToRevision(..., RevertMode::Scalar)`.
-- [ ] **Step 4:** Run the file, then `tests/Integration/Versioning` per file: the old callers pass an expected revision (`$model->currentRevision()`) and read a `RevertReport`.
-- [ ] **Step 5:** Record D62 in the review log. Commit (`feat(versioning): one revert implementation, every check under the root's lock (D48, D56)`).
+- [x] **Step 2:** Run, expect failures. Not run in the authoring environment (no host app, lint only): run in the host app at the Part A closing.
+- [x] **Step 3: Implement.** `RevisionReverter::revert()` opens the `Revert` set through `VersionSetManagerInterface::run()` and, inside it, in this order: the lock check of D39; `currentRevision()` against `$expectedRevision`; the target set belongs to the root (`root_type`, `root_id`, `root_table_ref`); the mode's preflight (A2 to A4); only then the writes. The scalar write rebuilds `stateAsOf()` from the latest own row at or before the target, drops the keys that are not columns of the table any more (listed once per call from the schema builder), and saves with `setForcedApprovalUpdate(true)` when the model uses `HasApprovals` (B2 decides whether to get here). `revertToVersion()` resolves the row, refuses a non-null `relation_path`, and calls `revertToRevision(..., RevertMode::Scalar)`.
+- [x] **Step 4:** Run the file, then `tests/Integration/Versioning` per file: the old callers pass an expected revision (`$model->currentRevision()`) and read a `RevertReport`.
+- [x] **Step 5:** Record D62 in the review log. Commit (`feat(versioning): one revert implementation, every check under the root's lock (D48, D56)`). Core `f0b7c087`, together with A2: `RevisionReverter` and the removal of `restoreToRevision()` span both. As built: the revision's ownership is checked before the set opens (what a set belongs to never changes); `RevertReport` also carries `restoredRelations`; the `VersionedDocument` stub's strategy is nullable (null defers to the setting) to test `NOT_VERSIONED`; `VersioningSwitchTest` reverts to the baseline in scalar mode, the stub's coverage being partial.
 
 ### Task A2: Link mode (D25, D45 rule 2)
 
@@ -94,9 +94,9 @@ module: core, ai
 - Consumes: `RevisionReverter::revert()` from A1.
 - Produces: `RevisionReverter::completeAnchorAtOrBefore(Model $root, int $revision): ?int`, the latest set of kind `baseline` (creation included) at or before the revision inside its epoch, used by A3 and A4.
 
-- [ ] **Step 1: Failing tests:** a link revert restores the membership of every `reference` relation and leaves the columns and the related records untouched; a reference deleted after the caller prepared the revert, deleted inside the lock window, throws `MissingRevertSubjectException` with nothing written (D48); with `$force` it is skipped, listed in `skippedSubjects`, and the report `isPartial()`; a revert to a revision with no complete anchor at or before it throws `NO_COMPLETE_ANCHOR` (D45 rule 2), never an empty membership.
-- [ ] **Step 2–4:** run and fail, implement the replay and the reference check inside the set, run. An `owned` descriptor is skipped by this mode.
-- [ ] **Step 5:** Commit (`feat(versioning): the link revert under the lock, refused without a complete anchor (D25, D45)`).
+- [x] **Step 1: Failing tests:** a link revert restores the membership of every `reference` relation and leaves the columns and the related records untouched; a reference deleted after the caller prepared the revert, deleted inside the lock window, throws `MissingRevertSubjectException` with nothing written (D48); with `$force` it is skipped, listed in `skippedSubjects`, and the report `isPartial()`; a revert to a revision with no complete anchor at or before it throws `NO_COMPLETE_ANCHOR` (D45 rule 2), never an empty membership.
+- [x] **Step 2–4:** run and fail, implement the replay and the reference check inside the set, run. An `owned` descriptor is skipped by this mode.
+- [x] **Step 5:** Commit: in Core `f0b7c087` with A1. As built: the membership is replayed from the anchor's image (rows from `baseline_from_sequence` in a baseline set), so a link a capture gap removed does not come back; `replaceMembership()` compares with the live pivot rows; the anchor must share the revision's epoch. Not run here: run in the host app.
 
 ### Task A3: Owned-part mode, the translations by locale
 
