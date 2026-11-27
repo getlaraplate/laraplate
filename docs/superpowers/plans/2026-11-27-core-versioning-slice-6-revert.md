@@ -140,9 +140,9 @@ module: core, ai
 - Modify (AI repository): `app/Listeners/HandleModelTranslationListener.php` (`shouldHandle()` is false when `fromRevert`)
 - Test: `Modules/Core/tests/Integration/Versioning/RevertContextTest.php` (create); `Modules/AI/tests/Feature/Listeners/HandleModelTranslationListenerTest.php` (extend)
 
-- [ ] **Step 1: Failing tests (D36):** `fromRevert` is true only inside a set of kind `Revert`; with automatic translation on, a revert of a translated model queues no `TranslateModelJob` (`Bus::fake`) while a normal save does; after a revert, also one that failed, a normal save queues the job again; the `HasTable` action still emits an event with `fromRevert = false`; the revert still dispatches `ModelRequiresIndexing` for a searchable model.
-- [ ] **Step 2–4:** run and fail, implement, run Core and AI files.
-- [ ] **Step 5:** Commit in Core (`feat(versioning): the revert context marks the translation event (D36)`) and in AI (`feat(ai): no automatic translation for a revert (D36)`).
+- [x] **Step 1: Failing tests (D36):** `fromRevert` is true only inside a set of kind `Revert`; with automatic translation on, a revert of a translated model queues no `TranslateModelJob` (`Bus::fake`) while a normal save does; after a revert, also one that failed, a normal save queues the job again; the `HasTable` action still emits an event with `fromRevert = false`; the revert still dispatches `ModelRequiresIndexing` for a searchable model.
+- [x] **Step 2–4:** run and fail, implement, run Core and AI files.
+- [x] **Step 5:** Commit in Core (`feat(versioning): the revert context marks the translation event (D36)`) and in AI (`feat(ai): no automatic translation for a revert (D36)`). Core `d60f0149`, AI `a5f109f`. As built: the event is built by `TranslatedModelSaved::ofCurrentSave()`, which reads `isRevert()` of the set in progress; the Core test checks the event inside and outside a revert set and after a failed one, the AI test that the listener queues nothing for `fromRevert`. Not covered end to end: during a revert `HasTranslations` emits no event at all in the paths tried (its `updated` handler sees no changed default translation, the translations being written after the root), so "a revert queues no `TranslateModelJob`" is proven at the listener, not through a revert. Not run here: run in the host app.
 
 ### Task B2: A revert that needs approval is one request (D26, D62)
 
@@ -153,13 +153,13 @@ module: core, ai
 **Interfaces:**
 - Produces: the request's `modifications` hold `{revision: int, expected_revision: int, mode: string, force: bool}`; its `md5` is `md5('revert|' . class . '|' . key . '|' . revision . '|' . mode)`, so asking twice for the same revert reuses the pending request.
 
-- [ ] **Step 1: Failing tests:** a writer without `approve` on an approval-gated stub gets a `RevertReport` with `isPending()` and one `revert` modification, and nothing reverted; approving it reverts the record with the stored expected revision, as one `Revert` set, with no second modification for the root's save; a record changed before the approval makes the approval throw `RevisionConflictException`, the request stays active and the vote is not stored; a superadmin, a writer holding `approve` with one approver required, and the console revert at once; a model whose `approvalOperations()` leaves out `Revert` reverts at once.
-- [ ] **Step 2–4:** run and fail, implement: the reverter checks `shouldCapture(Operation::Revert) && requiresApprovalForOperation(Operation::Revert)` before opening the set, after a cheap check of the expected revision; run.
-- [ ] **Step 5:** Commit (`feat(versioning): a revert that needs approval becomes one request (D26)`).
+- [x] **Step 1: Failing tests:** a writer without `approve` on an approval-gated stub gets a `RevertReport` with `isPending()` and one `revert` modification, and nothing reverted; approving it reverts the record with the stored expected revision, as one `Revert` set, with no second modification for the root's save; a record changed before the approval makes the approval throw `RevisionConflictException`, the request stays active and the vote is not stored; a superadmin, a writer holding `approve` with one approver required, and the console revert at once; a model whose `approvalOperations()` leaves out `Revert` reverts at once.
+- [x] **Step 2–4:** run and fail, implement: the reverter checks `shouldCapture(Operation::Revert) && requiresApprovalForOperation(Operation::Revert)` before opening the set, after a cheap check of the expected revision; run.
+- [x] **Step 5:** Commit (`feat(versioning): a revert that needs approval becomes one request (D26)`). Core `86b3520a`. As built: `HasApprovals::captureRevertRequest()` keys a request by record, revision and mode; `applyModificationChanges()` runs it through `applyApprovedRevert()`; stub `VersionedApprovalDocument`. The approvals UI shows the operation by its value, so no label was added. Not run here: run in the host app.
 
 ### Part B closing
 
-- [ ] Regression per suite, AI included; `MODULE.md` of Core (the revert and approvals, the revert context); `Modules/AI/docs/rag/MODULE.md` where automatic translation is described.
+- [ ] Regression per suite, AI included; `MODULE.md` of Core (the revert and approvals, the revert context); `Modules/AI/docs/rag/MODULE.md` where automatic translation is described. Documentation done 2026-11-27: Core `c15ea8a8` (`MODULE.md`, approvals and the revert context); AI `efaf899` in `docs/rag/MODERATION_AND_SEARCH.md` and `docs/SEARCH_AND_TRANSLATION.md`, where the listener is described (its `MODULE.md` does not describe it). Regression waits for the host app.
 
 ---
 
