@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.19.1] - 2026-11-27
+
+### 📚 Documentation
+
+- *(spec)* Db2 fork created, VCS distribution for now, closure prerequisite shipped
+- *(spec)* Db2 test environment, PUB400 reachable, no IBM i container
+- *(plan)* Db2 for i implementation plan, spec approved
+- *(plan)* Suggest the PDO extensions in the fork
+
+### ⚙️ Miscellaneous Tasks
+
+- *(modules)* Bump Core v2.2.1, CMS v1.50.3
+
 ## [1.19.0] - 2026-11-26
 
 ### 🚀 Features
