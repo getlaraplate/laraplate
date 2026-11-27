@@ -70,6 +70,8 @@ return [
                 'host' => [env('DB_HOST', '127.0.0.1')],
             ],
             'sticky' => true,
+            // The session reads and writes in UTC, like PHP: the database never applies the server timezone.
+            'timezone' => '+00:00',
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_DATABASE', 'laravel'),
             'username' => env('DB_USERNAME', 'root'),
@@ -94,6 +96,8 @@ return [
                 'host' => [env('DB_HOST', '127.0.0.1')],
             ],
             'sticky' => true,
+            // The session reads and writes in UTC, like PHP: the database never applies the server timezone.
+            'timezone' => '+00:00',
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_DATABASE', 'laravel'),
             'username' => env('DB_USERNAME', 'root'),
@@ -118,6 +122,7 @@ return [
                 'host' => [env('DB_HOST', '127.0.0.1')],
             ],
             'sticky' => true,
+            'timezone' => 'UTC',
             'port' => env('DB_PORT', '5432'),
             'database' => env('DB_DATABASE', 'laravel'),
             'username' => env('DB_USERNAME', 'root'),

@@ -32,13 +32,16 @@ A reader in Los Angeles and a reader in Rome should each see their own local tim
 - `APP_TIMEZONE` is removed and `app.timezone` is fixed to `UTC` in `config/app.php`. This supersedes the "no per-user time zone" line of `2026-10-20-aggregate-route-and-widget-tool-design.md`.
 - No display in the timezone of the event's location. The formatter accepts an explicit timezone so a later change can add it.
 - No change to how `lang` is chosen. Saving `lang` at first login is not part of this work.
-- No change of the MySQL session timezone. That is tracked separately.
 
 ## Anti-goals
 
 - Dates stored in a per-user timezone.
 - A surface that shows a date without a timezone label where the reader's zone is unknown.
 - A selector that asks every user to configure a timezone before using the product.
+
+## Storage frame
+
+The database connection is fixed to UTC as well: `timezone` is `+00:00` on `mysql` and `mariadb` and `UTC` on `pgsql` in `config/database.php`. Without it a `TIMESTAMP` column reads the UTC string in the server timezone, so an instant inside a local daylight saving gap is refused with error 1292. Rows written before this change were read in the server timezone: an installation that keeps its data re-creates it or corrects it, a fresh installation is not affected.
 
 ## Resolution order
 
@@ -85,7 +88,7 @@ Browser-only without a profile column was also considered. It cannot serve mail,
 
 ## Left to the builder
 
-- Verify in the installed Laravel 13 source that Eloquent date serialization already produces UTC with `Z`, and add a test that pins it.
+- Eloquent date serialization already produces UTC with `Z` and microseconds, for example `2025-03-30T02:45:37.000000Z`: `serializeDate()` calls Carbon `toJSON()`, which converts to UTC. `UtcContractTest` pins it.
 - Find in Filament 5 the supported global timezone and date configuration. Do not assume names from older versions.
 - Check how `CrudController` and the filter layer parse date values today, and keep existing clients that send a value without an offset working.
 - Decide the exact class names and the cookie name, following sibling files.
