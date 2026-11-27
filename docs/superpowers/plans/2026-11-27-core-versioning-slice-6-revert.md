@@ -108,9 +108,9 @@ module: core, ai
 - Consumes: `completeAnchorAtOrBefore()` from A2; `HasTranslations::translations()`, `setTranslation()`.
 - Produces: `RevisionReverter::translationsAsOf(Model $root, int $revision): array<string, array<string, mixed>>`, locale to fields, a locale whose last row up to the revision is `deleted` absent.
 
-- [ ] **Step 1: Failing tests:** a translation changed after the revision gets its fields back; one added after it is removed; one deleted after it is recreated; each change is a row of the `Revert` set on the owner (D28) and the owner's `lock_version` rises once; the root's columns are untouched; no complete anchor at or before the revision throws `NO_COMPLETE_ANCHOR`.
-- [ ] **Step 2–4:** run and fail, implement: per locale, the latest `SNAPSHOT` row at or before the revision and every later row applied forward (the rule of `stateAsOf()`), then a write or a delete through the translation model so its observer writes the row; run.
-- [ ] **Step 5:** Commit (`feat(versioning): revert the translations by locale`).
+- [x] **Step 1: Failing tests:** a translation changed after the revision gets its fields back; one added after it is removed; one deleted after it is recreated; each change is a row of the `Revert` set on the owner (D28) and the owner's `lock_version` rises once; the root's columns are untouched; no complete anchor at or before the revision throws `NO_COMPLETE_ANCHOR`.
+- [x] **Step 2–4:** run and fail, implement: per locale, the latest `SNAPSHOT` row at or before the revision and every later row applied forward (the rule of `stateAsOf()`), then a write or a delete through the translation model so its observer writes the row; run.
+- [x] **Step 5:** Commit (`feat(versioning): revert the translations by locale`). Core `b39a2d8e`. As built: each locale is written through `setTranslation()` (revives a trashed one, hands the owner over), a locale absent from the target is deleted with `recordOnHistoryOf()`; replayed from the anchor's image like the links. Not run here: run in the host app.
 
 ### Task A4: Complete mode and its availability (spec "Complete revert", D57)
 
@@ -121,13 +121,13 @@ module: core, ai
 **Interfaces:**
 - Produces: `RevisionReverter::completeRevertBlockers(Model $root, int $revision): list<string>`, the `RevertRefusedException` reasons that refuse a complete revert to that revision, empty when it may run. Read by the complete mode and, later, by the timeline.
 
-- [ ] **Step 1: Failing tests:** a complete revert restores columns, translations and links in one `Revert` set; a root with one `partial` descriptor is refused `INCOMPLETE_COVERAGE` and allowed a link revert (D57); a `best_effort` set between the anchor and the revision refuses `NOT_ATOMIC`; a revision written in another epoch than the current one refuses `EPOCH_CHANGED`; an `owned` descriptor refuses `UNSUPPORTED_RELATION`; each refusal writes nothing; a model with no translations and no registered relations gets a complete revert equal to the scalar one.
-- [ ] **Step 2–4:** run and fail, implement the blockers (coverage of every descriptor; `capture = atomic` for every set of the root from the anchor up to the revision; the revision's `epoch_id` against `VersionEpochs::currentFor()`; an anchor) and the complete mode as scalar, then owned part, then link; run.
-- [ ] **Step 5:** Commit (`feat(versioning): the complete revert, offered only when coverage, capture and epoch allow it`).
+- [x] **Step 1: Failing tests:** a complete revert restores columns, translations and links in one `Revert` set; a root with one `partial` descriptor is refused `INCOMPLETE_COVERAGE` and allowed a link revert (D57); a `best_effort` set between the anchor and the revision refuses `NOT_ATOMIC`; a revision written in another epoch than the current one refuses `EPOCH_CHANGED`; an `owned` descriptor refuses `UNSUPPORTED_RELATION`; each refusal writes nothing; a model with no translations and no registered relations gets a complete revert equal to the scalar one.
+- [x] **Step 2–4:** run and fail, implement the blockers (coverage of every descriptor; `capture = atomic` for every set of the root from the anchor up to the revision; the revision's `epoch_id` against `VersionEpochs::currentFor()`; an anchor) and the complete mode as scalar, then owned part, then link; run.
+- [x] **Step 5:** Commit (`feat(versioning): the complete revert, offered only when coverage, capture and epoch allow it`). Core `0999c11e`. As built: stubs `CoveredRelationRoot` (complete coverage, every column versioned so a column added opens an epoch) and `OwnedRelationRoot`; the success case covers columns and links, no stub has translations and links together (A3 covers the translations); a record with neither reverts completely as its columns with no anchor asked. Not run here: run in the host app.
 
 ### Part A closing
 
-- [ ] Regression per suite (Core per folder, CMS, ERP, MES, Shop); `VERSIONING_DEVELOPER.md` of Core: "Restore a model to an earlier version" rewritten for the two entry points, the modes, the report and the refusals; `MODULE.md` of Core, the versioning flow.
+- [ ] Regression per suite (Core per folder, CMS, ERP, MES, Shop); `VERSIONING_DEVELOPER.md` of Core: "Restore a model to an earlier version" rewritten for the two entry points, the modes, the report and the refusals; `MODULE.md` of Core, the versioning flow. Documentation done 2026-11-27, Core `docs(versioning): reverting to a revision`: `MODULE.md` *Reverting to a revision*, `VERSIONING_DEVELOPER.md`, `RECORD_LOCKING_DEVELOPER.md`. Regression waits for the host app.
 
 ---
 
