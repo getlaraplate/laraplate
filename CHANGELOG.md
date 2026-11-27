@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.19.2] - 2026-11-27
+
+### 💼 Other
+
+- Update subproject commits for AI, CMS, and Core modules
+
+### 📚 Documentation
+
+- *(specs)* Draft search variants and content findability design
+- *(specs)* Settle builder review points in search variants design
+- *(specs)* Record owner decisions on anchoring, registry, providers and order
+- *(plans)* Plan search eligibility, searchable tags and the search registry
+- *(plans)* Tick the finished steps and move module pointers to the fix wave
+- *(plans)* Close the search eligibility, tags and registry plan
+- *(ai)* Record the memory decision: conversation memory delivered, memory across conversations not planned
+
+### ⚙️ Miscellaneous Tasks
+
+- *(modules)* Point Core and CMS at the search eligibility and tags work
+- *(dependencies)* Update composer.lock and package-lock.json for dependency versions and remove unused packages
+- *(modules)* Bump AI v3.4.0
+- *(git)* Add .mailmap to unify author name
+
 ## [1.19.1] - 2026-11-27
 
 ### 📚 Documentation
