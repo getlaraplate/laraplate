@@ -139,7 +139,8 @@ Purpose: know what people search, in which language, and how much they find.
 - A `/app` route returns suggestions for a content in a locale. Nothing is stored until the editor accepts.
 - Sources: two or three web search providers queried with the **title only** and the locale; a model reading the title and a bounded excerpt of the text, which also proposes a type from the registry.
 - Existing tags first, matched by slug in that locale; then new terms, marked new. Each suggestion names its sources.
-- Accepting attaches an existing tag or creates one through the shared tag lookup (D5) with the name in **that** locale. The builder makes sure creation in a non-default locale respects the `(locale, slug)` identity.
+- **Saving from the content form** (calls made in this draft, section 11): the generic relation sync of Core stays as it is, ids only. The client keeps the new terms the editor picked; on save it first creates each missing tag through the existing tag write route, with the name in the form locale and the type, then saves the content with the ids. A tag is left unattached only if the content save fails after it, and it is then an ordinary shared tag.
+- Creation goes through the shared tag lookup (D5) with the name in **that** locale. The builder makes sure creation in a non-default locale respects the `(locale, slug)` identity.
 - Core contract `IWebSearchProvider` with a null implementation; AI provides drivers for official search APIs only, configured as settings with keys stored like the other AI provider keys. Which providers is left to the plan (section 9).
 - **Settings:** `cms.tag_suggestions.enabled` (false), providers, rate limit per person.
 
@@ -157,12 +158,16 @@ Purpose: know what people search, in which language, and how much they find.
 3. a term survives only if it occurs in the corpus of that model and locale and passes anchoring against the original query;
 4. survivors are stored as active variants `{query, locale, model, variant, source, evidence}` and used by P2. No human review.
 
-**Suggestions per content** (CMS). When a variant finds a content that is pertinent to the original query but the original words do not find it, the CMS stores a suggestion: add the **user's words** to that content in that locale, as a `search` tag or as an existing tag with the same slug. Each suggestion keeps the query, the locale, the evidence and a status: pending, accepted, dismissed.
+`evidence` holds numbers only: how many documents of the corpus contain the term, and the anchoring score. No snippet or result text from the provider is stored, so the design does not depend on a provider allowing results to be cached.
+
+**Suggestions per content** (CMS). Built by the **nightly job**, never on the search path. For each candidate query with active variants, the job runs the query with and without its variants. A content is **pertinent** when it passes the same anchoring scorer and threshold used at runtime (decision 3). A pertinent content found by a variant but not by the original words gets a suggestion: add the **user's words** to that content in that locale, as a `search` tag or as an existing tag with the same slug. Each suggestion keeps the query, the locale, the evidence and a status: pending, accepted, dismissed. A dismissed suggestion is not proposed again for the same query and content. Accepting on the editor page attaches the tag at once, through a CMS accept route.
+
+The job is CMS code that consumes Core contracts (registry, variants, scorer); Core never calls into the CMS.
 
 **Unanswered searches** (CMS read route). Low-result queries of the last period per locale with one of three outcomes:
 - *contents exist but are not found:* the contents and their pending suggestions;
 - *no content exists:* a content gap, an idea for a new content;
-- *a pertinent content lacks this locale:* a missing translation.
+- *a pertinent content lacks this locale:* a missing translation. Found by the nightly job with a vector search on the query restricted to the other locales, since vectors are language-agnostic, then the anchoring scorer. Without a vector profile this outcome is not computed.
 
 **Effect of a change.** For a query whose suggestion was accepted, the result counts per day before and after the acceptance, read from the registry.
 
@@ -176,6 +181,7 @@ Purpose: know what people search, in which language, and how much they find.
 - **Relevance:** before the answer, the candidates of each perspective may be filtered by the cross-encoder. Off by default and turned on only after an on/off comparison, since the cross-encoder gave no gain as a reranker.
 - **Answer:** a summary per perspective, citing only retrieved articles, then a comparison across perspectives, then the coverage summary (articles per perspective, proposed perspectives marked).
 - **Settings:** `features.analysis.enabled` (false), queries per perspective, cap per perspective, `min_per_perspective`, maximum rounds.
+- **Own switch.** The analysis uses the second fusion level of P2 through its own entry, with its own weights and caps. It does not need `search.variants.enabled`, which governs normal search only, so an evaluation of one never blocks the other.
 
 ## 6. Out of scope
 
@@ -210,3 +216,12 @@ Purpose: know what people search, in which language, and how much they find.
 ## 10. Left to the builder
 
 Table and column names, setting keys beyond the switches named here, default weights, thresholds and caps (as settings), the route names and payloads of P4 and P5, how `TagForm` merges the option lists, how Filament renders a letter in place of an icon, how the analysis mode is carried by the chat request.
+
+## 11. Calls made while writing, to check
+
+1. Suggestions per content are built by the nightly job, not at search time; "pertinent" means passing the runtime anchoring scorer and threshold.
+2. The variant table stores numbers as evidence, never provider text.
+3. "Missing translation" uses a vector search across the other locales and is skipped without a vector profile.
+4. New tags picked in the content form are created by the client just before the content save; the Core relation sync keeps taking ids only.
+5. The perspective analysis has its own switch and its own fusion settings, independent of `search.variants.enabled`.
+6. **Plans.** One plan per phase. The first plan starts with P0 unless it has already been delivered on its own. A plan closes when its parts are built, shipped off by default and documented; evaluation numbers go in its delivery status when they are run, and a pending evaluation is stated there.
